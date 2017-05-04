@@ -1,4 +1,4 @@
-package uk.gov.hmrc.rasfrontend
+package config
 
 import java.io.File
 
