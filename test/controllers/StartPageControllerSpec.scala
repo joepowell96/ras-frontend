@@ -35,7 +35,7 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
   "StartPageController" should {
 
     "respond to GET /relief-at-source/start" in {
-      val result = route(fakeApplication,FakeRequest(GET, "/relief-at-source/start"))
+      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/start"))
       status(result.get) should not equal (NOT_FOUND)
     }
 
@@ -49,6 +49,9 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
+  }
+
+  "Start page" should {
 
     "contain correct title and header" in {
       val result = TestStartPageController.get(fakeRequest)
@@ -57,17 +60,47 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
       doc.getElementById("header").text shouldBe Messages("start.page.header")
     }
 
-    "contain introduction paragraphs and help link" in {
+    "contain introduction paragraphs" in {
       val result = TestStartPageController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
 
       doc.getElementById("introduction-p1").text shouldBe Messages("introduction.paragraph.1")
       doc.getElementById("introduction-p2").text shouldBe Messages("introduction.paragraph.2")
       doc.getElementById("introduction-p3").text should startWith(Messages("introduction.paragraph.3"))
+    }
 
+    "contain introduction legislation link" in {
+      val result = TestStartPageController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
       doc.getElementById("legislation").attr("href") shouldBe "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm044220"
     }
 
+    "contain 'when to use this service' and its description" in {
+      val result = TestStartPageController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("usage-header").text shouldBe Messages("usage.header")
+      doc.getElementById("usage-subheader").text shouldBe Messages("usage.subheader")
+      doc.getElementById("usage-bullet-1").text shouldBe Messages("usage.bullet.1")
+      doc.getElementById("usage-bullet-2").text shouldBe Messages("usage.bullet.2")
+    }
+
+    "contain 'what you'll need' and its description" in {
+      val result = TestStartPageController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("what-you-need-header").text shouldBe Messages("what.you.need.header")
+      doc.getElementById("what-you-need-subheader").text shouldBe Messages("what.you.need.subheader")
+      doc.getElementById("what-you-need-bullet-1").text shouldBe Messages("what.you.need.bullet.1")
+      doc.getElementById("what-you-need-bullet-2").text shouldBe Messages("what.you.need.bullet.2")
+      doc.getElementById("what-you-need-bullet-3").text shouldBe Messages("what.you.need.bullet.3")
+      doc.getElementById("what-you-need-bullet-4").text shouldBe Messages("what.you.need.bullet.4")
+      doc.getElementById("what-you-need-post-bullet").text should startWith(Messages("what.you.need.post.bullet"))
+    }
+
+    "contain relief at source guidance link" in {
+      val result = TestStartPageController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("ras-guidance").attr("href") shouldBe "https://www.google.uk/"
+    }
 
 
   }
