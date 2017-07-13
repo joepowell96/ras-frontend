@@ -60,9 +60,12 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
     "contain introduction paragraphs and help link" in {
       val result = TestStartPageController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
+
       doc.getElementById("introduction-p1").text shouldBe Messages("introduction.paragraph.1")
       doc.getElementById("introduction-p2").text shouldBe Messages("introduction.paragraph.2")
-      doc.getElementById("introduction-p3").text shouldBe Messages("introduction.paragraph.3")
+      doc.getElementById("introduction-p3").text should startWith(Messages("introduction.paragraph.3"))
+
+      doc.getElementById("legislation").attr("href") shouldBe "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm044220"
     }
 
 
