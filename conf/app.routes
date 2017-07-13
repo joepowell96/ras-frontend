@@ -1,3 +1,5 @@
 # microservice specific routes
 
-GET        /hello-world             controllers.HelloWorldController.helloWorld
+GET         /assets/*file     @controllers.AssetsController.at(path="/public", file)
+
+GET         /start             controllers.StartPageController.get

@@ -16,20 +16,7 @@
 
 package controllers
 
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import com.google.inject.Inject
+import play.api.http.HttpErrorHandler
 
-import scala.concurrent.Future
-
-
-object HelloWorldController extends HelloWorldController
-
-trait HelloWorldController extends FrontendController {
-
-  def helloWorld = Action.async { implicit request =>
-		Future.successful(Ok(views.html.hello_world()))
-  }
-
-}
+class AssetsController @Inject()(errorHandler: HttpErrorHandler) extends AssetsBuilder(errorHandler)

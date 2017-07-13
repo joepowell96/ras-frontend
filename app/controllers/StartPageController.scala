@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit request: Request[_], messages: Messages)
+package controllers
 
-@views.html.main_template(title = "Hello from ras-frontend", bodyClasses = None) {
-    <h1>Hello from ras-frontend !</h1>
+import play.api.mvc._
+import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+
+import scala.concurrent.Future
+
+
+object StartPageController extends StartPageController
+
+trait StartPageController extends FrontendController {
+
+  def get = Action.async { implicit request =>
+		Future.successful(Ok(views.html.start_page()))
+  }
+
 }
