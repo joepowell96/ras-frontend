@@ -99,10 +99,15 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
     "contain relief at source guidance link" in {
       val result = TestStartPageController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.getElementById("ras-guidance").attr("href") shouldBe "https://www.google.uk/"
+      doc.getElementById("ras-guidance").attr("href") shouldBe "https://www.gov.uk/guidance/pension-administrators-reclaim-tax-relief-using-relief-at-source"
     }
 
-
+    "contain a start button pointing to find member details page" in {
+      val result = TestStartPageController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("start").text shouldBe Messages("start")
+      doc.getElementById("start").attr("href") shouldBe "/relief-at-source/member-details"
+    }
   }
 
 

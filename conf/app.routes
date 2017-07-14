@@ -1,5 +1,7 @@
 # microservice specific routes
 
-GET         /assets/*file     @controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                 @controllers.AssetsController.at(path="/public", file)
 
-GET         /start             controllers.StartPageController.get
+GET         /start                        controllers.StartPageController.get
+
+GET         /member-details               controllers.MemberDetailsController.get
