@@ -105,7 +105,7 @@ class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
     "contain a start button pointing to find member details page" in {
       val result = TestStartPageController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.getElementById("start").text shouldBe Messages("start")
+      doc.getElementById("start").text shouldBe Messages("start.now")
       doc.getElementById("start").attr("href") shouldBe "/relief-at-source/member-details"
     }
   }
