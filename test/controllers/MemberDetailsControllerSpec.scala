@@ -16,12 +16,15 @@
 
 package controllers
 
+import helpers.helpers.I18nHelper
+import org.jsoup.Jsoup
 import play.api.http.Status
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentType, _}
+import play.api.test.Helpers.{contentAsString, contentType, _}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication {
+
+class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
 
   val fakeRequest = FakeRequest("GET", "/")
 
@@ -43,6 +46,16 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication {
       val result = TestMemberDetailsController.get(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
+    }
+  }
+
+  "Find member details page" should {
+
+    "contain correct title and header" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.title shouldBe Messages("member.details.page.title")
+      doc.getElementById("header").text shouldBe Messages("member.details.page.header")
     }
   }
 }

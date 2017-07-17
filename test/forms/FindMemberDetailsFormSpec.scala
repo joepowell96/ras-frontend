@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-package controllers
+package forms
 
-import config.RasContextImpl
 import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import scala.concurrent.Future
+import uk.gov.hmrc.play.test.UnitSpec
 
-object MemberDetailsController extends MemberDetailsController
+class FindMemberDetailsFormSpec extends UnitSpec with I18nHelper {
 
-trait MemberDetailsController extends FrontendController with I18nHelper {
-
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-    Future.successful(Ok(views.html.find_member_details()))
-  }
 }

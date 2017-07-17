@@ -26,3 +26,6 @@ start.now=Start now
 #----------------------------------------------
 
 find.member.details=Find member details
+
+member.details.page.title=Find member details - GOV.UK
+member.details.page.header=Find member details
