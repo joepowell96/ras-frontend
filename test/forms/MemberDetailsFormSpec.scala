@@ -16,9 +16,27 @@
 
 package forms
 
+import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
-class FindMemberDetailsFormSpec extends UnitSpec with I18nHelper {
+class MemberDetailsFormSpec extends UnitSpec with I18nHelper {
+
+  "Find member derails form" should {
+
+    "return no error when valid data is entered" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB123456C",
+        "dateOfBirth" -> "1989-09-29"
+      )
+
+      val validatedForm = form.bind(formData)
+    }
+
+  }
 
 }
