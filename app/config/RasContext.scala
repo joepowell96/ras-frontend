@@ -22,13 +22,9 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import scala.concurrent.Future
 
 trait RasContext {
-
   def getPageHelpPartial()(implicit hc: HeaderCarrier): Future[String]
-
 }
 
 case object RasContextImpl extends RasContext {
-
   override def getPageHelpPartial()(implicit hc: HeaderCarrier): Future[String] = ContactFrontendConnector.getHelpPartial
-
 }
