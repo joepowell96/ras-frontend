@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers
+@import uk.gov.hmrc.play.http.HeaderCarrier
+@import connectors._
+@import scala.concurrent.Await
+@import scala.concurrent.duration._
 
-import play.api.mvc._
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+@(supportLinkEnabled: Boolean)(implicit request: Request[_], context: config.RasContext)
 
-import scala.concurrent.Future
-
-
-object HelloWorldController extends HelloWorldController
-
-trait HelloWorldController extends FrontendController {
-
-  def helloWorld = Action.async { implicit request =>
-		Future.successful(Ok(views.html.hello_world()))
-  }
-
+@if(supportLinkEnabled) {
+    @Html(Await.result(context.getPageHelpPartial()(HeaderCarrier.fromHeadersAndSession(request.headers)), 5 seconds))
 }

@@ -14,15 +14,24 @@
  * limitations under the License.
  *@
 
-@(title: String,
+@import uk.gov.hmrc.play.http.HeaderCarrier
+@import scala.concurrent.ExecutionContext
+@import uk.gov.hmrc.play.views.html.layouts
+
+@(appConfig: config.ApplicationConfig = config.ApplicationConfig,
+  title: String,
   sidebarLinks: Option[Html] = None,
   contentHeader: Option[Html] = None,
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
-  scriptElem: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+  scriptElem: Option[Html] = None,
+  supportLinkEnabled: Boolean = true,
+  linkElement : Option[Html] = None)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
 
-@import uk.gov.hmrc.play.views.html.layouts
 
+@getHelpForm = {
+  @includes.report_problem(supportLinkEnabled)
+}
 
 @serviceInfoContent = {}
 
@@ -32,14 +41,19 @@
     }
 }
 
+@linkElement = {
+  <link rel="stylesheet" href='@controllers.routes.AssetsController.at("stylesheets/ras.css")'/>
+}
 
-@govuk_wrapper(appConfig = config.FrontendAppConfig,
+@govuk_wrapper(applicationConfig = config.ApplicationConfig,
                title = title,
                mainClass = mainClass,
                bodyClasses = bodyClasses,
                sidebar = sidebar,
+               getHelpForm = getHelpForm,
                contentHeader = contentHeader,
                mainContent = layouts.article(mainContent),
                serviceInfoContent = serviceInfoContent,
-               scriptElem = scriptElem
+               scriptElem = scriptElem,
+               linkElement = Some(linkElement)
 )

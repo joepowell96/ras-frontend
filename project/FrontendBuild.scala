@@ -11,6 +11,9 @@ object FrontendBuild extends Build with MicroService {
 
   override lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 
+  private val scalatestPlusPlayVersion = "1.5.1"
+  private val mockitoCoreVersion = "1.9.5"
+
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "frontend-bootstrap" % "7.23.0",
@@ -28,7 +31,9 @@ object FrontendBuild extends Build with MicroService {
     "org.scalatest" %% "scalatest" % "2.2.6" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
     "org.jsoup" % "jsoup" % "1.8.1" % scope,
-    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+    "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+    "org.scalatestplus.play" %% "scalatestplus-play" % scalatestPlusPlayVersion % scope,
+    "org.mockito" % "mockito-core" % mockitoCoreVersion %scope
   )
 
 }

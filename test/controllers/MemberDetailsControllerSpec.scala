@@ -16,31 +16,22 @@
 
 package controllers
 
-import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-
-class HelloWorldControllerSpec extends UnitSpec with WithFakeApplication{
+class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication {
 
   val fakeRequest = FakeRequest("GET", "/")
 
+  object TestMemberDetailsController extends MemberDetailsController
 
-  "GET /" should {
-    "return 200" in {
-      val result = HelloWorldController.helloWorld(fakeRequest)
-      status(result) shouldBe Status.OK
+  "MemberDetailsController" should {
+
+    "respond to GET /relief-at-source/member-details" in {
+      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/member-details"))
+      status(result.get) should not equal (NOT_FOUND)
     }
-
-    "return HTML" in {
-      val result = HelloWorldController.helloWorld(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-    }
-
 
   }
-
-
 }

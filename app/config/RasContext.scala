@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit request: Request[_], messages: Messages)
+package config
 
-@views.html.main_template(title = "Hello from ras-frontend", bodyClasses = None) {
-    <h1>Hello from ras-frontend !</h1>
+import connectors.ContactFrontendConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.concurrent.Future
+
+trait RasContext {
+  def getPageHelpPartial()(implicit hc: HeaderCarrier): Future[String]
+}
+
+case object RasContextImpl extends RasContext {
+  override def getPageHelpPartial()(implicit hc: HeaderCarrier): Future[String] = ContactFrontendConnector.getHelpPartial
 }
