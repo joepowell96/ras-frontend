@@ -2,6 +2,7 @@
 
 GET         /assets/*file                 @controllers.AssetsController.at(path="/public", file)
 
+GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
 
 GET         /member-details               controllers.MemberDetailsController.get

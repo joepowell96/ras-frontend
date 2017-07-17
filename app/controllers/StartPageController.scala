@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.RasContextImpl
 import play.api.mvc._
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import play.api.Play.current
@@ -27,6 +28,8 @@ import scala.concurrent.Future
 object StartPageController extends StartPageController
 
 trait StartPageController extends FrontendController {
+
+  implicit val context: config.RasContext = RasContextImpl
 
   def get = Action.async { implicit request =>
 		Future.successful(Ok(views.html.start_page()))

@@ -14,17 +14,18 @@
  * limitations under the License.
  *@
 
-@(appConfig: config.AppConfig,
-  title: String,
-  mainClass: Option[String] = None,
-  mainDataAttributes: Option[Html] = None,
-  bodyClasses: Option[String] = None,
-  sidebar: Html = HtmlFormat.empty,
-  contentHeader: Option[Html] = None,
-  mainContent: Html = HtmlFormat.empty,
-  serviceInfoContent: Html = HtmlFormat.empty,
-  scriptElem: Option[Html] = None,
-  linkElement : Option[Html] = None)(implicit request: Request[_], messages: Messages)
+@(applicationConfig: config.ApplicationConfig,
+    title: String,
+    mainClass: Option[String] = None,
+    mainDataAttributes: Option[Html] = None,
+    bodyClasses: Option[String] = None,
+    sidebar: Html = HtmlFormat.empty,
+    contentHeader: Option[Html] = None,
+    mainContent: Html = HtmlFormat.empty,
+    serviceInfoContent: Html = HtmlFormat.empty,
+    scriptElem: Option[Html] = None,
+    linkElement : Option[Html] = None,
+    getHelpForm: Html  = HtmlFormat.empty)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import layouts.{govuk_template => hmrcGovUkTemplate}
 @import uk.gov.hmrc.play.views.html.{layouts => uiLayouts}
@@ -54,8 +55,8 @@
 
 @bodyEnd = {
     @uiLayouts.footer(
-      analyticsToken = Some(appConfig.analyticsToken),
-      analyticsHost = appConfig.analyticsHost,
+      analyticsToken = Some(applicationConfig.analyticsToken),
+      analyticsHost = applicationConfig.analyticsHost,
       ssoUrl = None,
       scriptElem = scriptElem,
       gaCalls = None)
@@ -76,8 +77,6 @@
         @uiLayouts.main_content_header(contentHeader = contentHeader.get)
     }
 }
-
-@getHelpForm = @{uiHelpers.reportAProblemLink(appConfig.reportAProblemPartialUrl, appConfig.reportAProblemNonJSUrl)}
 
 
 @content = {

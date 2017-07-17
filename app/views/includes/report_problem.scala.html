@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
+@import uk.gov.hmrc.play.http.HeaderCarrier
+@import connectors._
+@import scala.concurrent.Await
+@import scala.concurrent.duration._
 
-@contentHeader = {
-<h1>@heading</h1>
+@(supportLinkEnabled: Boolean)(implicit request: Request[_], context: config.RasContext)
+
+@if(supportLinkEnabled) {
+    @Html(Await.result(context.getPageHelpPartial()(HeaderCarrier.fromHeadersAndSession(request.headers)), 5 seconds))
 }
-
-@mainContent = {
-<p>@message</p>
-}
-
