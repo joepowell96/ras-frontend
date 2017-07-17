@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package controllers
+@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
-import config.RasContextImpl
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
 
-import scala.concurrent.Future
+@ras_main(title = Messages("find.member.details")) {
 
-object MemberDetailsController extends MemberDetailsController
 
-trait MemberDetailsController extends FrontendController{
 
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-    Future.successful(Ok(views.html.find_member_details()))
-  }
 }
