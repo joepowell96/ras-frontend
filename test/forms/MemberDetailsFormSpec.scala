@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberDetailsFormSpec extends UnitSpec with I18nHelper {
 
-  "Find member derails form" should {
+  "Find member details form" should {
 
     "return no error when valid data is entered" in {
 
@@ -35,6 +35,8 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper {
       )
 
       val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
     }
 
   }
