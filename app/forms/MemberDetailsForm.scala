@@ -20,15 +20,45 @@ import helpers.helpers.I18nHelper
 import models.{MemberDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import validators.NinoValidator
 
 object MemberDetailsForm extends I18nHelper{
+
+  val MAX_LENGTH = 99
+  val NAME_REGEX = "^[a-zA-Z][a-zA-z\\s|'|-]*$"
+  val NINO_SUFFIX_REGEX = "[A-D]"
+  val TEMP_NINO = "TN"
+  val YEAR_FIELD_LENGTH: Int = 4
+
+  val ninoConstraint : Constraint[String] = Constraint("constraints.nino") ({
+    text =>
+      val ninoText = text.replaceAll("\\s", "")
+      if (ninoText.length == 0){
+        Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("nino")))))
+      }
+      else if (ninoText.toUpperCase().startsWith(TEMP_NINO)){
+        Invalid(Seq(ValidationError(Messages("error.nino.temporary"))))
+      }
+      else if (!NinoValidator.isValid(ninoText.toUpperCase())){
+        Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
+      }
+      else if (!ninoText.takeRight(1).toUpperCase().matches(NINO_SUFFIX_REGEX)){
+        Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
+      }
+      else {
+        Valid
+      }
+  })
 
   val form = Form(
     mapping(
       "firstName" -> text
         .verifying(Messages("error.mandatory", Messages("first.name")), _.length > 0),
-      "lastName" -> text,
-      "nino" -> text,
+      "lastName" -> text
+        .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0),
+      "nino" -> text
+        .verifying(ninoConstraint),
       "dateOfBirth" -> mapping(
         "day" -> optional(text),
         "month" -> optional(text),

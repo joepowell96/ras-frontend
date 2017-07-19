@@ -44,3 +44,5 @@ dob.hint=For example, 21 2 1983
 nino.hint=For example, 'QQ 12 34 56 C'
 
 error.mandatory = Enter a {0}
+
+error.nino.invalid = The National Insurance number you have entered is not valid. Check it and try again.

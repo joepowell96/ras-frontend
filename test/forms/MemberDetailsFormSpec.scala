@@ -18,12 +18,16 @@ package forms
 
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
+import models.RasDate
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.FormError
+import play.api.i18n.Messages
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite{
+
+  val dateOfBirth = RasDate(Some("1"),Some("1"),Some("1984"))
 
   "Find member details form" should {
 
@@ -33,7 +37,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> "AB123456C",
-        "dateOfBirth" -> "1989-09-29"
+        "dateOfBirth" -> dateOfBirth
       )
 
       val validatedForm = form.bind(formData)
@@ -47,11 +51,51 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "",
         "lastName" -> "Esfandiari",
         "nino" -> "AB123456C",
-        "dateOfBirth" -> "1989-09-29"
+        "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
 
       assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.mandatory", Messages("first.name"))))))
+    }
+
+    "return an error when last name field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "",
+        "nino" -> "AB123456C",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.mandatory", Messages("last.name"))))))
+    }
+
+    "return an error when nino field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "",
+        "nino" -> "",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.mandatory", Messages("nino"))))))
+    }
+
+    "return an error when invalid" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "QQ322312B",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.invalid")))))
+      assert(!validatedForm.errors.contains(FormError("nino", List(Messages("error.mandatory")))))
     }
 
   }
