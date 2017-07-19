@@ -73,10 +73,6 @@ class NinoValidatorSpec extends UnitSpec with Matchers {
       validateNino("AB123456E") should equal(false)
     }
 
-    "fail with missing suffix" in {
-      validateNino("AB123456") should equal(false)
-    }
-
     "pass with 'KC' prefixed NINO" in {
       validateNino("KC000000A") should equal(true)
     }

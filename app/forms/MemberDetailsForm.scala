@@ -37,13 +37,7 @@ object MemberDetailsForm extends I18nHelper{
       if (ninoText.length == 0){
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("nino")))))
       }
-      else if (ninoText.toUpperCase().startsWith(TEMP_NINO)){
-        Invalid(Seq(ValidationError(Messages("error.nino.temporary"))))
-      }
       else if (!NinoValidator.isValid(ninoText.toUpperCase())){
-        Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
-      }
-      else if (!ninoText.takeRight(1).toUpperCase().matches(NINO_SUFFIX_REGEX)){
         Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
       }
       else {

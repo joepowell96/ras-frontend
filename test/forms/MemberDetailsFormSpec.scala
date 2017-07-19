@@ -84,12 +84,26 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.mandatory", Messages("nino"))))))
     }
 
-    "return an error when invalid" in {
+    "return an error when invalid nino is passed" in {
 
       val formData = Json.obj(
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> "QQ322312B",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.invalid")))))
+      assert(!validatedForm.errors.contains(FormError("nino", List(Messages("error.mandatory")))))
+    }
+
+    "return an error when invalid nino suffix is passed" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB322312E",
         "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
