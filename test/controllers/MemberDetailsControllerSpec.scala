@@ -57,5 +57,15 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc.title shouldBe Messages("member.details.page.title")
       doc.getElementById("header").text shouldBe Messages("member.details.page.header")
     }
+
+    "contain correct field labels" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("first-name").text shouldBe Messages("first.name")
+      doc.getElementById("last-name").text shouldBe Messages("last.name")
+      doc.getElementById("ninol").text shouldBe Messages("nino")
+      doc.getElementById("dob-label").text shouldBe Messages("dob")
+      doc.getElementById("continue").text shouldBe Messages("continue")
+    }
   }
 }

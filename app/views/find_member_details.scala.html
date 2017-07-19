@@ -14,13 +14,52 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(memberDetailsForm: Form[models.MemberDetails])(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.helpers._
 
 @ras_main(title = Messages("member.details.page.title")) {
 
-  <h1 id="header" class="heading-xlarge">@Messages("member.details.page.header")</h1>
+ <div class="grid-row">
+
+  <div class="column-full">
+
+   <h1 id="header" class="heading-xlarge">@Messages("member.details.page.header")</h1>
+
+     @form(action = routes.MemberDetailsController.get) {
+
+       <div class="form-group">
+
+        @rasInput(memberDetailsForm("firstName"),
+        '_label -> Html(Messages("first.name")),
+        '_labelClass -> "form-label-bold",
+        '_id -> "first-name",
+        '_maxLength -> 35)
+
+        @rasInput(memberDetailsForm("lastName"),
+        '_label -> Html(Messages("last.name")),
+        '_labelClass -> "form-label-bold",
+        '_id -> "last-name",
+        '_maxLength -> 35)
+
+        @rasInput(memberDetailsForm("nino"),
+        '_label -> Html(Messages("nino")),
+        '_labelClass -> "form-label-bold",
+        '_id -> "nino",
+        '_maxLength -> 9)
+
+       </div>
+
+       <div>
+        <button class="button" type="submit" id="continue">@Messages("continue")</button>
+       </div>
+     }
+
+
+  </div>
+
+ </div>
 
 }

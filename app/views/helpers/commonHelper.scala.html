@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package forms
+@(field: Field,errors: Seq[FormError])(implicit messages: Messages)
 
-import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate}
-import play.api.data.Form
-import play.api.data.Forms._
-
-object MemberDetailsForm extends I18nHelper{
-
-  val form = Form(
-    mapping(
-      "nino" -> text,
-      "firstName" -> text,
-      "lastName" -> text,
-      "dateOfBirth" -> mapping(
-        "day" -> optional(text),
-        "month" -> optional(text),
-        "year" -> optional(text)
-      )(RasDate.apply)(RasDate.unapply))
-    (MemberDetails.apply)(MemberDetails.unapply)
-  )
+@errors.zipWithIndex.map { case (error, index) =>
+<span class="error-notification"
+      role="tooltip"
+      data-journey="gmp:error:@field.name"
+      id="@(field.name)-error-@index">
+                    @Messages(error.message)
+                </span>
 }

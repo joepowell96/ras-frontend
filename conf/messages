@@ -22,6 +22,7 @@ what.you.need.post.bullet=You are unable to search for a member if no national i
 relief.at.source.guidance=relief at source guidance
 
 start.now=Start now
+continue=Continue
 
 #----------------------------------------------
 
@@ -29,3 +30,8 @@ find.member.details=Find member details
 
 member.details.page.title=Find member details - GOV.UK
 member.details.page.header=Find member details
+
+first.name=First name
+last.name=Last name
+nino=National Insurance number
+dob=Date of birth
