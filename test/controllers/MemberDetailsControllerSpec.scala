@@ -61,11 +61,33 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "contain correct field labels" in {
       val result = TestMemberDetailsController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.getElementById("first-name").text shouldBe Messages("first.name")
-      doc.getElementById("last-name").text shouldBe Messages("last.name")
-      doc.getElementById("ninol").text shouldBe Messages("nino")
-      doc.getElementById("dob-label").text shouldBe Messages("dob")
+      doc.getElementById("first-name_label").text shouldBe Messages("first.name")
+      doc.getElementById("last-name_label").text shouldBe Messages("last.name")
+      doc.getElementById("nino_label").text shouldBe Messages("nino")
+      doc.getElementById("dob-legend").text shouldBe Messages("dob")
+    }
+
+    "contain correct input fields" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      assert(doc.getElementById("first-name").attr("input") != null)
+      assert(doc.getElementById("last-name").attr("input") != null)
+      assert(doc.getElementById("nino").attr("input") != null)
+    }
+
+    "contain continue button" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
       doc.getElementById("continue").text shouldBe Messages("continue")
     }
+
+    "contain a date field" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("dob-day_label").text shouldBe Messages("day")
+      doc.getElementById("dob-month_label").text shouldBe Messages("month")
+      doc.getElementById("dob-year_label").text shouldBe Messages("year")
+    }
   }
+
 }

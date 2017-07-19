@@ -50,6 +50,39 @@
         '_id -> "nino",
         '_maxLength -> 9)
 
+
+        <fieldset>
+
+          <legend id="dob">
+           <span class="form-label-bold" id="dob-legend">@Messages("dob")</span>
+          </legend>
+
+          <div class="form-date">
+             <div class="dob-field">
+              @rasInput(memberDetailsForm("dateOfBirth.day"),
+               '_label -> Html(Messages("day")),
+               '_id -> "dob-day",
+               '_maxLength -> 2)
+             </div>
+
+             <div class="dob-field">
+                @rasInput(memberDetailsForm("dateOfBirth.month"),
+                '_label -> Html(Messages("month")),
+                '_id -> "dob-month",
+                '_maxLength -> 2)
+              </div>
+
+              <div class="dob-field">
+                @rasInput(memberDetailsForm("dateOfBirth.year"),
+                '_label -> Html(Messages("year")),
+                '_id -> "dob-year",
+                '_maxLength ->4,
+                '_inputClass -> " form-control year-input")
+              </div>
+          </div>
+
+        </fieldset>
+
        </div>
 
        <div>

@@ -10,3 +10,8 @@
 .heading-medium{
   margin: 0px;
 }
+
+.dob-field{
+  display: inline-block;
+  margin-bottom: 0px;
+}
