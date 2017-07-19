@@ -34,28 +34,28 @@
 
         @rasInput(memberDetailsForm("firstName"),
         '_label -> Html(Messages("first.name")),
-        '_labelClass -> "form-label-bold",
+        '_labelClass -> "form-label",
         '_id -> "first-name",
         '_maxLength -> 35)
 
         @rasInput(memberDetailsForm("lastName"),
         '_label -> Html(Messages("last.name")),
-        '_labelClass -> "form-label-bold",
+        '_labelClass -> "form-label",
         '_id -> "last-name",
         '_maxLength -> 35)
 
         @rasInput(memberDetailsForm("nino"),
         '_label -> Html(Messages("nino")),
-        '_labelClass -> "form-label-bold",
+        '_labelClass -> "form-label",
         '_id -> "nino",
-        '_maxLength -> 9)
+        '_maxLength -> 9,
+        '_hintText -> Messages("nino.hint"))
 
 
         <fieldset>
 
-          <legend id="dob">
-           <span class="form-label-bold" id="dob-legend">@Messages("dob")</span>
-          </legend>
+          <legend  id="dob-legend">@Messages("dob")</legend>
+          <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
 
           <div class="form-date">
              <div class="dob-field">

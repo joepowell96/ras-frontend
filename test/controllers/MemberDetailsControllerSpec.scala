@@ -63,7 +63,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       val doc = Jsoup.parse(contentAsString(result))
       doc.getElementById("first-name_label").text shouldBe Messages("first.name")
       doc.getElementById("last-name_label").text shouldBe Messages("last.name")
-      doc.getElementById("nino_label").text shouldBe Messages("nino")
+      doc.getElementById("nino_label").text should include(Messages("nino"))
       doc.getElementById("dob-legend").text shouldBe Messages("dob")
     }
 
@@ -87,6 +87,13 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc.getElementById("dob-day_label").text shouldBe Messages("day")
       doc.getElementById("dob-month_label").text shouldBe Messages("month")
       doc.getElementById("dob-year_label").text shouldBe Messages("year")
+    }
+
+    "contain hint text for national insurance and date of birth fields" in {
+      val result = TestMemberDetailsController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.getElementById("nino_hint").text shouldBe Messages("nino.hint")
+      doc.getElementById("dob_hint").text shouldBe Messages("dob.hint")
     }
   }
 
