@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package forms
+package validators
 
-import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate}
-import play.api.data.Form
-import play.api.data.Forms._
+import uk.gov.hmrc.domain.Nino
 
-object MemberDetailsForm extends I18nHelper{
-
-  val form = Form(
-    mapping(
-      "firstName" -> text
-        .verifying(Messages("error.mandatory", Messages("firstName")), _.length > 0),
-      "lastName" -> text,
-      "nino" -> text,
-      "dateOfBirth" -> mapping(
-        "day" -> optional(text),
-        "month" -> optional(text),
-        "year" -> optional(text)
-      )(RasDate.apply)(RasDate.unapply))
-    (MemberDetails.apply)(MemberDetails.unapply)
-  )
+trait Validator {
+  def isValid(value: String): Boolean
 }
+
+object NinoValidator extends Validator {
+  override def isValid(nino: String): Boolean = Nino.isValid(nino.replaceAll("\\s", "").toUpperCase)
+}
+
+
+
+
+
+
 
 

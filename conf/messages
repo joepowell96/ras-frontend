@@ -31,14 +31,16 @@ find.member.details=Find member details
 member.details.page.title=Find member details - GOV.UK
 member.details.page.header=Find member details
 
-first.name=First name
-last.name=Last name
+first.name=first name
+last.name=last name
 nino=National Insurance number
-dob=Date of birth
+dob=date of birth
 
-day=Day
-month=Month
-year=Year
+day=day
+month=month
+year=year
 
 dob.hint=For example, 21 2 1983
 nino.hint=For example, 'QQ 12 34 56 C'
+
+error.mandatory = Enter a {0}

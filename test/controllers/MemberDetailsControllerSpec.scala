@@ -61,10 +61,10 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "contain correct field labels" in {
       val result = TestMemberDetailsController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.getElementById("first-name_label").text shouldBe Messages("first.name")
-      doc.getElementById("last-name_label").text shouldBe Messages("last.name")
+      doc.getElementById("first-name_label").text shouldBe Messages("first.name").capitalize
+      doc.getElementById("last-name_label").text shouldBe Messages("last.name").capitalize
       doc.getElementById("nino_label").text should include(Messages("nino"))
-      doc.getElementById("dob-legend").text shouldBe Messages("dob")
+      doc.getElementById("dob-legend").text shouldBe Messages("dob").capitalize
     }
 
     "contain correct input fields" in {

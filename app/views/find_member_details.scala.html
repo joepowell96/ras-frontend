@@ -33,13 +33,13 @@
        <div class="form-group">
 
         @rasInput(memberDetailsForm("firstName"),
-        '_label -> Html(Messages("first.name")),
+        '_label -> Html(Messages("first.name").capitalize),
         '_labelClass -> "form-label",
         '_id -> "first-name",
         '_maxLength -> 35)
 
         @rasInput(memberDetailsForm("lastName"),
-        '_label -> Html(Messages("last.name")),
+        '_label -> Html(Messages("last.name").capitalize),
         '_labelClass -> "form-label",
         '_id -> "last-name",
         '_maxLength -> 35)
@@ -54,7 +54,7 @@
 
         <fieldset>
 
-          <legend  id="dob-legend">@Messages("dob")</legend>
+          <legend  id="dob-legend">@Messages("dob").capitalize</legend>
           <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
 
           <div class="form-date">

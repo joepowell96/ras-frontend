@@ -18,10 +18,12 @@ package forms
 
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
+import org.scalatestplus.play.OneAppPerSuite
+import play.api.data.FormError
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
-class MemberDetailsFormSpec extends UnitSpec with I18nHelper {
+class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite{
 
   "Find member details form" should {
 
@@ -37,6 +39,19 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper {
       val validatedForm = form.bind(formData)
 
       assert(validatedForm.errors.isEmpty)
+    }
+
+    "return an error when first name field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB123456C",
+        "dateOfBirth" -> "1989-09-29"
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.mandatory", Messages("first.name"))))))
     }
 
   }
