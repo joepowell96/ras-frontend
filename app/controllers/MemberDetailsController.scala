@@ -31,6 +31,19 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
   implicit val context: config.RasContext = RasContextImpl
 
   def get = Action.async { implicit request =>
-    Future.successful(Ok(views.html.find_member_details(form)))
+    Future.successful(Ok(views.html.member_details(form)))
+  }
+
+  def post = Action.async { implicit request =>
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Future.successful(BadRequest(views.html.member_details(formWithErrors)))
+      },
+      memberDetails => {
+        Future.successful(SeeOther("poipoipowie"))
+      }
+    )
+
   }
 }

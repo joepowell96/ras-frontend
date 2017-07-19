@@ -16,10 +16,13 @@
 
 package controllers
 
+import helpers.RandomNino
 import helpers.helpers.I18nHelper
+import models.{MemberDetails, RasDate}
 import org.jsoup.Jsoup
 import play.api.http.Status
-import play.api.test.FakeRequest
+import play.api.libs.json.Json
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -96,5 +99,26 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc.getElementById("dob_hint").text shouldBe Messages("dob.hint")
     }
   }
+
+  "Member details controller form submission" should {
+
+    "respond to POST /relief-at-source/member-details" in {
+      val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-details"))
+      status(result.get) should not equal (NOT_FOUND)
+    }
+
+    "redirect" in {
+
+        val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate(Some("1"),Some("1"),Some("1984")))
+        val formData = Json.obj(
+          "firstName" -> "Ramin",
+          "lastName" -> "Esfandiari",
+          "nino" -> RandomNino.generate,
+          "dateOfBirth" -> "1984-1-1"
+        )
+        val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
+        status(result) should equal(SEE_OTHER)
+      }
+    }
 
 }

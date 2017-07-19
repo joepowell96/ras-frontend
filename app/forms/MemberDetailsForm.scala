@@ -26,7 +26,7 @@ object MemberDetailsForm extends I18nHelper{
   val form = Form(
     mapping(
       "firstName" -> text
-        .verifying(Messages("error.mandatory", Messages("firstName")), _.length > 0),
+        .verifying(Messages("error.mandatory", Messages("first.name")), _.length > 0),
       "lastName" -> text,
       "nino" -> text,
       "dateOfBirth" -> mapping(
