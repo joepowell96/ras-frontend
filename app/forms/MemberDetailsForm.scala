@@ -85,21 +85,27 @@ object MemberDetailsForm extends I18nHelper{
   }
 
   def checkDayRange(day: String): Boolean = {
-    if (day forall Character.isDigit)
+    if(day.isEmpty)
+      false
+    else if (day forall Character.isDigit)
       day.toInt > 0 && day.toInt < 32
     else
       true
   }
 
   def checkMonthRange(month: String): Boolean = {
-    if (month forall Character.isDigit)
+    if(month.isEmpty)
+      false
+    else if (month forall Character.isDigit)
       month.toInt > 0 && month.toInt < 13
     else
       true
   }
 
   def checkYearLength(year: String): Boolean = {
-    if (year forall Character.isDigit)
+    if(year.isEmpty)
+      false
+    else if (year forall Character.isDigit)
       year.length == YEAR_FIELD_LENGTH
     else
       true
