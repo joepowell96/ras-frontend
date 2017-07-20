@@ -55,12 +55,23 @@ object MemberDetailsForm extends I18nHelper{
       "nino" -> text
         .verifying(ninoConstraint),
       "dateOfBirth" -> mapping(
-        "day" -> optional(text),
-        "month" -> optional(text),
-        "year" -> optional(text)
-      )(RasDate.apply)(RasDate.unapply))
+        "day" -> text
+          .verifying(Messages("error.mandatory", Messages("day")), _.length > 0),
+        "month" -> text
+          .verifying(Messages("error.mandatory", Messages("month")), _.length > 0),
+        "year" -> text
+          .verifying(Messages("error.mandatory", Messages("year")), _.length > 0)
+      )(RasDate.apply)(RasDate.unapply)
+    )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
+
+  def checkForNumber(optionValue: Option[String]): Boolean = {
+    optionValue match {
+      case Some(value) => value forall Character.isDigit
+      case None => true
+    }
+  }
 }
 
 

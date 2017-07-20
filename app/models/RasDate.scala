@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.Json
 
-case class RasDate(day: Option[String], month: Option[String], year: Option[String])
+case class RasDate(day: String, month: String, year: String)
 
 object RasDate {
   implicit val format = Json.format[RasDate]

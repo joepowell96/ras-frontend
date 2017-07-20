@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
 
-  val dateOfBirth = RasDate(Some("1"),Some("1"),Some("1984"))
+  val dateOfBirth = RasDate("1","1","1984")
   val MAX_NAME_LENGTH = 35
 
   "Find member details form" should {
@@ -292,6 +292,44 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.isEmpty)
     }
 
+    "return an error when day field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("","1","1984")
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("dateOfBirth.day", List(Messages("error.mandatory", Messages("day"))))))
+    }
+
+    "return an error when month field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1","","1984")
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("dateOfBirth.month", List(Messages("error.mandatory", Messages("month"))))))
+    }
+
+    "return an error when year field is empty" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1","1","")
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("dateOfBirth.year", List(Messages("error.mandatory", Messages("year"))))))
+    }
   }
 
 }

@@ -109,7 +109,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
 
     "redirect" in {
 
-        val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate(Some("1"),Some("1"),Some("1984")))
+        val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
         val formData = Json.obj(
           "firstName" -> "Ramin",
           "lastName" -> "Esfandiari",
