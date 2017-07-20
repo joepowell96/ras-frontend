@@ -66,7 +66,7 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.date.non.number"), x => checkForNumber(x.day) && checkForNumber(x.month) && checkForNumber(x.year))
         .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
         .verifying(Messages("error.month.invalid"), x => checkMonthRange(x.month))
-
+        .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
     )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
@@ -75,20 +75,26 @@ object MemberDetailsForm extends I18nHelper{
     value forall Character.isDigit
   }
 
-  def checkDayRange(value: String): Boolean = {
-    if (value forall Character.isDigit)
-      value.toInt > 0 && value.toInt < 32
+  def checkDayRange(day: String): Boolean = {
+    if (day forall Character.isDigit)
+      day.toInt > 0 && day.toInt < 32
     else
       true
   }
 
-  def checkMonthRange(value: String): Boolean = {
-    if (value forall Character.isDigit)
-      value.toInt > 0 && value.toInt < 13
+  def checkMonthRange(month: String): Boolean = {
+    if (month forall Character.isDigit)
+      month.toInt > 0 && month.toInt < 13
     else
       true
   }
 
+  def checkYearLength(year: String): Boolean = {
+    if (year forall Character.isDigit)
+      year.length == 4
+    else
+      true
+  }
 }
 
 

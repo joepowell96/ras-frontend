@@ -354,6 +354,27 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val validatedForm = form.bind(formData)
       assert(!validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
     }
+
+    "return an error when year has invalid format" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1","0","19842"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
+    }
+
+    "return an error when year has only 3 digits" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1","0","142"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
+    }
+
   }
 
 }
