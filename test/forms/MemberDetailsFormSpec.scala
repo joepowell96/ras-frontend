@@ -242,7 +242,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("","1","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth.day", List(Messages("error.mandatory", Messages("day"))))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("dob"))))))
     }
 
     "return an error when month field is empty" in {
@@ -252,7 +252,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth.month", List(Messages("error.mandatory", Messages("month"))))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth.month", List(Messages("error.mandatory", Messages("dob"))))))
     }
 
     "return an error when year field is empty" in {
@@ -262,7 +262,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","1",""))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth.year", List(Messages("error.mandatory", Messages("year"))))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth.year", List(Messages("error.mandatory", Messages("dob"))))))
     }
 
     "return an error when day is a non number" in {

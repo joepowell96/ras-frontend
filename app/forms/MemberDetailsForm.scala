@@ -31,7 +31,7 @@ object MemberDetailsForm extends I18nHelper{
   val TEMP_NINO = "TN"
   val YEAR_FIELD_LENGTH: Int = 4
 
-  val ninoConstraint : Constraint[String] = Constraint("constraints.nino") ({
+  val ninoConstraint : Constraint[String] = Constraint("nino") ({
     text =>
       val ninoText = text.replaceAll("\\s", "")
       if (ninoText.length == 0)
@@ -40,6 +40,18 @@ object MemberDetailsForm extends I18nHelper{
         Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
       else
         Valid
+  })
+
+  val rasDateConstraint : Constraint[MemberDetails] = Constraint("dateOfBirth") ({
+    memberDetails => {
+
+      if (memberDetails.dateOfBirth.day.isEmpty ||
+          memberDetails.dateOfBirth.month.isEmpty ||
+          memberDetails.dateOfBirth.year.isEmpty)
+        Invalid(ValidationError(Messages("error.mandatory", Messages("dob"))))
+      else
+        Valid
+    }
   })
 
   val form = Form(
@@ -55,12 +67,9 @@ object MemberDetailsForm extends I18nHelper{
       "nino" -> text
         .verifying(ninoConstraint),
       "dateOfBirth" -> mapping(
-        "day" -> text
-          .verifying(Messages("error.mandatory", Messages("day")), _.length > 0),
-        "month" -> text
-          .verifying(Messages("error.mandatory", Messages("month")), _.length > 0),
+        "day" -> text,
+        "month" -> text,
         "year" -> text
-          .verifying(Messages("error.mandatory", Messages("year")), _.length > 0)
       )(RasDate.apply)(RasDate.unapply)
         .verifying(Messages("error.date.non.number"), x => checkForNumber(x.day) && checkForNumber(x.month) && checkForNumber(x.year))
         .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
@@ -68,6 +77,7 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
     )
     (MemberDetails.apply)(MemberDetails.unapply)
+      .verifying(rasDateConstraint)
   )
 
   def checkForNumber(value: String): Boolean = {
@@ -94,6 +104,8 @@ object MemberDetailsForm extends I18nHelper{
     else
       true
   }
+
+
 }
 
 
