@@ -25,8 +25,8 @@ import validators.NinoValidator
 
 object MemberDetailsForm extends I18nHelper{
 
-  val MAX_LENGTH = 99
-  val NAME_REGEX = "^[a-zA-Z][a-zA-z\\s|'|-]*$"
+  val MAX_LENGTH = 35
+  val NAME_REGEX = """^[a-zA-Z &`\-\'^]{1,35}$"""
   val NINO_SUFFIX_REGEX = "[A-D]"
   val TEMP_NINO = "TN"
   val YEAR_FIELD_LENGTH: Int = 4
@@ -34,23 +34,22 @@ object MemberDetailsForm extends I18nHelper{
   val ninoConstraint : Constraint[String] = Constraint("constraints.nino") ({
     text =>
       val ninoText = text.replaceAll("\\s", "")
-      if (ninoText.length == 0){
+      if (ninoText.length == 0)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("nino")))))
-      }
-      else if (!NinoValidator.isValid(ninoText.toUpperCase())){
+      else if (!NinoValidator.isValid(ninoText.toUpperCase()))
         Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
-      }
-      else {
+      else
         Valid
-      }
   })
 
   val form = Form(
     mapping(
       "firstName" -> text
-        .verifying(Messages("error.mandatory", Messages("first.name")), _.length > 0),
+        .verifying(Messages("error.mandatory", Messages("first.name")), _.length > 0)
+        .verifying(Messages("error.length", Messages("first.name"), MAX_LENGTH), _.length <= MAX_LENGTH),
       "lastName" -> text
-        .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0),
+        .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0)
+        .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH),
       "nino" -> text
         .verifying(ninoConstraint),
       "dateOfBirth" -> mapping(

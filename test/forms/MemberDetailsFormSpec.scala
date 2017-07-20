@@ -21,13 +21,13 @@ import helpers.helpers.I18nHelper
 import models.RasDate
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.FormError
-import play.api.i18n.Messages
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.test.UnitSpec
 
-class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite{
+class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
 
   val dateOfBirth = RasDate(Some("1"),Some("1"),Some("1984"))
+  val MAX_NAME_LENGTH = 35
 
   "Find member details form" should {
 
@@ -75,7 +75,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
 
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "",
+        "lastName" -> "Esfandiari",
         "nino" -> "",
         "dateOfBirth" -> dateOfBirth
       )
@@ -111,6 +111,46 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.invalid")))))
       assert(!validatedForm.errors.contains(FormError("nino", List(Messages("error.mandatory")))))
     }
+
+    "return no error when nino with no suffix is passed" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB123456",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "return error when first name is longer max allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "r" * (MAX_NAME_LENGTH + 1),
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB123456",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.length",Messages("first.name"), MAX_NAME_LENGTH)))))
+    }
+
+    "return error when last name is longer max allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "e" * (MAX_NAME_LENGTH + 1),
+        "nino" -> "AB123456",
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.length",Messages("last.name"), MAX_NAME_LENGTH)))))
+    }
+
 
   }
 
