@@ -21,6 +21,7 @@ import models.{MemberDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.i18n.Messages
 import validators.NinoValidator
 
 object MemberDetailsForm extends I18nHelper{
@@ -62,16 +63,32 @@ object MemberDetailsForm extends I18nHelper{
         "year" -> text
           .verifying(Messages("error.mandatory", Messages("year")), _.length > 0)
       )(RasDate.apply)(RasDate.unapply)
+        .verifying(Messages("error.date.non.number"), x => checkForNumber(x.day) && checkForNumber(x.month) && checkForNumber(x.year))
+        .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
+        .verifying(Messages("error.month.invalid"), x => checkMonthRange(x.month))
+
     )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
 
-  def checkForNumber(optionValue: Option[String]): Boolean = {
-    optionValue match {
-      case Some(value) => value forall Character.isDigit
-      case None => true
-    }
+  def checkForNumber(value: String): Boolean = {
+    value forall Character.isDigit
   }
+
+  def checkDayRange(value: String): Boolean = {
+    if (value forall Character.isDigit)
+      value.toInt > 0 && value.toInt < 32
+    else
+      true
+  }
+
+  def checkMonthRange(value: String): Boolean = {
+    if (value forall Character.isDigit)
+      value.toInt > 0 && value.toInt < 13
+    else
+      true
+  }
+
 }
 
 

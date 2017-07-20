@@ -1,50 +1,53 @@
 #----------------------------------------------
 
-start.page.title=Relief at Source - GOV.UK
-start.page.header=Check the residency status of a pension scheme member
-introduction.paragraph.1=Use this service to find the residency status for tax purposes of your scheme member when claiming relief at source on pension contributions.
-introduction.paragraph.2=This service will allow you to claim the correct rate of relief at source for members not included in your last annual COM100 submission.
-introduction.paragraph.3=You should only claim relief at source when you have the correct residency status for a pension scheme member. For further information please see the
-legislation=legislation
+start.page.title = Relief at Source - GOV.UK
+start.page.header = Check the residency status of a pension scheme member
+introduction.paragraph.1 = Use this service to find the residency status for tax purposes of your scheme member when claiming relief at source on pension contributions.
+introduction.paragraph.2 = This service will allow you to claim the correct rate of relief at source for members not included in your last annual COM100 submission.
+introduction.paragraph.3 = You should only claim relief at source when you have the correct residency status for a pension scheme member. For further information please see the
+legislation = legislation
 
-usage.header=When to use this service
-usage.subheader=You should always check when:
-usage.bullet.1=a new member joins your pension scheme
-usage.bullet.2=an existing member has made no contributions in the last tax year
+usage.header = When to use this service
+usage.subheader = You should always check when:
+usage.bullet.1 = a new member joins your pension scheme
+usage.bullet.2 = an existing member has made no contributions in the last tax year
 
-what.you.need.header=What you’ll need
-what.you.need.subheader=For each search, you’ll need the member’s:
-what.you.need.bullet.1=first name
-what.you.need.bullet.2=last name
-what.you.need.bullet.3=National Insurance number
-what.you.need.bullet.4=date of birth
-what.you.need.post.bullet=You are unable to search for a member if no national insurance number is held. For further information please follow the
-relief.at.source.guidance=relief at source guidance
+what.you.need.header = What you’ll need
+what.you.need.subheader = For each search, you’ll need the member’s:
+what.you.need.bullet.1 = first name
+what.you.need.bullet.2 = last name
+what.you.need.bullet.3 = National Insurance number
+what.you.need.bullet.4 = date of birth
+what.you.need.post.bullet = You are unable to search for a member if no national insurance number is held. For further information please follow the
+relief.at.source.guidance = relief at source guidance
 
-start.now=Start now
-continue=Continue
+start.now = Start now
+continue = Continue
 
 #----------------------------------------------
 
-find.member.details=Find member details
+find.member.details = Find member details
 
-member.details.page.title=Find member details - GOV.UK
-member.details.page.header=Find member details
+member.details.page.title = Find member details - GOV.UK
+member.details.page.header = Find member details
 
-first.name=first name
-last.name=last name
-nino=National Insurance number
-dob=date of birth
+first.name = first name
+last.name = last name
+nino = National Insurance number
+dob = date of birth
 
-day=day
-month=month
-year=year
+day = day
+month = month
+year = year
 
-dob.hint=For example, 21 2 1983
-nino.hint=For example, 'QQ 12 34 56 C'
+dob.hint = For example, 21 2 1983
+nino.hint = For example, 'QQ 12 34 56 C'
 
 error.mandatory = Enter a {0}
 error.nino.invalid = The National Insurance number you have entered is not valid. Check it and try again.
 error.length = {0} is too long (>{1})
-
 error.name.invalid = Enter a {0} using only letters, hyphens, apostrophes and spaces
+error.date.non.number = Enter a date using numbers only
+error.day.invalid = Enter a day between 1 and 31
+error.month.invalid = Enter a month between 1 and 12
+error.year.invalid.format = Enter the year in full (4 numbers)
