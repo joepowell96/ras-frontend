@@ -46,10 +46,12 @@ object MemberDetailsForm extends I18nHelper{
     mapping(
       "firstName" -> text
         .verifying(Messages("error.mandatory", Messages("first.name")), _.length > 0)
-        .verifying(Messages("error.length", Messages("first.name"), MAX_LENGTH), _.length <= MAX_LENGTH),
+        .verifying(Messages("error.length", Messages("first.name"), MAX_LENGTH), _.length <= MAX_LENGTH)
+        .verifying(Messages("error.name.invalid", Messages("first.name")), x => x.length == 0 || x.matches(NAME_REGEX)),
       "lastName" -> text
         .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0)
-        .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH),
+        .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH)
+        .verifying(Messages("error.name.invalid", Messages("last.name")), x => x.length == 0 || x.matches(NAME_REGEX)),
       "nino" -> text
         .verifying(ninoConstraint),
       "dateOfBirth" -> mapping(

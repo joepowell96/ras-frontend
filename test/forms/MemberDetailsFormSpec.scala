@@ -17,6 +17,7 @@
 package forms
 
 import forms.MemberDetailsForm._
+import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models.RasDate
 import org.scalatestplus.play.OneAppPerSuite
@@ -36,7 +37,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val formData = Json.obj(
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
-        "nino" -> "AB123456C",
+        "nino" -> RandomNino.generate,
         "dateOfBirth" -> dateOfBirth
       )
 
@@ -50,7 +51,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val formData = Json.obj(
         "firstName" -> "",
         "lastName" -> "Esfandiari",
-        "nino" -> "AB123456C",
+        "nino" -> RandomNino.generate,
         "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
@@ -63,7 +64,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val formData = Json.obj(
         "firstName" -> "Ramin",
         "lastName" -> "",
-        "nino" -> "AB123456C",
+        "nino" -> RandomNino.generate,
         "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
@@ -130,7 +131,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val formData = Json.obj(
         "firstName" -> "r" * (MAX_NAME_LENGTH + 1),
         "lastName" -> "Esfandiari",
-        "nino" -> "AB123456",
+        "nino" -> RandomNino.generate,
         "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
@@ -143,7 +144,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val formData = Json.obj(
         "firstName" -> "Ramin",
         "lastName" -> "e" * (MAX_NAME_LENGTH + 1),
-        "nino" -> "AB123456",
+        "nino" -> RandomNino.generate,
         "dateOfBirth" -> dateOfBirth
       )
       val validatedForm = form.bind(formData)
@@ -151,6 +152,145 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.length",Messages("last.name"), MAX_NAME_LENGTH)))))
     }
 
+    "return no error when first name is of minimum allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "r",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "return no error when last name is of minimum allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "E",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "return no error when first name max allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "r" * MAX_NAME_LENGTH,
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "return no error when last name max allowed length" in {
+
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "E" * MAX_NAME_LENGTH,
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "return an error when name contains a digit" in {
+      val formData1 = Json.obj(
+        "firstName" -> "Ramin1",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm1 = form.bind(formData1)
+
+      val formData2 = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiar3i",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm2 = form.bind(formData2)
+
+      assert(validatedForm1.errors.contains(FormError("firstName", List(Messages("error.name.invalid", Messages("first.name"))))))
+      assert(validatedForm2.errors.contains(FormError("lastName", List(Messages("error.name.invalid", Messages("last.name"))))))
+    }
+
+    "allow apostrophes" in {
+
+      val formData1 = Json.obj(
+        "firstName" -> "R'n",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm1 = form.bind(formData1)
+
+      val formData2 = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfa'ndiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm2 = form.bind(formData2)
+
+      assert(validatedForm1.errors.isEmpty)
+      assert(validatedForm2.errors.isEmpty)
+    }
+
+    "allow hyphens" in {
+      val formData = Json.obj(
+        "firstName" -> "Ram-in",
+        "lastName" -> "Esfa-ndiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
+
+    "disallow other special characters" in {
+      val formData1 = Json.obj(
+        "firstName" -> "Ra$min",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm1 = form.bind(formData1)
+
+      val formData2 = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfan@diari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm2 = form.bind(formData2)
+
+      assert(validatedForm1.errors.contains(FormError("firstName", List(Messages("error.name.invalid", Messages("first.name"))))))
+      assert(validatedForm2.errors.contains(FormError("lastName", List(Messages("error.name.invalid", Messages("last.name"))))))
+    }
+
+    "allow whitespace" in {
+      val formData = Json.obj(
+        "firstName" -> "Ra min",
+        "lastName" -> "Esfand iari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> dateOfBirth
+      )
+      val validatedForm = form.bind(formData)
+
+      assert(validatedForm.errors.isEmpty)
+    }
 
   }
 
