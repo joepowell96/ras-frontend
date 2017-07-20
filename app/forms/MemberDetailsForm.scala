@@ -21,7 +21,6 @@ import models.{MemberDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import play.api.i18n.Messages
 import validators.NinoValidator
 
 object MemberDetailsForm extends I18nHelper{
@@ -91,7 +90,7 @@ object MemberDetailsForm extends I18nHelper{
 
   def checkYearLength(year: String): Boolean = {
     if (year forall Character.isDigit)
-      year.length == 4
+      year.length == YEAR_FIELD_LENGTH
     else
       true
   }
