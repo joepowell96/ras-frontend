@@ -22,6 +22,8 @@
 
 @ras_main(title = Messages("member.details.page.title")) {
 
+@views.html.helpers.errorSummary(memberDetailsForm)
+
  <div class="grid-row">
 
   <div class="column-full">
@@ -34,19 +36,19 @@
 
         @rasInput(memberDetailsForm("firstName"),
         '_label -> Html(Messages("first.name").capitalize),
-        '_labelClass -> "form-label",
+         '_labelClass -> "form-label-bold",
         '_id -> "first-name",
         '_maxLength -> 35)
 
         @rasInput(memberDetailsForm("lastName"),
         '_label -> Html(Messages("last.name").capitalize),
-        '_labelClass -> "form-label",
+         '_labelClass -> "form-label-bold",
         '_id -> "last-name",
         '_maxLength -> 35)
 
         @rasInput(memberDetailsForm("nino"),
         '_label -> Html(Messages("nino")),
-        '_labelClass -> "form-label",
+         '_labelClass -> "form-label-bold",
         '_id -> "nino",
         '_maxLength -> 15,
         '_hintText -> Messages("nino.hint"))
@@ -58,6 +60,9 @@
           <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
 
           <div class="form-date">
+
+            @views.html.helpers.groupError(memberDetailsForm("dateOfBirth"))
+
              <div class="dob-field">
               @rasInput(memberDetailsForm("dateOfBirth.day"),
                '_label -> Html(Messages("day")),
@@ -79,6 +84,8 @@
                 '_maxLength ->4,
                 '_inputClass -> " form-control year-input")
               </div>
+
+
           </div>
 
         </fieldset>
