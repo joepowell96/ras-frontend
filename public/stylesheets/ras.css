@@ -22,6 +22,7 @@
 
 #dob-legend{
   margin-bottom:0px;
+  font-weight:bold;
 }
 
 .form-hint{
@@ -33,15 +34,10 @@
 }
 
 .form-field--error .error-notification{
-  font-weight: bold;
   font-size:19px;
   color: #b10e1e;
 }
 
-.form-group .form-field--error{
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
 
 .validation-summary{
   border: 5px solid #b10e1e;
@@ -52,4 +48,8 @@
 
 .validation-summary a, .validation-summary .link-style, .validation-summary .button--link-style{
   color: #b10e1e;
+}
+
+.form-control-error {
+    border: 4px solid #b10e1e;
 }
