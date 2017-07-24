@@ -67,7 +67,13 @@
           maxlength="@elements.args.get('_maxLength)"
     }else{}
 
-    class="@if( elements.args.get('_inputClass)){@elements.args.get('_inputClass)}else{form-control}"
+    class="@if( elements.args.get('_inputClass)){
+              @elements.args.get('_inputClass)
+          }@if(errors.nonEmpty){
+              form-control form-control-error
+          }else{
+              form-control
+          }"
 
     @if(elements.args.contains('_dataAttributes) ){
         @elements.args.get('_dataAttributes)

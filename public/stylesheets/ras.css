@@ -42,3 +42,14 @@
   padding-top: 0px;
   padding-bottom: 0px;
 }
+
+.validation-summary{
+  border: 5px solid #b10e1e;
+  font-weight: bold;
+  font-size:19px;
+  color: #b10e1e;
+}
+
+.validation-summary a, .validation-summary .link-style, .validation-summary .button--link-style{
+  color: #b10e1e;
+}

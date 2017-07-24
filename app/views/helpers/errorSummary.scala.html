@@ -19,7 +19,7 @@
 @if(form.hasGlobalErrors || form.hasErrors) {
 
 <div id="errors" class="validation-summary">
-    <h1 class="heading-small" id="errorMessageHeadingText">@Messages("gmp.generic.errors_heading")</h1>
+    <h1 class="heading-small" id="errorMessageHeadingText">@Messages("generic.errors_heading")</h1>
     <ul>
         @form.errors.map { error =>
             @defining(
