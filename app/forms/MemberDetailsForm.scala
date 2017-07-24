@@ -42,18 +42,6 @@ object MemberDetailsForm extends I18nHelper{
         Valid
   })
 
-  val rasDateConstraint : Constraint[MemberDetails] = Constraint("dateOfBirth") ({
-    memberDetails => {
-
-      if (memberDetails.dateOfBirth.day.isEmpty ||
-          memberDetails.dateOfBirth.month.isEmpty ||
-          memberDetails.dateOfBirth.year.isEmpty)
-        Invalid(ValidationError(Messages("error.mandatory", Messages("dob"))))
-      else
-        Valid
-    }
-  })
-
   val form = Form(
     mapping(
       "firstName" -> text
@@ -77,7 +65,6 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
     )
     (MemberDetails.apply)(MemberDetails.unapply)
-      .verifying(rasDateConstraint)
   )
 
   def checkForNumber(value: String): Boolean = {

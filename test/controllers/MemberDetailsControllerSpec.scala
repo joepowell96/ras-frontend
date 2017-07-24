@@ -64,8 +64,8 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "contain correct field labels" in {
       val result = TestMemberDetailsController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.getElementById("first-name_label").text shouldBe Messages("first.name").capitalize
-      doc.getElementById("last-name_label").text shouldBe Messages("last.name").capitalize
+      doc.getElementById("firstName_label").text shouldBe Messages("first.name").capitalize
+      doc.getElementById("lastName_label").text shouldBe Messages("last.name").capitalize
       doc.getElementById("nino_label").text should include(Messages("nino"))
       doc.getElementById("dob-legend").text shouldBe Messages("dob").capitalize
     }
@@ -73,8 +73,8 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "contain correct input fields" in {
       val result = TestMemberDetailsController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      assert(doc.getElementById("first-name").attr("input") != null)
-      assert(doc.getElementById("last-name").attr("input") != null)
+      assert(doc.getElementById("firstName").attr("input") != null)
+      assert(doc.getElementById("lastName").attr("input") != null)
       assert(doc.getElementById("nino").attr("input") != null)
     }
 
@@ -108,17 +108,16 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "redirect" in {
-
         val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
-        val formData = Json.obj(
-          "firstName" -> "Ramin",
-          "lastName" -> "Esfandiari",
-          "nino" -> RandomNino.generate,
-          "dateOfBirth" -> "1984-1-1"
-        )
         val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
         status(result) should equal(SEE_OTHER)
       }
+    }
+
+    "return bad request when errors present" in {
+      val memberDetails = MemberDetails(RandomNino.generate, "", "",RasDate("1","1","1984"))
+      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
+      status(result) should equal(BAD_REQUEST)
     }
 
 }
