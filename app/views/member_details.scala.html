@@ -34,24 +34,30 @@
 
        <div class="form-group">
 
+         <div>
           @rasInput(memberDetailsForm("firstName"),
           '_label -> Html(Messages("first.name").capitalize),
            '_labelClass -> "form-label-bold",
-          '_id -> "first-name",
+          '_id -> "firstName",
           '_maxLength -> 35)
+         </div>
 
+         <div>
           @rasInput(memberDetailsForm("lastName"),
           '_label -> Html(Messages("last.name").capitalize),
            '_labelClass -> "form-label-bold",
-          '_id -> "last-name",
+          '_id -> "lastName",
           '_maxLength -> 35)
+         </div>
 
+         <div>
           @rasInput(memberDetailsForm("nino"),
           '_label -> Html(Messages("nino")),
            '_labelClass -> "form-label-bold",
           '_id -> "nino",
           '_maxLength -> 15,
           '_hintText -> Messages("nino.hint"))
+         </div>
 
        </div>
 
@@ -61,7 +67,7 @@
            <div class="form-group">
         }
 
-          <fieldset>
+          <fieldset id="dateOfBirth_label">
 
               <legend  id="dob-legend">@Messages("dob").capitalize</legend>
               <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>

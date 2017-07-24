@@ -19,9 +19,10 @@
 @if(form.hasGlobalErrors || form.hasErrors) {
 
 <div id="errors" class="validation-summary">
-    <h1 class="heading-small" id="errorMessageHeadingText">@Messages("generic.errors_heading")</h1>
+    <h1 class="heading-s mall" id="errorMessageHeadingText">@Messages("generic.errors_heading")</h1>
+
     <ul>
-        @form.errors.map { error =>
+        @form.errors.map{ error =>
             @defining(
                 error.args.nonEmpty match {
                     case true => {
@@ -31,14 +32,14 @@
                             error.args.head
                         }
                     }
-                    case _ => { error.key }
+                    case _ => { error.key + "_label"}
                 }
             ) { anchor =>
-            <li role="tooltip" data-journey="search-page:error:@error.key">
-                <a href="#@anchor" class="error-list" data-focuses="@error.key">
-                    @Messages(error.message)
-                </a>
-            </li>
+              <li role="tooltip" data-journey="search-page:error:@error.key">
+                  <a href="#@anchor" class="error-list" data-focuses="@error.key"  >
+                      @Messages(error.message)
+                  </a>
+              </li>
             }
         }
     </ul>
