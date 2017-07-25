@@ -26,3 +26,4 @@ object NinoValidator extends Validator {
 
   override def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
 }
+
