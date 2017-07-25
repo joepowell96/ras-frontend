@@ -387,7 +387,15 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
 
-
+    "return no error when nino with spaces is passed" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB 12 34 56 C",
+        "dateOfBirth" -> RasDate("1","2","1422"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.isEmpty)
+    }
 
   }
 
