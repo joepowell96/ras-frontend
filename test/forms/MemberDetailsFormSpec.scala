@@ -265,6 +265,18 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
 
+    "return an error when all date fields are empty" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("","",""))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
+    }
+
     "return an error when day is a non number" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
@@ -290,7 +302,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","a","198asasas4"))
+        "dateOfBirth" -> RasDate("1","2","198asasas4"))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number")))))
     }
@@ -360,7 +372,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","0","19842"))
+        "dateOfBirth" -> RasDate("1","2","19842"))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
@@ -370,10 +382,12 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","0","142"))
+        "dateOfBirth" -> RasDate("1","2","142"))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
+
+
 
   }
 
