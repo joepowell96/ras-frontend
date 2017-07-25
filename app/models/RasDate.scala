@@ -16,9 +16,17 @@
 
 package models
 
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
-case class RasDate(day: String, month: String, year: String)
+case class RasDate(day: String, month: String, year: String){
+
+  def isInFuture: Boolean = {
+    val dob = new LocalDate(year.toInt, month.toInt, day.toInt)
+    dob.isAfter(LocalDate.now)
+  }
+
+}
 
 object RasDate {
   implicit val format = Json.format[RasDate]

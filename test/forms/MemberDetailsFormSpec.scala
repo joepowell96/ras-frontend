@@ -20,6 +20,7 @@ import forms.MemberDetailsForm._
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models.RasDate
+import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.FormError
 import play.api.libs.json.Json
@@ -395,6 +396,19 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "dateOfBirth" -> RasDate("1","2","1422"))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
+    }
+
+    "return an error when date of birth is in the future" in {
+      val futureDate = LocalDate.now()
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate(futureDate.getDayOfMonth.toString,
+                                 futureDate.getMonthOfYear.toString,
+                                 (futureDate.getYear + 1).toString))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.dob.invalid.future")))))
     }
 
   }

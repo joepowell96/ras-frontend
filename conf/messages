@@ -51,5 +51,6 @@ error.date.non.number = Enter a date using numbers only
 error.day.invalid = Enter a day between 1 and 31
 error.month.invalid = Enter a month between 1 and 12
 error.year.invalid.format = Enter the year in full (4 numbers)
+error.dob.invalid.future = Enter a date that is not in the future
 
 generic.errors_heading = There is a problem with the form

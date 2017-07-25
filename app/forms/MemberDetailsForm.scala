@@ -18,6 +18,7 @@ package forms
 
 import helpers.helpers.I18nHelper
 import models.{MemberDetails, RasDate}
+import org.joda.time.IllegalFieldValueException
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
@@ -42,6 +43,18 @@ object MemberDetailsForm extends I18nHelper{
         Valid
   })
 
+  val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
+    dob => {
+      try{
+        if(dob.isInFuture)
+          Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
+        else
+          Valid
+      }
+      catch { case e: Exception => Valid }
+    }
+  })
+
   val form = Form(
     mapping(
       "firstName" -> text
@@ -63,6 +76,8 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
         .verifying(Messages("error.month.invalid"), x => checkMonthRange(x.month))
         .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
+        .verifying(rasDateConstraint)
+//        .verifying(Messages("error.dob.invalid.future"), x => x.isInFuture)
     )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
