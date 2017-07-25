@@ -27,3 +27,4 @@ trait I18nHelper {
 }
 
 object I18nHelper extends I18nHelper
+
