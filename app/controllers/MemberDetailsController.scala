@@ -41,7 +41,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
-        Future.successful(SeeOther(""))
+        Future.successful(Ok(views.html.match_found()))
       }
     )
 

@@ -107,10 +107,10 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result.get) should not equal (NOT_FOUND)
     }
 
-    "redirect" in {
+    "return ok " in {
         val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
         val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
-        status(result) should equal(SEE_OTHER)
+        status(result) should equal(OK)
       }
     }
 

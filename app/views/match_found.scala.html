@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package validators
+@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
-trait Validator {
-  def isValid(value: String): Boolean
-}
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.helpers._
 
-object NinoValidator extends Validator {
+@ras_main(title = "Mahi Mahi Mahi Mahi") {
 
-  val validNinoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$"
+  <h1>MATCH FOUND</h1>
+  <h2>Well Done Mahi</h2>
 
-  override def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
 }
