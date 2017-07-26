@@ -16,14 +16,11 @@
 
 package validators
 
-trait Validator {
+trait NinoValidator {
   def isValid(value: String): Boolean
 }
 
-object NinoValidator extends Validator {
-
+object NinoValidator extends NinoValidator {
   val validNinoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$"
-
   override def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
 }
-

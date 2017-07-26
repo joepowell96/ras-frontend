@@ -17,12 +17,11 @@
 package forms
 
 import helpers.helpers.I18nHelper
-import models.{MemberDetails, MemberDetails$, RasDate}
-import org.joda.time.DateTime
+import models.{MemberDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import validators.NinoValidator
+import validators.{DateValidator, NinoValidator}
 
 object MemberDetailsForm extends I18nHelper{
 
@@ -30,7 +29,6 @@ object MemberDetailsForm extends I18nHelper{
   val NAME_REGEX = """^[a-zA-Z &`\-\'^]{1,35}$"""
   val NINO_SUFFIX_REGEX = "[A-D]"
   val TEMP_NINO = "TN"
-  val YEAR_FIELD_LENGTH: Int = 4
 
   val ninoConstraint : Constraint[String] = Constraint("nino") ({
     text =>
@@ -72,47 +70,17 @@ object MemberDetailsForm extends I18nHelper{
         "month" -> text,
         "year" -> text
       )(RasDate.apply)(RasDate.unapply)
-        .verifying(Messages("error.date.non.number"), x => checkForNumber(x.day) && checkForNumber(x.month) && checkForNumber(x.year))
-        .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
-        .verifying(Messages("error.month.invalid"), x => checkMonthRange(x.month))
-        .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
+        .verifying(Messages("error.date.non.number"), x =>
+          DateValidator.checkForNumber(x.day) &&
+          DateValidator.checkForNumber(x.month) &&
+          DateValidator.checkForNumber(x.year))
+        .verifying(Messages("error.day.invalid"), x => DateValidator.checkDayRange(x.day))
+        .verifying(Messages("error.month.invalid"), x => DateValidator.checkMonthRange(x.month))
+        .verifying(Messages("error.year.invalid.format"), x => DateValidator.checkYearLength(x.year))
         .verifying(rasDateConstraint)
     )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
-
-  def checkForNumber(value: String): Boolean = {
-    value forall Character.isDigit
-  }
-
-  def checkDayRange(day: String): Boolean = {
-    if(day.isEmpty)
-      false
-    else if (day forall Character.isDigit)
-      day.toInt > 0 && day.toInt < 32
-    else
-      true
-  }
-
-  def checkMonthRange(month: String): Boolean = {
-    if(month.isEmpty)
-      false
-    else if (month forall Character.isDigit)
-      month.toInt > 0 && month.toInt < 13
-    else
-      true
-  }
-
-  def checkYearLength(year: String): Boolean = {
-    if(year.isEmpty)
-      false
-    else if (year forall Character.isDigit)
-      year.length == YEAR_FIELD_LENGTH
-    else
-      true
-  }
-
-
 }
 
 
