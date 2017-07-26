@@ -16,7 +16,9 @@
 
 package controllers
 
-
+import config.RasContextImpl
+import forms.MemberDetailsForm._
+import helpers.helpers.I18nHelper
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -24,8 +26,24 @@ import scala.concurrent.Future
 
 object MemberDetailsController extends MemberDetailsController
 
-trait MemberDetailsController extends FrontendController{
+trait MemberDetailsController extends FrontendController with I18nHelper {
+
+  implicit val context: config.RasContext = RasContextImpl
+
   def get = Action.async { implicit request =>
-    Future.successful(Ok)
+    Future.successful(Ok(views.html.member_details(form)))
+  }
+
+  def post = Action.async { implicit request =>
+
+    form.bindFromRequest.fold(
+      formWithErrors => {
+        Future.successful(BadRequest(views.html.member_details(formWithErrors)))
+      },
+      memberDetails => {
+        Future.successful(Ok(views.html.match_found()))
+      }
+    )
+
   }
 }

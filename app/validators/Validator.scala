@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package controllers
+package validators
 
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import scala.concurrent.Future
-
-object StartPageController extends StartPageController
-
-trait StartPageController extends FrontendController with I18nHelper {
-
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-		Future.successful(Ok(views.html.start_page()))
-  }
-
+trait Validator {
+  def isValid(value: String): Boolean
 }
+
+object NinoValidator extends Validator {
+
+  val validNinoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$"
+
+  override def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
+}
+

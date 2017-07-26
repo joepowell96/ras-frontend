@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package helpers
 
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import scala.concurrent.Future
+package helpers
 
-object StartPageController extends StartPageController
+import play.api.Play.current
 
-trait StartPageController extends FrontendController with I18nHelper {
+trait I18nHelper {
+  def Messages(key: String, args: Any*): String = play.api.i18n.Messages.apply(key,args: _*)(implicitAppMessages)
 
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-		Future.successful(Ok(views.html.start_page()))
-  }
-
+  implicit def implicitAppMessages : play.api.i18n.Messages = play.api.i18n.Messages.Implicits.applicationMessages
 }
+
+object I18nHelper extends I18nHelper
+

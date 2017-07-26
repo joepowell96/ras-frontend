@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package controllers
+package models
 
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import scala.concurrent.Future
+import org.joda.time.LocalDate
+import play.api.libs.json.Json
 
-object StartPageController extends StartPageController
+case class RasDate(day: String, month: String, year: String){
 
-trait StartPageController extends FrontendController with I18nHelper {
-
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-		Future.successful(Ok(views.html.start_page()))
+  def isInFuture: Boolean = {
+    val dob = new LocalDate(year.toInt, month.toInt, day.toInt)
+    dob.isAfter(LocalDate.now)
   }
 
+}
+
+object RasDate {
+  implicit val format = Json.format[RasDate]
 }

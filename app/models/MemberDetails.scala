@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package controllers
+package models
 
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import scala.concurrent.Future
+import play.api.libs.json.Json
 
-object StartPageController extends StartPageController
+case class MemberDetails(nino: String,
+                         firstName: String,
+                         lastName: String,
+                         dateOfBirth: RasDate)
 
-trait StartPageController extends FrontendController with I18nHelper {
-
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async { implicit request =>
-		Future.successful(Ok(views.html.start_page()))
-  }
-
+object MemberDetails {
+  implicit val formats = Json.format[MemberDetails]
 }
