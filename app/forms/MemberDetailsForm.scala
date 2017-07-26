@@ -17,7 +17,7 @@
 package forms
 
 import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate}
+import models.{CustomerDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
@@ -77,7 +77,7 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
         .verifying(rasDateConstraint)
     )
-    (MemberDetails.apply)(MemberDetails.unapply)
+    (CustomerDetails.apply)(CustomerDetails.unapply)
   )
 
   def checkForNumber(value: String): Boolean = {

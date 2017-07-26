@@ -18,11 +18,11 @@ package models
 
 import play.api.libs.json.Json
 
-case class MemberDetails(nino: String,
-                         firstName: String,
-                         lastName: String,
-                         dateOfBirth: RasDate)
+case class CustomerDetails(nino: String,
+                           firstName: String,
+                           lastName: String,
+                           dateOfBirth: RasDate)
 
-object MemberDetails {
-  implicit val formats = Json.format[MemberDetails]
+object CustomerDetails {
+  implicit val formats = Json.format[CustomerDetails]
 }
