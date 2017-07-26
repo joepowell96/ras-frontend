@@ -18,7 +18,7 @@ package controllers
 
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
-import models.{CustomerDetails, RasDate}
+import models.{MemberDetails, RasDate}
 import org.jsoup.Jsoup
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -108,14 +108,14 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return ok " in {
-        val memberDetails = CustomerDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
+        val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
         val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
         status(result) should equal(OK)
       }
     }
 
     "return bad request when errors present" in {
-      val memberDetails = CustomerDetails(RandomNino.generate, "", "",RasDate("1","1","1984"))
+      val memberDetails = MemberDetails(RandomNino.generate, "", "",RasDate("1","1","1984"))
       val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
       status(result) should equal(BAD_REQUEST)
     }
