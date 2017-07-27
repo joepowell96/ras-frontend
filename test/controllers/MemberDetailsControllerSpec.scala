@@ -19,22 +19,28 @@ package controllers
 import connectors.CustomerMatchingAPIConnector
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate}
+import models.{CustomerMatchingResponse, Link, MemberDetails, RasDate}
 import org.jsoup.Jsoup
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{contentAsString, contentType, _}
+import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import org.mockito.Matchers.{eq => meq, _}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.Future
 
 class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
   val fakeRequest = FakeRequest("GET", "/")
+  val mockCustomerMatchingConnector = mock[CustomerMatchingAPIConnector]
+  implicit val headerCarrier = HeaderCarrier()
 
   object TestMemberDetailsController extends MemberDetailsController{
-    override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mock[CustomerMatchingAPIConnector]
+    override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mockCustomerMatchingConnector
   }
 
   "MemberDetailsController" should {
@@ -112,16 +118,22 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return ok " in {
-        val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari",RasDate("1","1","1984"))
-        val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
-        status(result) should equal(OK)
-      }
+      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1", "1", "1984"))
+      val customerDetails = memberDetails.asCustomerDetails
+      val customerMatchingResponse = CustomerMatchingResponse(List(Link("", "")))
+      when(mockCustomerMatchingConnector.findMemberDetails(meq(customerDetails))(any())).thenReturn(Future.successful(customerMatchingResponse))
+      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(customerDetails)))
+      status(result) should equal(OK)
+
     }
 
     "return bad request when errors present" in {
-      val memberDetails = MemberDetails(RandomNino.generate, "", "",RasDate("1","1","1984"))
-      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
+      val memberDetails = MemberDetails(RandomNino.generate, "", "", RasDate("1", "1", "1984"))
+      val customerDetails = memberDetails.asCustomerDetails
+      val customerMatchingResponse = CustomerMatchingResponse(List(Link("", "")))
+      when(mockCustomerMatchingConnector.findMemberDetails(meq(customerDetails))(any()))thenReturn(Future.successful(customerMatchingResponse))
+      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(customerDetails)))
       status(result) should equal(BAD_REQUEST)
     }
-
+  }
 }
