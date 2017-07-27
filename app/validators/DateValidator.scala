@@ -17,21 +17,14 @@
 package validators
 
 trait DateValidator {
-  def checkForNumber(value: String): Boolean
-  def checkDayRange(day: String): Boolean
-  def checkMonthRange(month: String): Boolean
-  def checkYearLength(year: String): Boolean
-}
-
-object DateValidator extends DateValidator{
 
   val YEAR_FIELD_LENGTH: Int = 4
 
-  override def checkForNumber(value: String): Boolean = {
+  def checkForNumber(value: String): Boolean = {
     value forall Character.isDigit
   }
 
-  override def checkDayRange(day: String): Boolean = {
+  def checkDayRange(day: String): Boolean = {
     if(day.isEmpty)
       false
     else if (day forall Character.isDigit)
@@ -40,7 +33,7 @@ object DateValidator extends DateValidator{
       true
   }
 
-  override def checkMonthRange(month: String): Boolean = {
+  def checkMonthRange(month: String): Boolean = {
     if(month.isEmpty)
       false
     else if (month forall Character.isDigit)
@@ -49,7 +42,7 @@ object DateValidator extends DateValidator{
       true
   }
 
-  override def checkYearLength(year: String): Boolean = {
+  def checkYearLength(year: String): Boolean = {
     if(year.isEmpty)
       false
     else if (year forall Character.isDigit)
@@ -57,4 +50,9 @@ object DateValidator extends DateValidator{
     else
       true
   }
+}
+
+object DateValidator extends DateValidator{
+
+
 }

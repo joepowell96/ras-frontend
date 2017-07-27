@@ -16,12 +16,20 @@
 
 package models
 
+import org.joda.time.DateTime
 import play.api.libs.json.Json
 
 case class MemberDetails(nino: String,
                          firstName: String,
                          lastName: String,
-                         dateOfBirth: RasDate)
+                         dateOfBirth: RasDate) {
+
+  def asCustomerDetails: CustomerDetails = {
+    val dob = new DateTime(dateOfBirth.year,dateOfBirth.month,dateOfBirth.day)
+    CustomerDetails(nino, firstName, lastName, dob)
+  }
+
+}
 
 object MemberDetails {
   implicit val formats = Json.format[MemberDetails]
