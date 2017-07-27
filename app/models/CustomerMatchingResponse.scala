@@ -18,11 +18,7 @@ package models
 
 import play.api.libs.json.Json
 
-case class Link(name: String, href: String)
 
-object Link {
-  implicit val format = Json.format[Link]
-}
 
 
 case class CustomerMatchingResponse (links: List[Link])

@@ -19,14 +19,13 @@ package models
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 
-case class MemberDetails(nino: String,
-                         firstName: String,
+case class MemberDetails(firstName: String,
                          lastName: String,
+                         nino: String,
                          dateOfBirth: RasDate) {
 
   def asCustomerDetails: CustomerDetails = {
-    val dob = new DateTime(dateOfBirth.year,dateOfBirth.month,dateOfBirth.day)
-    CustomerDetails(nino, firstName, lastName, dob)
+    CustomerDetails(nino, firstName, lastName, dateOfBirth.asDateTime)
   }
 
 }

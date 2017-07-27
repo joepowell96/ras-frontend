@@ -17,6 +17,7 @@
 package controllers
 
 import config.RasContextImpl
+import connectors.CustomerMatchingAPIConnector
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
 import play.api.mvc.Action
@@ -24,9 +25,13 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
-object MemberDetailsController extends MemberDetailsController
+object MemberDetailsController extends MemberDetailsController{
+  override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
+}
 
 trait MemberDetailsController extends FrontendController with I18nHelper {
+
+  val customerMatchingAPIConnector: CustomerMatchingAPIConnector
 
   implicit val context: config.RasContext = RasContextImpl
 
@@ -41,6 +46,8 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
+        customerMatchingAPIConnector.findMemberDetails(memberDetails.asCustomerDetails) map { response =>
+        }
         Future.successful(Ok(views.html.match_found()))
       }
     )

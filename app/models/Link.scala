@@ -16,22 +16,10 @@
 
 package models
 
-import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json.Json
 
-case class RasDate(day: String, month: String, year: String){
+case class Link(name: String, href: String)
 
-  def isInFuture: Boolean = {
-    val dob = new LocalDate(year.toInt, month.toInt, day.toInt)
-    dob.isAfter(LocalDate.now)
-  }
-
-  def asDateTime: DateTime = {
-    new DateTime(year + "-" + month + "-" + day)
-  }
-
-}
-
-object RasDate {
-  implicit val format = Json.format[RasDate]
+object Link {
+  implicit val format = Json.format[Link]
 }

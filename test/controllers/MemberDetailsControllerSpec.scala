@@ -16,10 +16,12 @@
 
 package controllers
 
+import connectors.CustomerMatchingAPIConnector
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models.{MemberDetails, RasDate}
 import org.jsoup.Jsoup
+import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.{FakeRequest, Helpers}
@@ -27,11 +29,13 @@ import play.api.test.Helpers.{contentAsString, contentType, _}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 
-class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
+class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
   val fakeRequest = FakeRequest("GET", "/")
 
-  object TestMemberDetailsController extends MemberDetailsController
+  object TestMemberDetailsController extends MemberDetailsController{
+    override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mock[CustomerMatchingAPIConnector]
+  }
 
   "MemberDetailsController" should {
 
