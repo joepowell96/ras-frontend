@@ -16,17 +16,16 @@
 
 package connectors
 
-import config.ApplicationConfig
+
 import helpers.RandomNino
 import models._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
 
@@ -52,13 +51,11 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
         Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
         Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
 
-      CustomerMatchingResponse
-
-      when(TestConnector.http.POST[CustomerDetails, CustomerMatchingResponse](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
+      when(TestConnector.http.POST[CustomerDetails, CustomerMatchingResponse](meq(serviceBase),meq(customerDetails),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
 
       await(TestConnector.findMemberDetails(customerDetails))
 
-      verify(TestConnector.http).POST(meq(serviceBase),customerDetails)(any(), any(),any())
+      verify(TestConnector.http).POST(meq(serviceBase),meq(customerDetails))(any(), any(),any())
 
     }
 
