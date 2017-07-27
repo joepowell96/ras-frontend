@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.{ApplicationConfig, WSHttp}
+import config.WSHttp
 import models._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
@@ -26,7 +26,6 @@ import scala.concurrent.Future
 trait CustomerMatchingAPIConnector extends ServicesConfig{
 
   val http: HttpPost = WSHttp
-  val applicationConfig: ApplicationConfig
 
   lazy val serviceUrl = baseUrl("customer-matching")
 
@@ -39,6 +38,4 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
   }
 }
 
-object CustomerMatchingAPIConnector extends CustomerMatchingAPIConnector {
-  override val applicationConfig: ApplicationConfig = ApplicationConfig
-}
+object CustomerMatchingAPIConnector extends CustomerMatchingAPIConnector

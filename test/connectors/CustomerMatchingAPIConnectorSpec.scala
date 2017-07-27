@@ -26,7 +26,7 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpPost, HttpResponse}
 
 import scala.concurrent.Future
 
@@ -35,30 +35,30 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
   val mockHttp = mock[HttpPost]
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  object TestCustomerMatchingAPIConnector extends CustomerMatchingAPIConnector {
-    override val applicationConfig = mock[ApplicationConfig]
+  object TestConnector extends CustomerMatchingAPIConnector {
+    override val http = mock[HttpPost]
   }
 
   "Customer Matching API connector" should {
 
     lazy val serviceBase = s"${baseUrl("customer-matching")}/match"
 
-    "hand" in {
+    "ensure connector is called" in {
 
-      assert(1 == 1)
-//      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
-//      val customerDetails = memberDetails.asCustomerDetails
-//
-//      val expectedResponse = CustomerMatchingResponse(List(
-//        Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
-//        Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
-//
-//      when(mockHttp.POST[CustomerDetails, CustomerMatchingResponse](any(),any())(any(),any(),any())).
-//        thenReturn(Future.successful(HttpResponse(200, Some(Json.toJson(expectedResponse)))))
-//
-//      await(TestCustomerMatchingAPIConnector.findMemberDetails(customerDetails))
-//
-//      verify(TestCustomerMatchingAPIConnector.http).POST(meq(serviceBase),customerDetails)(any(), any(),any[HeaderCarrier])
+      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
+      val customerDetails = memberDetails.asCustomerDetails
+
+      val expectedResponse = CustomerMatchingResponse(List(
+        Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
+        Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
+
+      CustomerMatchingResponse
+
+      when(TestConnector.http.POST[CustomerDetails, CustomerMatchingResponse](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
+
+      await(TestConnector.findMemberDetails(customerDetails))
+
+      verify(TestConnector.http).POST(meq(serviceBase),customerDetails)(any(), any(),any())
 
     }
 
