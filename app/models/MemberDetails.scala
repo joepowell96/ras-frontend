@@ -16,7 +16,6 @@
 
 package models
 
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 
 case class MemberDetails(firstName: String,
@@ -24,8 +23,20 @@ case class MemberDetails(firstName: String,
                          nino: String,
                          dateOfBirth: RasDate) {
 
-  def asCustomerDetails: CustomerDetails = {
-    CustomerDetails(nino, firstName, lastName, dateOfBirth.asDateTime)
+  def asCustomerDetailsRequest = {
+
+    val date = dateOfBirth.year + "-" + dateOfBirth.month + "-" + dateOfBirth.day
+
+    Json.parse(
+      s"""
+        {
+          "nino" : "${nino}",
+          "firstName" : "${firstName}",
+          "lastName" : "${lastName}",
+          "dateOfBirth" : "${date}"
+        }
+      """
+    )
   }
 
 }

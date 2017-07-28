@@ -18,6 +18,7 @@ package connectors
 
 import config.WSHttp
 import models._
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
@@ -29,13 +30,14 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
   lazy val serviceUrl = baseUrl("customer-matching")
 
-  def findMemberDetails(customerDetails: CustomerDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
+  def findMemberDetails(customerDetailsRequest: JsValue)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
 
     val matchingUri = s"$serviceUrl/match"
 
-    http.POST[CustomerDetails,CustomerMatchingResponse](matchingUri, customerDetails,Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
-
+    http.POST[JsValue,CustomerMatchingResponse](matchingUri, customerDetailsRequest, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
   }
+
+
 }
 
 object CustomerMatchingAPIConnector extends CustomerMatchingAPIConnector
