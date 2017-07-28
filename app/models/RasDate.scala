@@ -16,7 +16,7 @@
 
 package models
 
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
 case class RasDate(day: String, month: String, year: String){
@@ -26,9 +26,7 @@ case class RasDate(day: String, month: String, year: String){
     dob.isAfter(LocalDate.now)
   }
 
-  def asDateTime: DateTime = {
-    new DateTime(year + "-" + month + "-" + day)
-  }
+  override def toString = year + "-" + month + "-" + day
 
 }
 

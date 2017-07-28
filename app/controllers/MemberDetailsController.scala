@@ -46,7 +46,10 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
-        customerMatchingAPIConnector.findMemberDetails(memberDetails.asCustomerDetailsRequest) map { response =>
+        customerMatchingAPIConnector.findMemberDetails(memberDetails) map { response =>
+
+
+
         }
         Future.successful(Ok(views.html.match_found()))
       }
