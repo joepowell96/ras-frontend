@@ -118,7 +118,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return ok " in {
-      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1", "1", "1984"))
+      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1", "1", "1999"))
       val customerDetails = memberDetails
       val customerMatchingResponse = CustomerMatchingResponse(List(Link("", "")))
       when(mockCustomerMatchingConnector.findMemberDetails(meq(customerDetails))(any())).thenReturn(Future.successful(customerMatchingResponse))

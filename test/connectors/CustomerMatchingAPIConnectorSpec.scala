@@ -31,34 +31,30 @@ import scala.concurrent.Future
 
 class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
-  val mockHttp = mock[HttpPost]
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   object TestConnector extends CustomerMatchingAPIConnector {
-    override val http = mock[HttpPost]
+    override val http: HttpPost = mock[HttpPost]
   }
 
   "Customer Matching API connector" should {
 
     lazy val serviceBase = s"${baseUrl("customer-matching")}/match"
 
-    "ensure connector is called" in {
+    "send a post request to customer mathing service" in {
 
+      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
 
-      assert (1 == 1)
+      val expectedResponse = CustomerMatchingResponse(List(
+        Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
+        Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
 
-//      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
-//      val customerDetails = memberDetails.asCustomerDetails
-//
-//      val expectedResponse = CustomerMatchingResponse(List(
-//        Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
-//        Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
-//
-//      when(TestConnector.http.POST[CustomerDetails, CustomerMatchingResponse](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
-//
-//      await(TestConnector.findMemberDetails(customerDetails))
-//
-//      verify(TestConnector.http).POST(meq(serviceBase),meq(customerDetails))(any(), any(), any())
+      when(TestConnector.http.POST[MemberDetails, CustomerMatchingResponse](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
+
+      val result = await(TestConnector.findMemberDetails(memberDetails))
+
+//      verify(TestConnector.http).POST(meq(serviceBase),meq(memberDetails))(any(), any(), any())
+      result mustBe expectedResponse
 
     }
 
