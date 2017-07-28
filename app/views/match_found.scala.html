@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(response: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -25,4 +25,5 @@
   <h1>MATCH FOUND</h1>
   <h2>Well Done Mahi</h2>
 
+  <p>@response</p>
 }

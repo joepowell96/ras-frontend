@@ -29,7 +29,7 @@ import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.mockito.Matchers.{eq => meq, _}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 
@@ -117,22 +117,21 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result.get) should not equal (NOT_FOUND)
     }
 
-    "return ok " in {
+    "redirect" in {
       val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1", "1", "1999"))
-      val customerDetails = memberDetails
-      val customerMatchingResponse = CustomerMatchingResponse(List(Link("", "")))
-      when(mockCustomerMatchingConnector.findMemberDetails(meq(customerDetails))(any())).thenReturn(Future.successful(customerMatchingResponse))
-      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(customerDetails)))
-      status(result) should equal(OK)
-
+      val response = HttpResponse(303,None,Map("Location" -> Seq("/matched/12121212")),None)
+      when(mockCustomerMatchingConnector.findMemberDetails(meq(memberDetails))(any())).thenReturn(Future.successful(response))
+      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
+      status(result) should equal(SEE_OTHER)
+      // check the content
     }
 
     "return bad request when errors present" in {
       val memberDetails = MemberDetails(RandomNino.generate, "", "", RasDate("1", "1", "1984"))
-      val customerDetails = memberDetails
-      val customerMatchingResponse = CustomerMatchingResponse(List(Link("", "")))
-      when(mockCustomerMatchingConnector.findMemberDetails(meq(customerDetails))(any()))thenReturn(Future.successful(customerMatchingResponse))
-      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(customerDetails)))
+//      val response = HttpResponse(400,None,Map("Location" -> Seq("/matched/12121212")),None)
+
+//      when(mockCustomerMatchingConnector.findMemberDetails(meq(memberDetails))(any()))thenReturn(Future.successful(any()))
+      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
       status(result) should equal(BAD_REQUEST)
     }
   }

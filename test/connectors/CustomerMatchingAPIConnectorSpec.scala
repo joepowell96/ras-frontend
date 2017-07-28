@@ -41,7 +41,7 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
 
     lazy val serviceBase = s"${baseUrl("customer-matching")}/match"
 
-    "send a post request to customer mathing service" in {
+    "send a post request to customer matching service" in {
 
       val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
 
