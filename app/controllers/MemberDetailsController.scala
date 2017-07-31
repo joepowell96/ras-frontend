@@ -49,7 +49,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
         customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { response =>
-          Future.successful(Ok(views.html.match_found(response.body.toString())))
+          Future.successful(Ok(views.html.match_found(response.links.toString())))
         }
       }
     )

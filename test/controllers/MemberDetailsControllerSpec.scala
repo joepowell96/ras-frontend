@@ -132,7 +132,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
         )
       )
 
-      val residencyStatus = ResidencyStatus
+      val residencyStatus = ResidencyStatus("scotResident","otherUKResident")
 
       when(mockCustomerMatchingConnector.findMemberDetails(meq(memberDetails))(any())).thenReturn(Future.successful(customerMatchingResponse))
       when(mockRasConnector.getResidencyStatus(meq(uuid))(any())).thenReturn(Future.successful(residencyStatus))
