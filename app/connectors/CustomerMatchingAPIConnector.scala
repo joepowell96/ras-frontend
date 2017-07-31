@@ -29,14 +29,13 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
   lazy val serviceUrl = baseUrl("customer-matching")
 
-  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
 
     val matchingUri = s"$serviceUrl/match"
 
-    http.POST[MemberDetails,HttpResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
+    http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
 
   }
-
 
 }
 

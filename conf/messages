@@ -54,3 +54,6 @@ error.year.invalid.format = Enter the year in full (4 numbers)
 error.dob.invalid.future = Enter a date that is not in the future
 
 generic.errors_heading = There is a problem with the form
+
+scottish.taxpayer = Scottish taxpayer
+non.scottish.taxpayer = Non-Scottish taxpayer
