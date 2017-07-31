@@ -16,6 +16,7 @@
 
 package controllers
 
+import akka.actor.Status.Success
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
@@ -49,16 +50,13 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { response =>
+        (for {
+          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
+          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
+        } yield {
+          Future.successful(Ok(views.html.match_found(rasResponse.currentYearResidencyStatus)))
+        }).flatMap(result => result)
 
-          val rasLink = response._links.filter( _.name == "ras").head.href
-
-          val rs = residencyStatusAPIConnector.getResidencyStatus(rasLink).map { rs =>
-            rs.currentYearResidencyStatus
-          }
-
-          Future.successful(Ok(views.html.match_found(rs)))
-        }
       }
     )
 
