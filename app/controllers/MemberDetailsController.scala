@@ -48,8 +48,20 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
+
         customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { response =>
-          Future.successful(Ok(views.html.match_found(response.links.toString())))
+
+          println(Console.YELLOW + "this is the response " + response + Console.WHITE)
+
+//          val rasLink = response.links.filter( _.name == "ras").head.href
+//
+//          println(Console.YELLOW + rasLink + Console.WHITE)
+//
+//          residencyStatusAPIConnector.getResidencyStatus(rasLink).map { rs =>
+//            Future.successful(Ok(views.html.match_found(rs.currentYearResidencyStatus)))
+//          }
+
+          Future.successful(Ok(views.html.match_found("failed to retrieve residency status")))
         }
       }
     )

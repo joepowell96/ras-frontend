@@ -29,9 +29,9 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
 
   lazy val serviceUrl = baseUrl("ras")
 
-  def getResidencyStatus(uuid: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
+  def getResidencyStatus(uri: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
 
-    val rasUri = s"$serviceUrl/residency-status/customer/${uuid}/residency-status"
+    val rasUri = s"$serviceUrl/${uri}"
 
     http.GET[ResidencyStatus](rasUri, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
 

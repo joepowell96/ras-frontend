@@ -16,13 +16,12 @@
 
 package connectors
 
-import helpers.RandomNino
 import models._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.test.Helpers.{await, _}
+import play.api.test.Helpers._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
@@ -38,20 +37,17 @@ class ResidencyStatusAPIConnectorSpec extends PlaySpec with OneAppPerSuite with 
 
   "Residency Status API connector" should {
 
-    lazy val serviceBase = s"${baseUrl("ras")}/match"
-
     "send a get request to residency status service" in {
 
       val uuid = "633e0ee7-315b-49e6-baed-d79c3dffe467"
-      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
 
       val expectedResponse = ResidencyStatus("scotResident","otherUKResident")
 
-      when(TestConnector.http.GET[ResidencyStatus](meq(uuid))(any(), any[HeaderCarrier])) thenReturn Future.successful(expectedResponse)
+      when(TestConnector.http.GET[ResidencyStatus](any())(any(),any())).thenReturn(Future.successful(expectedResponse))
 
-      val result = await(TestConnector.getResidencyStatus(uuid))
+      val result = TestConnector.getResidencyStatus(uuid)
 
-      result mustBe expectedResponse
+      await(result) mustBe expectedResponse
 
     }
 

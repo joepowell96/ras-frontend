@@ -19,7 +19,7 @@ package connectors
 import config.WSHttp
 import models._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
 
@@ -36,6 +36,8 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
     http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
 
   }
+
+
 
 }
 
