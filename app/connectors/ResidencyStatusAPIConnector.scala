@@ -19,7 +19,7 @@ package connectors
 import config.WSHttp
 import models.ResidencyStatus
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpReads}
 
 import scala.concurrent.Future
 
@@ -33,7 +33,9 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
 
     val rasUri = s"$serviceUrl/${uri}"
 
-    http.GET[ResidencyStatus](rasUri, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
+     val hh = hc.withExtraHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" )
+
+     http.GET[ResidencyStatus](rasUri)(implicitly[HttpReads[ResidencyStatus]],hc = hh)
 
   }
 
