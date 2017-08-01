@@ -40,15 +40,12 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   implicit val headerCarrier = HeaderCarrier()
 
   val fakeRequest = FakeRequest()
-
-  val postData = Json.obj(
-    "firstName" -> "Ramin",
-    "lastName" -> "Esfandiari",
-    "nino" -> RandomNino.generate,
-    "dateOfBirth" -> RasDate("1", "1", "1999"))
-
   val uuid = "b5a4c95d-93ff-4054-b416-79c8a7e6f712"
-
+  val SCOTTISH = "scotResident"
+  val NON_SCOTTISH = "otherUKResident"
+  val nino = RandomNino.generate
+  val dob = RasDate("1", "1", "1999")
+  val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
   val customerMatchingResponse = CustomerMatchingResponse(
     List(
       Link("self", s"/customer/matched/${uuid}"),
@@ -56,18 +53,18 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     )
   )
 
-  val SCOTTISH = "scotResident"
-  val NON_SCOTTISH = "otherUKResident"
-
-
   object TestMemberDetailsController extends MemberDetailsController{
     override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mock[CustomerMatchingAPIConnector]
     override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mock[ResidencyStatusAPIConnector]
-
+    // following mocks will run if not specified explicitly in individual tests
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
-
   }
+
+  private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
+
+
+  // and finally the tests
 
 
   "MemberDetailsController" should {
@@ -138,7 +135,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result.get) should not equal (NOT_FOUND)
     }
 
-    "return bad request when errors present" in {
+    "return bad request when form error present" in {
       val postData = Json.obj(
         "firstName" -> "",
         "lastName" -> "Esfandiari",
@@ -165,5 +162,4 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
 
   }
 
-  def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 }
