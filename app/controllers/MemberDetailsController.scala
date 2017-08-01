@@ -84,7 +84,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             TaxYearResolver.currentTaxYear.toString,
             (TaxYearResolver.currentTaxYear + 1).toString,
             name,
-            memberDetails.dateOfBirth.toString,
+            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             memberDetails.nino)))
         }).flatMap(result => result)
 

@@ -188,7 +188,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "contain entered member's date of birth" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.toString
+      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
     }
 
     "contain entered member's nino" in {
