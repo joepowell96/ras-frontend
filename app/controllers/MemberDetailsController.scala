@@ -36,6 +36,9 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
 
+  val SCOTTISH = "scotResident"
+  val NON_SCOTTISH = "otherUKResident"
+
   implicit val context: config.RasContext = RasContextImpl
 
   def get = Action.async { implicit request =>
@@ -46,7 +49,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
 
     form.bindFromRequest.fold(
       formWithErrors => {
-        Logger.debug("[MemberDetailsController][post] Invalid form field passed" + formWithErrors)
+        Logger.debug("[MemberDetailsController][post] Invalid form field passed")
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
@@ -55,7 +58,16 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
           rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
         } yield {
-          Future.successful(Ok(views.html.match_found(rasResponse.currentYearResidencyStatus)))
+
+          Logger.info("[MemberDetailsController][post] Match found")
+
+          val currentYearResidencyStatus =
+            if(rasResponse.currentYearResidencyStatus == SCOTTISH)
+              Messages("scottish.taxpayer")
+          else
+              Messages("non.scottish.taxpayer")
+
+          Future.successful(Ok(views.html.match_found(currentYearResidencyStatus)))
         }).flatMap(result => result)
 
       }
