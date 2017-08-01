@@ -31,10 +31,13 @@ find.member.details = Find member details
 member.details.page.title = Find member details - GOV.UK
 member.details.page.header = Find member details
 
+match.found.page.title = Residency Status - GOV.UK
+
 first.name = first name
 last.name = last name
 nino = National Insurance number
 dob = date of birth
+name = name
 
 day = day
 month = month

@@ -47,6 +47,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val NON_SCOTTISH = "otherUKResident"
   val nino = RandomNino.generate
   val dob = RasDate("1", "1", "1999")
+  val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
   val customerMatchingResponse = CustomerMatchingResponse(
     List(
@@ -165,12 +166,42 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
     }
 
-    "contain this current year's date and period" in {
+    "contain current year's date and period" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("this-tax-year").text() shouldBe Messages("this.tax.year")
-      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear, currentTaxYear + 1)
+      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)
     }
 
+    "contain the correct title" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).title shouldBe Messages("match.found.page.title")
+    }
+
+    "contain entered member's name" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
+      doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
+    }
+
+    "contain entered member's date of birth" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
+      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.toString
+    }
+
+    "contain entered member's nino" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
+      doc(result).getElementById("nino").text() shouldBe memberDetails.nino
+    }
+
+    "contain entered member's next year residency status forecast name" in {
+      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any()))
+        .thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("nty-status-label").text() shouldBe Messages("status.for.next.tax.year", currentTaxYear.toString, (currentTaxYear + 1).toString)
+      doc(result).getElementById("nty-status").text() shouldBe Messages("non.scottish.taxpayer")
+    }
 
   }
 

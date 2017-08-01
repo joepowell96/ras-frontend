@@ -67,13 +67,25 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
           val currentYearResidencyStatus =
             if(rasResponse.currentYearResidencyStatus == SCOTTISH)
               Messages("scottish.taxpayer")
-          else
+            else
               Messages("non.scottish.taxpayer")
 
+          val nextYearResidencyStatus =
+            if(rasResponse.nextYearForecastResidencyStatus == SCOTTISH)
+              Messages("scottish.taxpayer")
+            else
+              Messages("non.scottish.taxpayer")
+
+          val name = memberDetails.firstName + " " + memberDetails.lastName
+
           Future.successful(Ok(views.html.match_found(
-                                                      currentYearResidencyStatus,
-                                                      TaxYearResolver.currentTaxYear,
-                                                      TaxYearResolver.currentTaxYear + 1)))
+            currentYearResidencyStatus,
+            nextYearResidencyStatus,
+            TaxYearResolver.currentTaxYear.toString,
+            (TaxYearResolver.currentTaxYear + 1).toString,
+            name,
+            memberDetails.dateOfBirth.toString,
+            memberDetails.nino)))
         }).flatMap(result => result)
 
       }
