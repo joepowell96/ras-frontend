@@ -21,21 +21,22 @@ import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
-import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import org.mockito.Matchers.{eq => meq, _}
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.Future
 
 class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
   val fakeGetRequest = FakeRequest("GET", "/")
+  val fakePostRequest = FakeRequest("POST", "/")
 
   val mockCustomerMatchingConnector = mock[CustomerMatchingAPIConnector]
   val mockRasConnector = mock[ResidencyStatusAPIConnector]
@@ -122,7 +123,12 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "return residency status" in {
-      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1", "1", "1999"))
+
+      val postData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1", "1", "1999"))
 
       val uuid = "b5a4c95d-93ff-4054-b416-79c8a7e6f712"
       val customerMatchingResponse = CustomerMatchingResponse(
@@ -134,23 +140,25 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
 
       val residencyStatus = ResidencyStatus("scotResident","otherUKResident")
 
-      when(mockCustomerMatchingConnector.findMemberDetails(meq(memberDetails))(any())).thenReturn(Future.successful(customerMatchingResponse))
-      when(mockRasConnector.getResidencyStatus(meq(uuid))(any())).thenReturn(Future.successful(residencyStatus))
+      when(mockCustomerMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
+      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(residencyStatus))
 
-      val result = await(TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails))))
+      val result = TestMemberDetailsController.post.apply(fakePostRequest.withJsonBody(Json.toJson(postData)))
 
       status(result) should equal(OK)
       contentAsString(result) should include(Messages("scottish.taxpayer"))
 
     }
 
-//    "return bad request when errors present" in {
-//      val memberDetails = MemberDetails(RandomNino.generate, "", "", RasDate("1", "1", "1984"))
-////      val response = HttpResponse(400,None,Map("Location" -> Seq("/matched/12121212")),None)
-//
-////      when(mockCustomerMatchingConnector.findMemberDetails(meq(memberDetails))(any()))thenReturn(Future.successful(any()))
-//      val result = TestMemberDetailsController.post.apply(FakeRequest(Helpers.POST, "/").withJsonBody(Json.toJson(memberDetails)))
-//      status(result) should equal(BAD_REQUEST)
-//    }
+    "return bad request when errors present" in {
+      val postData = Json.obj(
+        "firstName" -> "",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("1", "1", "1999"))
+
+      val result = TestMemberDetailsController.post.apply(fakePostRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(BAD_REQUEST)
+    }
   }
 }

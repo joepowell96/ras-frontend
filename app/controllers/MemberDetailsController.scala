@@ -16,11 +16,11 @@
 
 package controllers
 
-import akka.actor.Status.Success
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
+import play.api.Logger
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -46,6 +46,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
 
     form.bindFromRequest.fold(
       formWithErrors => {
+        Logger.debug("[MemberDetailsController][post] Invalid form field passed" + formWithErrors)
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
