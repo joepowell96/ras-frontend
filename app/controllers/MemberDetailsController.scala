@@ -23,6 +23,7 @@ import helpers.helpers.I18nHelper
 import play.api.Logger
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
@@ -55,8 +56,10 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       memberDetails => {
 
         (for {
+
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
           rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
+
         } yield {
 
           Logger.info("[MemberDetailsController][post] Match found")
@@ -67,7 +70,10 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
           else
               Messages("non.scottish.taxpayer")
 
-          Future.successful(Ok(views.html.match_found(currentYearResidencyStatus)))
+          Future.successful(Ok(views.html.match_found(
+                                                      currentYearResidencyStatus,
+                                                      TaxYearResolver.currentTaxYear,
+                                                      TaxYearResolver.currentTaxYear + 1)))
         }).flatMap(result => result)
 
       }

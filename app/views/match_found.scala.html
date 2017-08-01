@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@(currentYearResidencyStatus: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(currentYearResidencyStatus: String, currentTaxYear: Int, nextTaxYear: Int)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -22,8 +22,9 @@
 
 @ras_main(title = "Mahi Mahi Mahi Mahi") {
 
-  <h1>MATCH FOUND</h1>
-  <h2>Well Done Mahi</h2>
+  <h1 id="cy-residency-status">@currentYearResidencyStatus</h1>
+  <p id="this-tax-year">@Messages("this.tax.year")</p>
+  <p id="tax-year-period">@Messages("tax.year.period", currentTaxYear, nextTaxYear)</p>
 
-  <p id="cy-residency-status">@currentYearResidencyStatus</p>
+
 }

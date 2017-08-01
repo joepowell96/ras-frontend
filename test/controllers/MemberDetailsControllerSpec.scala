@@ -32,6 +32,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
@@ -40,6 +41,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   implicit val headerCarrier = HeaderCarrier()
 
   val fakeRequest = FakeRequest()
+  val currentTaxYear = TaxYearResolver.currentTaxYear
   val uuid = "b5a4c95d-93ff-4054-b416-79c8a7e6f712"
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -146,9 +148,13 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result) should equal(BAD_REQUEST)
     }
 
-    "return residency status for scottish taxpayer" in {
+    "return ok" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) should equal(OK)
+    }
+
+    "return residency status for scottish taxpayer" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("cy-residency-status").text() shouldBe Messages("scottish.taxpayer")
     }
 
@@ -156,9 +162,15 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).
         thenReturn(Future.successful(ResidencyStatus(NON_SCOTTISH, SCOTTISH)))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) should equal(OK)
       doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
     }
+
+    "contain this current year's date and period" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("this-tax-year").text() shouldBe Messages("this.tax.year")
+      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear, currentTaxYear + 1)
+    }
+
 
   }
 
