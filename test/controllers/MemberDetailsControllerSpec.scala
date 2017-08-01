@@ -59,12 +59,14 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   object TestMemberDetailsController extends MemberDetailsController{
     override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mock[CustomerMatchingAPIConnector]
     override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mock[ResidencyStatusAPIConnector]
-    // following mocks will run if not specified explicitly in individual tests
+
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
   }
 
+
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
+
 
 
   // and finally the tests
