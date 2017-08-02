@@ -16,17 +16,14 @@
 
 package controllers
 
-import akka.actor.FSM.Failure
-import akka.actor.Status.Success
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
-import models.CustomerMatchingResponse
+import models.{CustomerMatchingResponse, MemberDetails, ResidencyStatus}
 import play.api.Logger
-import play.api.mvc.Action
+import play.api.mvc.{Action, Result}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import uk.gov.hmrc.play.http.{Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -59,30 +56,58 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        (for {
-          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails).recover{ case f:Throwable => CustomerMatchingResponse(List())}
-          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
-        } yield {
+        for {
 
-          Logger.info("[MemberDetailsController][post] Match found")
+          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
+            .recover{
+              case e:Throwable =>
+                Logger.info("[MemberDetailsController][getResult] Customer Matching failed")
+                CustomerMatchingResponse(List())
+            }
 
-          val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
-          val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-          val name = memberDetails.firstName + " " + memberDetails.lastName
+          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(getResidencyStatusLink(customerMatchingResponse))
+            .recover{
+              case e:Throwable =>
+                Logger.info("[MemberDetailsController][getResult] Residency status failed")
+                ResidencyStatus("","")
+            }
 
-          Future.successful(Ok(views.html.match_found(
-            currentYearResidencyStatus,
-            nextYearResidencyStatus,
-            TaxYearResolver.currentTaxYear.toString,
-            (TaxYearResolver.currentTaxYear + 1).toString,
-            name,
-            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
-            memberDetails.nino)))
+          result <- getResult(memberDetails, customerMatchingResponse, rasResponse)
 
-        }).flatMap(identity)
+        } yield result
 
       }
     )
+  }
+
+  private def getResult(memberDetails: MemberDetails,
+                         customerMatchingResponse: CustomerMatchingResponse,
+                         rasResponse: ResidencyStatus): Future[Result] ={
+
+    if(customerMatchingResponse._links.isEmpty)
+      Future.successful(Ok(views.html.global_error()))
+    else if (rasResponse.currentYearResidencyStatus=="")
+      Future.successful(Ok(views.html.global_error()))
+    else{
+      Logger.info("[MemberDetailsController][post] Match found")
+
+      val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
+      val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+      val name = memberDetails.firstName + " " + memberDetails.lastName
+
+      Future.successful(Ok(views.html.match_found(
+        currentYearResidencyStatus,
+        nextYearResidencyStatus,
+        TaxYearResolver.currentTaxYear.toString,
+        (TaxYearResolver.currentTaxYear + 1).toString,
+        name,
+        memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+        memberDetails.nino)))
+    }
+  }
+
+  private def getResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
+    customerMatchingResponse._links.filter( _.name == "ras").head.href
   }
 
   private def getResidencyStatus(residencyStatus: String) : String = {
