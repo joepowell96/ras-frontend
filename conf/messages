@@ -50,6 +50,7 @@ error.mandatory = Enter a {0}
 
 error.nino.invalid = The National Insurance number you have entered does not have the correct number of letters and numbers
 error.nino.length = Enter a valid National Insurance number using 8 or 9 characters
+error.nino.special.character = Enter a National Insurance number using only letters and numbers
 
 error.length = {0} is too long (>{1})
 error.name.invalid = Enter a {0} using only letters, hyphens, apostrophes and spaces

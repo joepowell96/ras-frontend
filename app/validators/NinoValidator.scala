@@ -18,7 +18,9 @@ package validators
 
 trait NinoValidator {
   val validNinoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$"
+  val specialCharacterRegex = "^[a-zA-Z0-9 ]*$"
   def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
+  def containsNoSpecialCharacters(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(specialCharacterRegex)
 }
 
 object NinoValidator extends NinoValidator {

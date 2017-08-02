@@ -411,6 +411,26 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.dob.invalid.future")))))
     }
 
+    "return an error when nino with wrong number of characters and digits is passed" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB1234 56 56 C",
+        "dateOfBirth" -> RasDate("1","2","1422"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.length")))))
+    }
+
+    "return an error when nino with special character is passed" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB£56 56 C",
+        "dateOfBirth" -> RasDate("1","2","1422"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.special.character")))))
+    }
+
   }
 
 }
