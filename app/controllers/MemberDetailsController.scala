@@ -56,8 +56,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        for {
-
+        (for {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
             .recover{
               case e:Throwable =>
@@ -71,39 +70,27 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
                 Logger.info("[MemberDetailsController][getResult] Residency status failed")
                 ResidencyStatus("","")
             }
+        } yield {
 
-          result <- getResult(memberDetails, customerMatchingResponse, rasResponse)
+          Logger.info("[MemberDetailsController][post] Match found")
 
-        } yield result
+          val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
+          val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+          val name = memberDetails.firstName + " " + memberDetails.lastName
+
+          Future.successful(Ok(views.html.match_found(
+            currentYearResidencyStatus,
+            nextYearResidencyStatus,
+            TaxYearResolver.currentTaxYear.toString,
+            (TaxYearResolver.currentTaxYear + 1).toString,
+            name,
+            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+            memberDetails.nino)))
+
+        }).flatMap(identity)
 
       }
     )
-  }
-
-  private def getResult(memberDetails: MemberDetails,
-                         customerMatchingResponse: CustomerMatchingResponse,
-                         rasResponse: ResidencyStatus): Future[Result] ={
-
-    if(customerMatchingResponse._links.isEmpty)
-      Future.successful(Ok(views.html.global_error()))
-    else if (rasResponse.currentYearResidencyStatus=="")
-      Future.successful(Ok(views.html.global_error()))
-    else{
-      Logger.info("[MemberDetailsController][post] Match found")
-
-      val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
-      val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-      val name = memberDetails.firstName + " " + memberDetails.lastName
-
-      Future.successful(Ok(views.html.match_found(
-        currentYearResidencyStatus,
-        nextYearResidencyStatus,
-        TaxYearResolver.currentTaxYear.toString,
-        (TaxYearResolver.currentTaxYear + 1).toString,
-        name,
-        memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
-        memberDetails.nino)))
-    }
   }
 
   private def getResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
