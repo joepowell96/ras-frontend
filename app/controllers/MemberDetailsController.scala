@@ -55,28 +55,27 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        (for {
-          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
-          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
-        } yield {
+        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { cmr =>
+          val link = cmr._links.filter(_.name == "ras").head.href
 
-          Logger.info("[MemberDetailsController][post] Match found")
+          residencyStatusAPIConnector.getResidencyStatus(link).map { rs =>
 
-          val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
-          val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-          val name = memberDetails.firstName + " " + memberDetails.lastName
+            Logger.info("[MemberDetailsController][post] Match found")
+            val currentYearResidencyStatus = getResidencyStatus(rs.currentYearResidencyStatus)
+            val nextYearResidencyStatus = getResidencyStatus(rs.nextYearForecastResidencyStatus)
+            val name = memberDetails.firstName + " " + memberDetails.lastName
 
-          Future.successful(Ok(views.html.match_found(
-            currentYearResidencyStatus,
-            nextYearResidencyStatus,
-            TaxYearResolver.currentTaxYear.toString,
-            (TaxYearResolver.currentTaxYear + 1).toString,
-            name,
-            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
-            memberDetails.nino)))
+            Future.successful(Ok(views.html.match_found(
+              currentYearResidencyStatus,
+              nextYearResidencyStatus,
+              TaxYearResolver.currentTaxYear.toString,
+              (TaxYearResolver.currentTaxYear + 1).toString,
+              name,
+              memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+              memberDetails.nino)))
 
-        }).flatMap(result => result)
-
+          }.flatMap(res=>res)
+        }
       }
     )
   }

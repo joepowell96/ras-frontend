@@ -26,24 +26,24 @@ trait DateValidator {
 
   val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
     x => {
-      if (x.day.isEmpty) {
+      if (x.day.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("day")))))
-      }
-      else if (x.month.isEmpty) {
+
+      else if (x.month.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("month")))))
-      }
-      else if (x.year.isEmpty) {
+
+      else if (x.year.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("year")))))
-      }
-      else if (!DateValidator.checkForNumber(x.day)) {
+
+      else if (!DateValidator.checkForNumber(x.day))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("day")))))
-      }
-      else if (!DateValidator.checkForNumber(x.month)) {
+
+      else if (!DateValidator.checkForNumber(x.month))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("month")))))
-      }
-      else if (!DateValidator.checkForNumber(x.year)) {
+
+      else if (!DateValidator.checkForNumber(x.year))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
-      }
+
       else if (!DateValidator.checkDayRange(x.day, x.month)) {
         if(x.month.toInt == 2)
           Invalid(Seq(ValidationError(Messages("error.day.invalid.feb"))))
@@ -52,12 +52,13 @@ trait DateValidator {
         else
           Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
       }
-      else if (!DateValidator.checkMonthRange(x.month)) {
+
+      else if (!DateValidator.checkMonthRange(x.month))
         Invalid(Seq(ValidationError(Messages("error.month.invalid"))))
-      }
-      else if (!DateValidator.checkYearLength(x.year)) {
+
+      else if (!DateValidator.checkYearLength(x.year))
         Invalid(Seq(ValidationError(Messages("error.year.invalid.format"))))
-      }
+
       else {
         try {
           if (x.isInFuture)
