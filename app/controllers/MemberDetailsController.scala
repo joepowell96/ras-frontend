@@ -56,26 +56,14 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       memberDetails => {
 
         (for {
-
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
           rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
-
         } yield {
 
           Logger.info("[MemberDetailsController][post] Match found")
 
-          val currentYearResidencyStatus =
-            if(rasResponse.currentYearResidencyStatus == SCOTTISH)
-              Messages("scottish.taxpayer")
-            else
-              Messages("non.scottish.taxpayer")
-
-          val nextYearResidencyStatus =
-            if(rasResponse.nextYearForecastResidencyStatus == SCOTTISH)
-              Messages("scottish.taxpayer")
-            else
-              Messages("non.scottish.taxpayer")
-
+          val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
+          val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
           val name = memberDetails.firstName + " " + memberDetails.lastName
 
           Future.successful(Ok(views.html.match_found(
@@ -86,10 +74,20 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             name,
             memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             memberDetails.nino)))
+
         }).flatMap(result => result)
 
       }
     )
+  }
 
+  private def getResidencyStatus(residencyStatus: String) : String = {
+    if(residencyStatus == SCOTTISH)
+      Messages("scottish.taxpayer")
+    else if(residencyStatus == NON_SCOTTISH)
+      Messages("non.scottish.taxpayer")
+    else
+      ""
   }
 }
+

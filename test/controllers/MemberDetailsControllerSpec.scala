@@ -64,13 +64,9 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
   }
 
-
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
-
-
   // and finally the tests
-
 
   "MemberDetailsController" should {
 
@@ -203,6 +199,23 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("nty-status-label").text() shouldBe Messages("status.for.next.tax.year", currentTaxYear.toString, (currentTaxYear + 1).toString)
       doc(result).getElementById("nty-status").text() shouldBe Messages("non.scottish.taxpayer")
+    }
+
+    "contain 'print this page' link" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
+      doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
+    }
+
+    "contain find another member details link" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
+      doc(result).getElementById("find-another-member").attr("href") shouldBe "/relief-at-source/member-details"
+    }
+
+    "contain finish button" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("finish").text() shouldBe Messages("finish")
     }
 
   }

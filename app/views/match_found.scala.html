@@ -29,6 +29,8 @@
 
 @ras_main(title = Messages("match.found.page.title")) {
 
+  <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
+
   <h1 id="cy-residency-status">@currentYearResidencyStatus</h1>
   <p id="this-tax-year">@Messages("this.tax.year")</p>
   <p id="tax-year-period">@Messages("tax.year.period", currentTaxYear, nextTaxYear)</p>
@@ -44,4 +46,12 @@
 
   <p id="nty-status-label">@Messages("status.for.next.tax.year", currentTaxYear, nextTaxYear)</p>
   <p id="nty-status">@nextYearResidencyStatus</p>
+
+  <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
+
+  <div>
+    <a id="finish" class="button" href="" role="button" >@Messages("finish")</a>
+  </div>
+
+
 }
