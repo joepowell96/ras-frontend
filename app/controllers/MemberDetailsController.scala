@@ -16,14 +16,17 @@
 
 package controllers
 
+import akka.actor.FSM.Failure
+import akka.actor.Status.Success
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
+import models.CustomerMatchingResponse
 import play.api.Logger
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
-import uk.gov.hmrc.play.http.Upstream4xxResponse
+import uk.gov.hmrc.play.http.{Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -56,31 +59,29 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { cmr =>
+        (for {
+          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails).recover{ case f:Throwable => CustomerMatchingResponse(List())}
+          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(customerMatchingResponse._links.filter( _.name == "ras").head.href)
+        } yield {
 
-          val link = cmr._links.filter(_.name == "ras").head.href
+          Logger.info("[MemberDetailsController][post] Match found")
 
-          residencyStatusAPIConnector.getResidencyStatus(link).map { rs =>
+          val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
+          val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+          val name = memberDetails.firstName + " " + memberDetails.lastName
 
-            Logger.info("[MemberDetailsController][post] Match found")
-            val currentYearResidencyStatus = getResidencyStatus(rs.currentYearResidencyStatus)
-            val nextYearResidencyStatus = getResidencyStatus(rs.nextYearForecastResidencyStatus)
-            val name = memberDetails.firstName + " " + memberDetails.lastName
+          Future.successful(Ok(views.html.match_found(
+            currentYearResidencyStatus,
+            nextYearResidencyStatus,
+            TaxYearResolver.currentTaxYear.toString,
+            (TaxYearResolver.currentTaxYear + 1).toString,
+            name,
+            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+            memberDetails.nino)))
 
-            Future.successful(Ok(views.html.match_found(
-              currentYearResidencyStatus,
-              nextYearResidencyStatus,
-              TaxYearResolver.currentTaxYear.toString,
-              (TaxYearResolver.currentTaxYear + 1).toString,
-              name,
-              memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
-              memberDetails.nino)))
+        }).flatMap(identity)
 
-          }
-
-        }
-
-      }.flatMap(res=>res)
+      }
     )
   }
 
