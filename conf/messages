@@ -58,6 +58,9 @@ error.date.non.number = Enter a {0} using numbers only
 
 
 error.day.invalid = Enter a day between 1 and 31
+error.day.invalid.feb = Enter a day between 1 and 29
+error.day.invalid.thirty = Enter a day between 1 and 30
+
 error.month.invalid = Enter a month between 1 and 12
 error.year.invalid.format = Enter a year in full using 4 numbers
 error.dob.invalid.future = Enter a date of birth that is not in the future

@@ -66,8 +66,13 @@ object MemberDetailsForm extends I18nHelper{
         else if (!DateValidator.checkForNumber(x.year)) {
           Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
         }
-        else if (!DateValidator.checkDayRange(x.day)) {
-          Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
+        else if (!DateValidator.checkDayRange(x.day, x.month)) {
+          if(x.month.toInt == 2)
+            Invalid(Seq(ValidationError(Messages("error.day.invalid.feb"))))
+          else if(List(4,6,9,11).contains(x.month.toInt))
+            Invalid(Seq(ValidationError(Messages("error.day.invalid.thirty"))))
+          else
+            Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
         }
         else if (!DateValidator.checkMonthRange(x.month)) {
           Invalid(Seq(ValidationError(Messages("error.month.invalid"))))

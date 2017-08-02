@@ -24,10 +24,15 @@ trait DateValidator {
     value forall Character.isDigit
   }
 
-  def checkDayRange(day: String): Boolean = {
-
-    if (day forall Character.isDigit)
-      day.toInt > 0 && day.toInt < 32
+  def checkDayRange(day: String, month: String): Boolean = {
+    if (day forall Character.isDigit){
+      if(month.toInt == 2)
+        day.toInt > 0 && day.toInt < 30
+      else if(List(4,6,9,11).contains(month.toInt))
+        day.toInt > 0 && day.toInt < 31
+      else
+        day.toInt > 0 && day.toInt < 32
+    }
     else
       true
   }
