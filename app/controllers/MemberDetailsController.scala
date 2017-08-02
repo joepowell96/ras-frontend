@@ -23,6 +23,7 @@ import helpers.helpers.I18nHelper
 import play.api.Logger
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -56,6 +57,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       memberDetails => {
 
         customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { cmr =>
+
           val link = cmr._links.filter(_.name == "ras").head.href
 
           residencyStatusAPIConnector.getResidencyStatus(link).map { rs =>
@@ -74,9 +76,11 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
               memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
               memberDetails.nino)))
 
-          }.flatMap(res=>res)
+          }
+
         }
-      }
+
+      }.flatMap(res=>res)
     )
   }
 
