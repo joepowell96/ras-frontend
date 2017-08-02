@@ -46,16 +46,51 @@ object MemberDetailsForm extends I18nHelper{
   })
 
   val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
-    dob => {
-      try{
-        if(dob.isInFuture)
-          Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
-        else
-          Valid
-      }
-      catch { case e: Exception => Valid }
+    x => {
+
+        if (x.day.isEmpty) {
+          Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("day")))))
+        }
+        else if (x.month.isEmpty) {
+          Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("month")))))
+        }
+        else if (x.year.isEmpty) {
+          Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("year")))))
+        }
+        else if (!DateValidator.checkForNumber(x.day)) {
+          Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("day")))))
+        }
+        else if (!DateValidator.checkForNumber(x.month)) {
+          Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("month")))))
+        }
+        else if (!DateValidator.checkForNumber(x.year)) {
+          Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
+        }
+        else if (!DateValidator.checkDayRange(x.day)) {
+          Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
+        }
+        else if (!DateValidator.checkMonthRange(x.month)) {
+          Invalid(Seq(ValidationError(Messages("error.month.invalid"))))
+        }
+        else if (!DateValidator.checkYearLength(x.year)) {
+          Invalid(Seq(ValidationError(Messages("error.year.invalid.format"))))
+        }
+        else {
+          try {
+            if (x.isInFuture)
+              Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
+            else
+              Valid
+          }
+          catch {
+            case e: Exception => Valid
+          }
+        }
+
     }
+
   })
+
 
   val form = Form(
     mapping(
@@ -74,13 +109,6 @@ object MemberDetailsForm extends I18nHelper{
         "month" -> text,
         "year" -> text
       )(RasDate.apply)(RasDate.unapply)
-        .verifying(Messages("error.date.non.number"), x =>
-          DateValidator.checkForNumber(x.day) &&
-          DateValidator.checkForNumber(x.month) &&
-          DateValidator.checkForNumber(x.year))
-        .verifying(Messages("error.day.invalid"), x => DateValidator.checkDayRange(x.day))
-        .verifying(Messages("error.month.invalid"), x => DateValidator.checkMonthRange(x.month))
-        .verifying(Messages("error.year.invalid.format"), x => DateValidator.checkYearLength(x.year))
         .verifying(rasDateConstraint)
     )
     (MemberDetails.apply)(MemberDetails.unapply)

@@ -54,11 +54,13 @@ error.nino.special.character = Enter a National Insurance number using only lett
 
 error.length = {0} is too long (>{1})
 error.name.invalid = Enter a {0} using only letters, hyphens, apostrophes and spaces
-error.date.non.number = Enter a date using numbers only
+error.date.non.number = Enter a {0} using numbers only
+
+
 error.day.invalid = Enter a day between 1 and 31
 error.month.invalid = Enter a month between 1 and 12
-error.year.invalid.format = Enter the year in full (4 numbers)
-error.dob.invalid.future = Enter a date that is not in the future
+error.year.invalid.format = Enter a year in full using 4 numbers
+error.dob.invalid.future = Enter a date of birth that is not in the future
 
 generic.errors_heading = There is a problem with the form
 
