@@ -14,14 +14,7 @@
  * limitations under the License.
  *@
 
-@(currentYearResidencyStatus: String,
-  nextYearResidencyStatus: String,
-  currentTaxYear: String,
-  nextTaxYear: String,
-  name: String,
-  dob: String,
-  nino: String
-)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -31,21 +24,21 @@
 
   <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
 
-  <h1 id="cy-residency-status">@currentYearResidencyStatus</h1>
+  <h1 id="cy-residency-status">@residencyStatusResult.currentYearResidencyStatus</h1>
   <p id="this-tax-year">@Messages("this.tax.year")</p>
-  <p id="tax-year-period">@Messages("tax.year.period", currentTaxYear, nextTaxYear)</p>
+  <p id="tax-year-period">@Messages("tax.year.period", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
 
   <p id="name-label">@Messages("name").capitalize</p>
-  <p id="name">@name</p>
+  <p id="name">@residencyStatusResult.name</p>
 
   <p id="dob-label">@Messages("dob").capitalize</p>
-  <p id="dob">@dob</p>
+  <p id="dob">@residencyStatusResult.dob</p>
 
   <p id="nino-label">@Messages("nino")</p>
-  <p id="nino">@nino</p>
+  <p id="nino">@residencyStatusResult.nino</p>
 
   <p id="nty-status-label">@Messages("status.for.next.tax.year", currentTaxYear, nextTaxYear)</p>
-  <p id="nty-status">@nextYearResidencyStatus</p>
+  <p id="nty-status">@residencyStatusResult.nextYearResidencyStatus</p>
 
   <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
 

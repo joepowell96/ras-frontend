@@ -20,7 +20,7 @@ import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
 import helpers.helpers.I18nHelper
-import models.{CustomerMatchingResponse, MemberDetails, ResidencyStatus}
+import models.{CustomerMatchingResponse, MemberDetails, ResidencyStatus, ResidencyStatusResult}
 import play.api.Logger
 import play.api.mvc.{Action, Result}
 import uk.gov.hmrc.play.frontend.controller.FrontendController
@@ -37,6 +37,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
 
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
+  val sessionService: SessionService = SessionService
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -78,14 +79,20 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
           val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
           val name = memberDetails.firstName + " " + memberDetails.lastName
 
-          Future.successful(Ok(views.html.match_found(
+          val residencyStatusResult = ResidencyStatusResult(
             currentYearResidencyStatus,
             nextYearResidencyStatus,
             TaxYearResolver.currentTaxYear.toString,
             (TaxYearResolver.currentTaxYear + 1).toString,
             name,
             memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
-            memberDetails.nino)))
+            memberDetails.nino
+          )
+
+          Future.successful(Ok(routes.MatchFoundController.get(residencyStatusResult)))
+
+
+
 
         }).flatMap(identity)
 

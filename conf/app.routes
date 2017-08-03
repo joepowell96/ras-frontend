@@ -7,3 +7,5 @@ GET         /start                        controllers.StartPageController.get
 
 GET         /member-details               controllers.MemberDetailsController.get
 POST        /member-details               controllers.MemberDetailsController.post
+
+GET         /match-found                  controllers.MatchFoundController.get(residencyStatusResult: ResidencyStatusResult)
