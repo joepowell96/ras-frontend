@@ -23,6 +23,8 @@ import helpers.helpers.I18nHelper
 import models.{CustomerMatchingResponse, MemberDetails, ResidencyStatus, ResidencyStatusResult}
 import play.api.Logger
 import play.api.mvc.{Action, Result}
+import services.SessionService
+import services.services.SessionService
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -31,12 +33,14 @@ import scala.concurrent.Future
 object MemberDetailsController extends MemberDetailsController{
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
+  override val sessionService: SessionService = SessionService
 }
 
 trait MemberDetailsController extends FrontendController with I18nHelper {
 
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
+  val sessionService: SessionService
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -55,6 +59,8 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
+
+        sessionService.cacheMemberDetails(memberDetails)
 
         for {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
@@ -88,7 +94,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             memberDetails.nino
           )
 
-          //cache the result in session
+          sessionService.cacheResidencyStatusResult(residencyStatusResult)
 
           Redirect(routes.MatchFoundController.get())
 

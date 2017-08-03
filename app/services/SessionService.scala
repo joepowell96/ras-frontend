@@ -59,6 +59,63 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
+  def cacheMemberDetails(memberDetails: MemberDetails)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    Logger.debug(s"[SessionService][cacheMemberDetails]")
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(memberDetails = memberDetails)
+          case None => cleanSession.copy(memberDetails = memberDetails)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
+
+    Logger.debug(s"[SessionService][fetchMemberDetails]")
+
+    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
+      currentSession.map {
+        _.memberDetails
+      }
+    }
+  }
+
+  def cacheResidencyStatusResult(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    Logger.debug(s"[SessionService][cacheResidencyStatusResult]")
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(residencyStatusResult = residencyStatusResult)
+          case None => cleanSession.copy(residencyStatusResult = residencyStatusResult)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def fetchResidencyStatusResult()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
+
+    Logger.debug(s"[SessionService][fetchResidencyStatusResult]")
+
+    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
+      currentSession.map {
+        _.memberDetails
+      }
+    }
+  }
 
 
 }
