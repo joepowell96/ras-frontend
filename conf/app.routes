@@ -8,5 +8,6 @@ GET         /start                        controllers.StartPageController.get
 GET         /member-details               controllers.MemberDetailsController.get
 POST        /member-details               controllers.MemberDetailsController.post
 
-GET         /match-found                  controllers.MatchFoundController.get
+GET         /match-found                  controllers.GlobalErrorController.get
 
+GET         /global-error                 controllers.GlobalErrorController.get

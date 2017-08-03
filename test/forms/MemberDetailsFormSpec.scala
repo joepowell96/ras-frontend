@@ -478,6 +478,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
+
   }
 
 }

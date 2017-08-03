@@ -22,18 +22,15 @@ import play.api.mvc.Action
 
 import scala.concurrent.Future
 
-object MatchFoundController extends GlobalErrorController
+object GlobalErrorController extends GlobalErrorController
 
-trait MatchFoundController extends RasController {
+trait GlobalErrorController extends RasController {
 
   implicit val context: config.RasContext = RasContextImpl
 
   def get = Action.async {
     implicit request =>
-
-//       Ok(views.html.match_found(rs))
-        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST","","","","","",""))))
-
+        Future.successful(Ok(views.html.global_error()))
   }
 
 }

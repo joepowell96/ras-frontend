@@ -53,6 +53,11 @@ class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I1
       charset(result) shouldBe Some("utf-8")
     }
 
+    "contain correct title and header" in {
+      val result = TestMatchFoundController.get(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.title shouldBe Messages("match.found.page.title")
+    }
   }
 
 }

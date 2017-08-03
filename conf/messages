@@ -31,7 +31,7 @@ find.member.details = Find member details
 member.details.page.title = Find member details - GOV.UK
 member.details.page.header = Find member details
 
-match.found.page.title = Residency Status - GOV.UK
+match.found.page.title = Match found - GOV.UK
 
 first.name = first name
 last.name = last name
@@ -77,4 +77,5 @@ tax.year.period = 6 April {0} to 5 April {1}
 print.this.page = Print this page
 find.another.member = Find another member
 finish = Finish
+
 
