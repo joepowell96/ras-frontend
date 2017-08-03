@@ -53,4 +53,6 @@ class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I1
       charset(result) shouldBe Some("utf-8")
     }
 
+  }
+
 }

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package config
+package controllers
 
-import uk.gov.hmrc.http.cache.client.SessionCache
+import helpers.helpers.I18nHelper
 
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-trait SessionCacheWiring {
-  def sessionCache: SessionCache = RasSessionCache
+trait RasController extends FrontendController with I18nHelper {
+
 }
+

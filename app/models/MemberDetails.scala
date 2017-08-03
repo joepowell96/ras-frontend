@@ -16,8 +16,9 @@
 
 package models
 
+
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Writes}
+import play.api.libs.json.{JsPath, Reads, Writes}
 
 case class MemberDetails(firstName: String,
                          lastName: String,
@@ -25,6 +26,13 @@ case class MemberDetails(firstName: String,
                          dateOfBirth: RasDate)
 
 object MemberDetails {
+  implicit val customerDetailsReads: Reads[MemberDetails] = (
+    (JsPath \ "nino").read[String] and
+      (JsPath \ "firstName").read[String]and
+      (JsPath \ "lastName").read[String] and
+      (JsPath \ "dateOfBirth").read[RasDate]
+    )(MemberDetails.apply _)
+
   implicit val memberDetailsWrites: Writes[MemberDetails] = (
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and

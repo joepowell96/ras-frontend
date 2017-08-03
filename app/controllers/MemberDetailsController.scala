@@ -19,13 +19,9 @@ package controllers
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
-import helpers.helpers.I18nHelper
-import models.{CustomerMatchingResponse, MemberDetails, ResidencyStatus, ResidencyStatusResult}
+import models.{CustomerMatchingResponse, ResidencyStatus, ResidencyStatusResult}
 import play.api.Logger
-import play.api.mvc.{Action, Result}
-import services.SessionService
-import services.services.SessionService
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.mvc.Action
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -33,14 +29,12 @@ import scala.concurrent.Future
 object MemberDetailsController extends MemberDetailsController{
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-  override val sessionService: SessionService = SessionService
 }
 
-trait MemberDetailsController extends FrontendController with I18nHelper {
+trait MemberDetailsController extends RasController {
 
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
-  val sessionService: SessionService
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -60,8 +54,6 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        sessionService.cacheMemberDetails(memberDetails)
-
         for {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
             .recover{
@@ -77,6 +69,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
                 ResidencyStatus("","")
             }
         } yield {
+
 
           Logger.info("[MemberDetailsController][post] Match found")
 
@@ -94,13 +87,12 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             memberDetails.nino
           )
 
-          sessionService.cacheResidencyStatusResult(residencyStatusResult)
-
-          Redirect(routes.MatchFoundController.get())
+          //Redirect(routes.MatchFoundController.get())
+          Future.successful(Ok(views.html.match_found(residencyStatusResult)))
 
         }
 
-      }
+      }.flatMap(identity)
     )
   }
 
