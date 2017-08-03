@@ -32,6 +32,7 @@ member.details.page.title = Find member details - GOV.UK
 member.details.page.header = Find member details
 
 match.found.page.title = Match found - GOV.UK
+global.error.page.title = Technical error - GOV.UK
 
 first.name = first name
 last.name = last name
@@ -78,4 +79,5 @@ print.this.page = Print this page
 find.another.member = Find another member
 finish = Finish
 
+technical.error = There was a technical problem retrieving the results. Please try again later.
 

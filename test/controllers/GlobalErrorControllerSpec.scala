@@ -25,38 +25,40 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
+
 import scala.concurrent.Future
 
-class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
+class GlobalErrorControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
 
   val fakeRequest = FakeRequest("GET", "/")
 
-  object TestMatchFoundController extends MatchFoundController
+  object TestGlobalErrorController extends GlobalErrorController
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
-  "MatchFoundController" should {
+  "GlobalErrorController" should {
 
-    "respond to GET /relief-at-source/match-found" in {
-      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-found"))
+    "respond to GET /relief-at-source/global-error" in {
+      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/global-error"))
       status(result.get) should not equal (NOT_FOUND)
     }
 
     "return 200" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+      val result = TestGlobalErrorController.get(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
     "return HTML" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+      val result = TestGlobalErrorController.get(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
-    "contain correct title" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+    "contain correct title and header" in {
+      val result = TestGlobalErrorController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
-      doc.title shouldBe Messages("match.found.page.title")
+      doc.title shouldBe Messages("global.error.page.title")
+      doc.getElementById("header").text shouldBe Messages("technical.error")
     }
   }
 

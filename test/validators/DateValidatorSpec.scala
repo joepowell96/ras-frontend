@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+package validators
 
-@import uk.gov.hmrc.play.views.html._
-@import uk.gov.hmrc.play.views.html.helpers._
+import org.scalatest.Matchers
+import uk.gov.hmrc.play.test.UnitSpec
 
-@ras_main(title = Messages("global.error.page.title")) {
+class DateValidatorSpec extends UnitSpec with Matchers {
 
-  <h1 id="header">@Messages("technical.error")</h1>
+  "date validator" should{
+
+    "return false when day is non digit" in {
+      DateValidator.checkDayRange("a","b") shouldBe false
+    }
+
+    "return false when month is non digit" in {
+      DateValidator.checkMonthRange("a") shouldBe false
+    }
+
+    "return false when year is non digit" in {
+      DateValidator.checkYearLength("a") shouldBe false
+    }
+  }
 
 }

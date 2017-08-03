@@ -87,21 +87,21 @@ trait DateValidator {
         day.toInt > 0 && day.toInt < 32
     }
     else
-      true
+      false
   }
 
   def checkMonthRange(month: String): Boolean = {
     if (month forall Character.isDigit)
       month.toInt > 0 && month.toInt < 13
     else
-      true
+      false
   }
 
   def checkYearLength(year: String): Boolean = {
     if (year forall Character.isDigit)
       year.length == YEAR_FIELD_LENGTH
     else
-      true
+      false
   }
 }
 

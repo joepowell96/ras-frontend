@@ -22,7 +22,6 @@ import forms.MemberDetailsForm._
 import models.{CustomerMatchingResponse, ResidencyStatus, ResidencyStatusResult}
 import play.api.Logger
 import play.api.mvc.Action
-import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -72,9 +71,9 @@ trait MemberDetailsController extends RasController {
         } yield {
 
           if(customerMatchingResponse._links.isEmpty)
-            Future.successful(Ok(views.html.global_error()))
+            Future.successful(Redirect(routes.GlobalErrorController.get))
           else if (rasResponse.currentYearResidencyStatus=="")
-            Future.successful(Ok(views.html.global_error()))
+            Future.successful(Redirect(routes.GlobalErrorController.get))
           else {
             Logger.info("[MemberDetailsController][post] Match found")
 

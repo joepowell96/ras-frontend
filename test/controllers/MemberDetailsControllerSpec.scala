@@ -218,6 +218,19 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc(result).getElementById("finish").text() shouldBe Messages("finish")
     }
 
+    "redirect to technical error page if customer matching fails to return a response" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+    }
+
+    "redirect to technical error page if ras fails to return a response" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
+      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+    }
+
   }
 
 }
