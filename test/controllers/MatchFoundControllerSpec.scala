@@ -17,7 +17,6 @@
 package controllers
 
 import helpers.helpers.I18nHelper
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._

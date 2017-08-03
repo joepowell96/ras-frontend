@@ -56,7 +56,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
       },
       memberDetails => {
 
-        (for {
+        for {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
             .recover{
               case e:Throwable =>
@@ -88,12 +88,9 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             memberDetails.nino
           )
 
-          Future.successful(Ok(views.html.match_found(residencyStatusResult)))
+          Redirect(routes.MatchFoundController.get())
 
-
-
-
-        }).flatMap(identity)
+        }
 
       }
     )
