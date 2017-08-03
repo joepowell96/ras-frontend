@@ -88,6 +88,8 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             memberDetails.nino
           )
 
+          //cache the result in session
+
           Redirect(routes.MatchFoundController.get())
 
         }

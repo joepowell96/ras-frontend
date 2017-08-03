@@ -33,7 +33,7 @@ trait MatchFoundController extends FrontendController with I18nHelper {
   def get = Action.async { implicit request => {
 
       // TODO
-      //retrieve residency status result from session instead
+      //retrieve residency status result from session cache instead
 
       val residencyStatusResult = ResidencyStatusResult("","","","","","","")
 

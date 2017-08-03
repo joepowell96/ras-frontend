@@ -17,16 +17,23 @@
 package controllers
 
 import helpers.helpers.I18nHelper
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import play.api.http.Status
+import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.{contentAsString, _}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+
+import scala.concurrent.Future
 
 class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
 
   val fakeRequest = FakeRequest("GET", "/")
 
   object TestMatchFoundController extends MatchFoundController
+
+  private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
   "MatchFoundController" should {
 
@@ -45,6 +52,5 @@ class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I1
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
-  }
 
 }

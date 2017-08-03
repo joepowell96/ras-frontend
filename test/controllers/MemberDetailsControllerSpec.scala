@@ -147,9 +147,9 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result) should equal(BAD_REQUEST)
     }
 
-    "return ok" in {
+    "redirect" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) should equal(OK)
+      status(result) should equal(303)
     }
 
     "return residency status for scottish taxpayer" in {
