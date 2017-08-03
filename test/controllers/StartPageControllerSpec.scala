@@ -16,17 +16,16 @@
 
 package controllers
 
+import helpers.helpers.I18nHelper
 import org.jsoup.Jsoup
 import play.api.http.Status
-import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 
-class StartPageControllerSpec extends UnitSpec with WithFakeApplication {
+
+class StartPageControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper{
 
   val fakeRequest = FakeRequest("GET", "/")
 

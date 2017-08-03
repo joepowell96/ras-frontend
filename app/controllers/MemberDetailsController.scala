@@ -37,7 +37,6 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
 
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
-  val sessionService: SessionService = SessionService
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -89,7 +88,7 @@ trait MemberDetailsController extends FrontendController with I18nHelper {
             memberDetails.nino
           )
 
-          Future.successful(Ok(routes.MatchFoundController.get(residencyStatusResult)))
+          Future.successful(Ok(views.html.match_found(residencyStatusResult)))
 
 
 

@@ -18,6 +18,7 @@ package controllers
 
 import config.RasContextImpl
 import helpers.helpers.I18nHelper
+import models.ResidencyStatusResult
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
@@ -29,9 +30,14 @@ trait MatchFoundController extends FrontendController with I18nHelper {
 
   implicit val context: config.RasContext = RasContextImpl
 
-  def get() = Action.async {
-    implicit request => {
-      Future.successful(Ok(views.html.match_found()))
+  def get = Action.async { implicit request => {
+
+      // TODO
+      //retrieve residency status result from session instead
+
+      val residencyStatusResult = ResidencyStatusResult("","","","","","","")
+
+      Future.successful(Ok(views.html.match_found(residencyStatusResult)))
     }
   }
 

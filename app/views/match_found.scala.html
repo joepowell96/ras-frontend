@@ -18,7 +18,6 @@
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
-@import views.html.helpers._
 
 @ras_main(title = Messages("match.found.page.title")) {
 
@@ -32,12 +31,12 @@
   <p id="name">@residencyStatusResult.name</p>
 
   <p id="dob-label">@Messages("dob").capitalize</p>
-  <p id="dob">@residencyStatusResult.dob</p>
+  <p id="dob">@residencyStatusResult.dateOfBirth</p>
 
   <p id="nino-label">@Messages("nino")</p>
   <p id="nino">@residencyStatusResult.nino</p>
 
-  <p id="nty-status-label">@Messages("status.for.next.tax.year", currentTaxYear, nextTaxYear)</p>
+  <p id="nty-status-label">@Messages("status.for.next.tax.year", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
   <p id="nty-status">@residencyStatusResult.nextYearResidencyStatus</p>
 
   <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
