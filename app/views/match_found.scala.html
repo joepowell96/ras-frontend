@@ -21,29 +21,58 @@
 
 @ras_main(title = Messages("match.found.page.title")) {
 
-  <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
+<div class="grid-row">
 
-  <h1 id="cy-residency-status">@residencyStatusResult.currentYearResidencyStatus</h1>
-  <p id="this-tax-year">@Messages("this.tax.year")</p>
-  <p id="tax-year-period">@Messages("tax.year.period", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
+  <div class="column-full">
 
-  <p id="name-label">@Messages("name").capitalize</p>
-  <p id="name">@residencyStatusResult.name</p>
+      <div>
+        <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
+      </div>
 
-  <p id="dob-label">@Messages("dob").capitalize</p>
-  <p id="dob">@residencyStatusResult.dateOfBirth</p>
+      <br>
 
-  <p id="nino-label">@Messages("nino")</p>
-  <p id="nino">@residencyStatusResult.nino</p>
+      <h1 id="cy-residency-status">@residencyStatusResult.currentYearResidencyStatus</h1>
+      <p id="this-tax-year">@Messages("this.tax.year")</p>
+      <p id="tax-year-period">@Messages("tax.year.period", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
 
-  <p id="nty-status-label">@Messages("status.for.next.tax.year", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
-  <p id="nty-status">@residencyStatusResult.nextYearResidencyStatus</p>
 
-  <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
+      <table>
+        <tbody>
 
-  <div>
-    <a id="finish" class="button" href="" role="button" >@Messages("finish")</a>
+          <tr>
+            <th id="name-label">@Messages("name").capitalize</th>
+            <td id="name">@residencyStatusResult.name</td>
+          </tr>
+
+          <tr>
+            <th id="dob-label">@Messages("dob").capitalize</th>
+            <td id="dob">@residencyStatusResult.dateOfBirth</td>
+          </tr>
+
+          <tr>
+            <th id="nino-label">@Messages("nino")</th>
+            <td id="nino">@residencyStatusResult.nino</td>
+          </tr>
+
+          <tr>
+            <th id="nty-status-label">@Messages("status.for.next.tax.year", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</th>
+            <td id="nty-status">@residencyStatusResult.nextYearResidencyStatus</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div>
+        <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
+      </div>
+
+      <br>
+
+      <div>
+        <a id="finish" class="button" href="" role="button" >@Messages("finish")</a>
+      </div>
+
   </div>
 
-
+</div>
 }
