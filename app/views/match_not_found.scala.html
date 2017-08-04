@@ -39,5 +39,22 @@
    <a id="try-again" class="button" href="" role="button" >@Messages("try.again")</a>
   </div>
 
+<br>
+  <div data-accordion
+       data-accordion-animate
+       aria-expanded="false"
+       class="accordion__body__row--no-border">
+
+     <a data-accordion-arrow class="accordion__button link--no-underline bold-small" href="" data-accordion-button role="button">
+      @Messages("tried")
+     </a>
+
+     <div class="accordion__body" aria-expanded="false" data-accordion-body aria-hidden="true">
+      <p>@Messages("tried.confirm.details")</p>
+      <p>@Messages("tried.guidance")
+       <a id="confirm-nino" href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/national-insurance-numbers">@Messages("confirm.nino.link")</a>.
+      </p>
+     </div>
+  </div>
 
 }
