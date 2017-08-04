@@ -16,17 +16,20 @@
 
 package config
 
-import com.typesafe.config.Config
+import akka.stream.Materializer
+import com.typesafe.config.{Config, ConfigFactory}
 import net.ceedubs.ficus.Ficus._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
-import play.api.mvc.Request
+import play.api.mvc.{EssentialFilter, Request}
 import play.api.{Application, Configuration, Play}
 import play.twirl.api.Html
+import uk.gov.hmrc.auth.filter.FilterConfig
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.filters.frontend.CSRFExceptionsFilter
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
@@ -46,6 +49,8 @@ object FrontendGlobal extends DefaultFrontendGlobal {
     views.html.error(pageTitle, heading, message)
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
+
+  override def filters: Seq[EssentialFilter] = super.filters ++ Seq(AuthorisationFilter())
 }
 
 object ControllerConfiguration extends ControllerConfig {
@@ -65,4 +70,17 @@ object AuditFilter extends FrontendAuditFilter with RunMode with AppName with Mi
   override lazy val auditConnector = FrontendAuditConnector
 
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
+}
+
+
+object AuthorisationFilter {
+  def apply()(implicit m: Materializer) = new uk.gov.hmrc.auth.filter.AuthorisationFilter {
+    override def config: FilterConfig = FilterConfig(Play.current.configuration.getConfig("controllers")
+      .map(_.underlying)
+      .getOrElse(ConfigFactory.empty()))
+
+    override def connector: uk.gov.hmrc.auth.core.AuthConnector = RasFrontendAuthConnector
+
+    override implicit def mat: Materializer = m
+  }
 }
