@@ -231,12 +231,44 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result) shouldBe 303
     }
 
-    "return no match found" in {
+    "return no match found with correct page header" in {
       when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) shouldBe 303
+      status(result) shouldBe 200
+      doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
     }
 
+    "return description and entered member details" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("subheader").text shouldBe Messages("match.not.found.subheader")
+    }
+
+    "contain entered member's name when no match found" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
+      doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
+    }
+
+    "contain entered member's date of birth when no match found" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
+      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+    }
+
+    "contain entered member's nino when no match found" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
+      doc(result).getElementById("nino").text() shouldBe memberDetails.nino
+    }
+
+    "contain try again button" in {
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
+    }
   }
 
 }

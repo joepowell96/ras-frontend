@@ -79,8 +79,11 @@ trait MemberDetailsController extends RasController {
             }
         } yield {
 
+          val name = memberDetails.firstName + " " + memberDetails.lastName
+          val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+
           if(extractResidencyStatusLink(customerMatchingResponse) == NO_MATCH)
-            Future.successful(Redirect(routes.MatchNotFoundController.get))
+            Future.successful(Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino)))
           else if(extractResidencyStatusLink(customerMatchingResponse).isEmpty)
             Future.successful(Redirect(routes.GlobalErrorController.get))
           else if (rasResponse.currentYearResidencyStatus.isEmpty)
@@ -94,7 +97,6 @@ trait MemberDetailsController extends RasController {
 
             val currentYearResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
             val nextYearResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-            val name = memberDetails.firstName + " " + memberDetails.lastName
 
             val residencyStatusResult = ResidencyStatusResult(
               currentYearResidencyStatus,
@@ -102,7 +104,7 @@ trait MemberDetailsController extends RasController {
               TaxYearResolver.currentTaxYear.toString,
               (TaxYearResolver.currentTaxYear + 1).toString,
               name,
-              memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+              dateOfBirth,
               memberDetails.nino
             )
 

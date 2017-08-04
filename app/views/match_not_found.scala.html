@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(name: String, dateOfBirth:String, nino:String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -24,6 +24,20 @@
 
   <h1 id="match-not-found">@Messages("member.details.not.found")</h1>
 
+  <p id="subheader">@Messages("match.not.found.subheader")</p>
+
+  <p id="name-label">@Messages("name").capitalize</p>
+  <p id="name">@name</p>
+
+  <p id="dob-label">@Messages("dob").capitalize</p>
+  <p id="dob">@dateOfBirth</p>
+
+  <p id="nino-label">@Messages("nino")</p>
+  <p id="nino">@nino</p>
+
+  <div>
+   <a id="try-again" class="button" href="" role="button" >@Messages("try.again")</a>
+  </div>
 
 
 }

@@ -84,3 +84,6 @@ technical.error = There was a technical problem retrieving the results. Please t
 
 member.details.not.found = Member details not found
 
+match.not.found.subheader = The details you''ve entered don't match HM Revenue and Customs’ records. Check you’ve entered the correct information.
+
+try.again = Try again

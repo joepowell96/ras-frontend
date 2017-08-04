@@ -17,7 +17,7 @@
 package controllers
 
 import config.RasContextImpl
-import models.ResidencyStatusResult
+import models.{MemberDetails, RasDate, ResidencyStatusResult}
 import play.api.mvc.Action
 
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ trait MatchNotFoundController extends RasController {
 
   def get = Action.async {
     implicit request =>
-        Future.successful(Ok(views.html.match_not_found(ResidencyStatusResult("TEST","","","","","",""))))
+        Future.successful(Ok(views.html.match_not_found("","","")))
   }
 
 }
