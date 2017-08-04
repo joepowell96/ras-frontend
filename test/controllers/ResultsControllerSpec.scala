@@ -27,36 +27,59 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
 
-class MatchFoundControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
+class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
 
   val fakeRequest = FakeRequest("GET", "/")
 
-  object TestMatchFoundController extends MatchFoundController
+  object TestResultsController extends ResultsController
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
-  "MatchFoundController" should {
+  "Results Controller" should {
 
     "respond to GET /relief-at-source/match-found" in {
       val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-found"))
       status(result.get) should not equal (NOT_FOUND)
     }
 
-    "return 200" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+    "respond to GET /relief-at-source/match-not-found" in {
+      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-not-found"))
+      status(result.get) should not equal (NOT_FOUND)
+    }
+
+    "return 200 when match found" in {
+      val result = TestResultsController.matchFound(fakeRequest)
       status(result) shouldBe Status.OK
     }
 
-    "return HTML" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+    "return HTML when match found" in {
+      val result = TestResultsController.matchFound(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
-    "contain correct title" in {
-      val result = TestMatchFoundController.get(fakeRequest)
+    "contain correct title when match found" in {
+      val result = TestResultsController.matchFound(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
       doc.title shouldBe Messages("match.found.page.title")
+    }
+
+    "return 200 when match not found" in {
+      val result = TestResultsController.noMatchFound(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
+    "return HTML when match not found" in {
+      val result = TestResultsController.noMatchFound(fakeRequest)
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+    }
+
+    "contain correct title when match not found" in {
+      val result = TestResultsController.noMatchFound(fakeRequest)
+      val doc = Jsoup.parse(contentAsString(result))
+      doc.title shouldBe Messages("match.not.found.page.title")
+      doc.getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
     }
   }
 

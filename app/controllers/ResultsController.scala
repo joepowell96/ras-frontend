@@ -17,20 +17,25 @@
 package controllers
 
 import config.RasContextImpl
-import models.{MemberDetails, RasDate, ResidencyStatusResult}
+import models.ResidencyStatusResult
 import play.api.mvc.Action
 
 import scala.concurrent.Future
 
-object MatchNotFoundController extends MatchNotFoundController
+object ResultsController extends ResultsController
 
-trait MatchNotFoundController extends RasController {
+trait ResultsController extends RasController {
 
   implicit val context: config.RasContext = RasContextImpl
 
-  def get = Action.async {
+  def matchFound = Action.async {
     implicit request =>
-        Future.successful(Ok(views.html.match_not_found("","","")))
+        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST","","","","","",""))))
+  }
+
+  def noMatchFound = Action.async {
+    implicit request =>
+      Future.successful(Ok(views.html.match_not_found("","","")))
   }
 
 }

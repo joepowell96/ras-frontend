@@ -108,7 +108,6 @@ trait MemberDetailsController extends RasController {
               memberDetails.nino
             )
 
-            //Redirect(routes.MatchFoundController.get())
             Future.successful(Ok(views.html.match_found(residencyStatusResult)))
           }
 
