@@ -82,3 +82,5 @@ finish = Finish
 
 technical.error = There was a technical problem retrieving the results. Please try again later.
 
+member.details.not.found = Member details not found
+

@@ -30,10 +30,7 @@ trait MatchNotFoundController extends RasController {
 
   def get = Action.async {
     implicit request =>
-
-//       Ok(views.html.match_found(rs))
         Future.successful(Ok(views.html.match_not_found(ResidencyStatusResult("TEST","","","","","",""))))
-
   }
 
 }
