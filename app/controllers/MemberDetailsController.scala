@@ -66,19 +66,18 @@ trait MemberDetailsController extends RasController {
 
             val name = memberDetails.firstName + " " + memberDetails.lastName
             val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+            val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
+            val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
 
-
-            if (extractResidencyStatus(rasResponse.currentYearResidencyStatus).isEmpty ||
-              extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus).isEmpty)
+            if (cyResidencyStatus.isEmpty || nyResidencyStatus.isEmpty){
+              Logger.info("[MemberDetailsController][post] An unknown residency status was returned")
               Future.successful(Redirect(routes.GlobalErrorController.get))
+            }
             else {
 
               Logger.info("[MemberDetailsController][post] Match found")
 
-              val currentYearResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
-              val nextYearResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-
-              val residencyStatusResult = ResidencyStatusResult(currentYearResidencyStatus, nextYearResidencyStatus,
+              val residencyStatusResult = ResidencyStatusResult(cyResidencyStatus, nyResidencyStatus,
                 TaxYearResolver.currentTaxYear.toString, (TaxYearResolver.currentTaxYear + 1).toString,
                 name, dateOfBirth, memberDetails.nino)
 

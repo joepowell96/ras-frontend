@@ -67,7 +67,10 @@ trait DateValidator {
             Valid
         }
         catch {
+          // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
           case e: Exception => Valid
+          // $COVERAGE-ON$
+
         }
       }
     }
