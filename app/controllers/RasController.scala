@@ -20,7 +20,5 @@ import helpers.helpers.I18nHelper
 
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-trait RasController extends FrontendController with I18nHelper {
-
-}
+trait RasController extends FrontendController with I18nHelper
 

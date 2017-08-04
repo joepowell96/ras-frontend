@@ -60,61 +60,47 @@ trait MemberDetailsController extends RasController {
       },
       memberDetails => {
 
-        for {
-          customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
-            .recover{
-              case e:Upstream4xxResponse if(e.upstreamResponseCode == FORBIDDEN) =>
-                Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
-                NO_MATCH_CMR
-              case e:Throwable =>
-                Logger.error("[MemberDetailsController][getResult] Customer Matching failed")
-                EMPTY_CMR
+        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>
+
+          residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).flatMap { rasResponse =>
+
+            val name = memberDetails.firstName + " " + memberDetails.lastName
+            val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+
+
+            if (extractResidencyStatus(rasResponse.currentYearResidencyStatus).isEmpty ||
+              extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus).isEmpty)
+              Future.successful(Redirect(routes.GlobalErrorController.get))
+            else {
+
+              Logger.info("[MemberDetailsController][post] Match found")
+
+              val currentYearResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
+              val nextYearResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+
+              val residencyStatusResult = ResidencyStatusResult(currentYearResidencyStatus, nextYearResidencyStatus,
+                TaxYearResolver.currentTaxYear.toString, (TaxYearResolver.currentTaxYear + 1).toString,
+                name, dateOfBirth, memberDetails.nino)
+
+              Future.successful(Ok(views.html.match_found(residencyStatusResult)))
             }
-
-          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse))
-            .recover{
-              case e:Throwable =>
-                Logger.error("[MemberDetailsController][getResult] Residency status failed")
-                ResidencyStatus("","")
-            }
-        } yield {
-
-          val name = memberDetails.firstName + " " + memberDetails.lastName
-          val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-
-          if(extractResidencyStatusLink(customerMatchingResponse) == NO_MATCH)
-            Future.successful(Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino)))
-          else if(extractResidencyStatusLink(customerMatchingResponse).isEmpty)
-            Future.successful(Redirect(routes.GlobalErrorController.get))
-          else if (rasResponse.currentYearResidencyStatus.isEmpty)
-            Future.successful(Redirect(routes.GlobalErrorController.get))
-          else if (extractResidencyStatus(rasResponse.currentYearResidencyStatus).isEmpty ||
-                    extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus).isEmpty)
-            Future.successful(Redirect(routes.GlobalErrorController.get))
-          else {
-
-            Logger.info("[MemberDetailsController][post] Match found")
-
-            val currentYearResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
-            val nextYearResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
-
-            val residencyStatusResult = ResidencyStatusResult(
-              currentYearResidencyStatus,
-              nextYearResidencyStatus,
-              TaxYearResolver.currentTaxYear.toString,
-              (TaxYearResolver.currentTaxYear + 1).toString,
-              name,
-              dateOfBirth,
-              memberDetails.nino
-            )
-
-            Future.successful(Ok(views.html.match_found(residencyStatusResult)))
+          }.recover{
+            case e:Throwable =>
+              Logger.error("[MemberDetailsController][getResult] Residency status failed")
+              Redirect(routes.GlobalErrorController.get)
           }
-
+        }.recover{
+          case e:Upstream4xxResponse if(e.upstreamResponseCode == FORBIDDEN) =>
+            Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
+            val name = memberDetails.firstName + " " + memberDetails.lastName
+            val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+            Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino))
+          case e:Throwable =>
+            Logger.error("[MemberDetailsController][getResult] Customer Matching failed")
+            Redirect(routes.GlobalErrorController.get)
         }
-
-      }.flatMap(identity)
-    )
+      }
+     )
   }
 
   private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
