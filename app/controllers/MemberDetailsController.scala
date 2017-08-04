@@ -19,9 +19,10 @@ package controllers
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
-import models.{CustomerMatchingResponse, ResidencyStatus, ResidencyStatusResult}
+import models.{CustomerMatchingResponse, Link, ResidencyStatus, ResidencyStatusResult}
 import play.api.Logger
 import play.api.mvc.Action
+import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
@@ -38,6 +39,11 @@ trait MemberDetailsController extends RasController {
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
+  val RAS = "ras"
+  val NO_MATCH = "noMatch"
+  val EMPTY_CMR = CustomerMatchingResponse(List(Link(RAS,"")))
+  val NO_MATCH_CMR = CustomerMatchingResponse(List(Link(RAS,NO_MATCH)))
+
 
   implicit val context: config.RasContext = RasContextImpl
 
@@ -57,12 +63,15 @@ trait MemberDetailsController extends RasController {
         for {
           customerMatchingResponse <- customerMatchingAPIConnector.findMemberDetails(memberDetails)
             .recover{
+              case e:Upstream4xxResponse if(e.upstreamResponseCode == FORBIDDEN) =>
+                Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
+                NO_MATCH_CMR
               case e:Throwable =>
                 Logger.error("[MemberDetailsController][getResult] Customer Matching failed")
-                CustomerMatchingResponse(List())
+                EMPTY_CMR
             }
 
-          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(getResidencyStatusLink(customerMatchingResponse))
+          rasResponse <- residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse))
             .recover{
               case e:Throwable =>
                 Logger.error("[MemberDetailsController][getResult] Residency status failed")
@@ -70,15 +79,21 @@ trait MemberDetailsController extends RasController {
             }
         } yield {
 
-          if(customerMatchingResponse._links.isEmpty)
+          if(extractResidencyStatusLink(customerMatchingResponse) == NO_MATCH)
+            Future.successful(Redirect(routes.MatchNotFoundController.get))
+          else if(extractResidencyStatusLink(customerMatchingResponse).isEmpty)
             Future.successful(Redirect(routes.GlobalErrorController.get))
-          else if (rasResponse.currentYearResidencyStatus=="")
+          else if (rasResponse.currentYearResidencyStatus.isEmpty)
+            Future.successful(Redirect(routes.GlobalErrorController.get))
+          else if (extractResidencyStatus(rasResponse.currentYearResidencyStatus).isEmpty ||
+                    extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus).isEmpty)
             Future.successful(Redirect(routes.GlobalErrorController.get))
           else {
+
             Logger.info("[MemberDetailsController][post] Match found")
 
-            val currentYearResidencyStatus = getResidencyStatus(rasResponse.currentYearResidencyStatus)
-            val nextYearResidencyStatus = getResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+            val currentYearResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
+            val nextYearResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
             val name = memberDetails.firstName + " " + memberDetails.lastName
 
             val residencyStatusResult = ResidencyStatusResult(
@@ -101,18 +116,11 @@ trait MemberDetailsController extends RasController {
     )
   }
 
-  private def getResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
-    try{
-      customerMatchingResponse._links.filter( _.name == "ras").head.href
-    }catch{
-      case e:Exception =>
-        Logger.error("[MemberDetailsController][getResidencyStatusLink] " +
-          "Problem with retrieving results from customer matching")
-        ""
-    }
+  private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
+    customerMatchingResponse._links.filter( _.name == RAS).head.href
   }
 
-  private def getResidencyStatus(residencyStatus: String) : String = {
+  private def extractResidencyStatus(residencyStatus: String) : String = {
     if(residencyStatus == SCOTTISH)
       Messages("scottish.taxpayer")
     else if(residencyStatus == NON_SCOTTISH)

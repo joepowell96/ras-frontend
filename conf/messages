@@ -32,6 +32,7 @@ member.details.page.title = Find member details - GOV.UK
 member.details.page.header = Find member details
 
 match.found.page.title = Match found - GOV.UK
+match.not.found.page.title = Match not found - GOV.UK
 global.error.page.title = Technical error - GOV.UK
 
 first.name = first name

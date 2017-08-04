@@ -30,7 +30,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -227,6 +227,12 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     "redirect to technical error page if ras fails to return a response" in {
       when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
       when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+    }
+
+    "return no match found" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
     }
