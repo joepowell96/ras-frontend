@@ -41,6 +41,4 @@ trait NinoValidator {
   })
 }
 
-object NinoValidator extends NinoValidator {
-
-}
+object NinoValidator extends NinoValidator

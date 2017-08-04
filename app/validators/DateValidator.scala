@@ -108,7 +108,4 @@ trait DateValidator {
   }
 }
 
-object DateValidator extends DateValidator{
-
-
-}
+object DateValidator extends DateValidator
