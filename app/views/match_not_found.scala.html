@@ -1,0 +1,81 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(name: String, dateOfBirth:String, nino:String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@ras_main(title = Messages("match.not.found.page.title")) {
+
+<div class="grid-row">
+
+  <div class="column-full">
+
+      <br>
+      <h1 id="match-not-found">@Messages("member.details.not.found")</h1>
+
+      <p id="subheader">@Messages("match.not.found.subheader")</p>
+
+
+      <table>
+        <tbody>
+
+        <tr>
+          <th id="name-label">@Messages("name").capitalize</th>
+          <td id="name">@name</td>
+        </tr>
+
+        <tr>
+          <th id="dob-label">@Messages("dob").capitalize</th>
+          <td id="dob">@dateOfBirth</td>
+        </tr>
+
+        <tr>
+          <th id="nino-label">@Messages("nino")</th>
+          <td id="nino">@nino</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <div>
+       <a id="try-again" class="button" href="" role="button" >@Messages("try.again")</a>
+      </div>
+
+      <br>
+
+      <div data-accordion
+           data-accordion-animate
+           aria-expanded="false"
+           class="accordion__body__row--no-border">
+
+         <a data-accordion-arrow class="accordion__button link--no-underline bold-small" href="" data-accordion-button role="button">
+          @Messages("tried")
+         </a>
+
+         <div class="accordion__body" aria-expanded="false" data-accordion-body aria-hidden="true">
+          <p>@Messages("tried.confirm.details")</p>
+          <p>@Messages("tried.guidance")
+           <a id="confirm-nino" href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/national-insurance-numbers">@Messages("confirm.nino.link")</a>.
+          </p>
+         </div>
+      </div>
+
+  </div>
+
+</div>
+}

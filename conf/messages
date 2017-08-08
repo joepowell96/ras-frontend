@@ -12,7 +12,7 @@ usage.subheader = You should always check when:
 usage.bullet.1 = a new member joins your pension scheme
 usage.bullet.2 = an existing member has made no contributions in the last tax year
 
-what.you.need.header = What you’ll need
+what.you.need.header = What you''ll need
 what.you.need.subheader = For each search, you’ll need the member’s:
 what.you.need.bullet.1 = first name
 what.you.need.bullet.2 = last name
@@ -31,10 +31,15 @@ find.member.details = Find member details
 member.details.page.title = Find member details - GOV.UK
 member.details.page.header = Find member details
 
+match.found.page.title = Match found - GOV.UK
+match.not.found.page.title = Match not found - GOV.UK
+global.error.page.title = Technical error - GOV.UK
+
 first.name = first name
 last.name = last name
 nino = National Insurance number
 dob = date of birth
+name = name
 
 day = day
 month = month
@@ -44,13 +49,46 @@ dob.hint = For example, 21 2 1983
 nino.hint = For example, 'QQ 12 34 56 C'
 
 error.mandatory = Enter a {0}
-error.nino.invalid = The National Insurance number you have entered is not valid. Check it and try again.
+
+error.nino.invalid = The National Insurance number you have entered does not have the correct number of letters and numbers
+error.nino.length = Enter a valid National Insurance number using 8 or 9 characters
+error.nino.special.character = Enter a National Insurance number using only letters and numbers
+
 error.length = {0} is too long (>{1})
 error.name.invalid = Enter a {0} using only letters, hyphens, apostrophes and spaces
-error.date.non.number = Enter a date using numbers only
+error.date.non.number = Enter a {0} using numbers only
+
+tried = Tried already and can’t find them?
+tried.confirm.details = Confirm with your scheme member the details you hold are correct
+tried.guidance = If you have already done this and still can’t find them, your scheme member will need to contact HMRC themselves to
+confirm.nino.link = confirm their National Insurance number
+
+
 error.day.invalid = Enter a day between 1 and 31
+error.day.invalid.feb = Enter a day between 1 and 29
+error.day.invalid.thirty = Enter a day between 1 and 30
+
 error.month.invalid = Enter a month between 1 and 12
-error.year.invalid.format = Enter the year in full (4 numbers)
-error.dob.invalid.future = Enter a date that is not in the future
+error.year.invalid.format = Enter a year in full using 4 numbers
+error.dob.invalid.future = Enter a date of birth that is not in the future
 
 generic.errors_heading = There is a problem with the form
+
+scottish.taxpayer = Scottish taxpayer
+non.scottish.taxpayer = Non-Scottish taxpayer
+
+this.tax.year = This tax year
+status.for.next.tax.year = Status for next tax year, {0} to {1}
+tax.year.period = 6 April {0} to 5 April {1}
+
+print.this.page = Print this page
+find.another.member = Find another member
+finish = Finish
+
+technical.error = There was a technical problem retrieving the results. Please try again later.
+
+member.details.not.found = Member details not found
+
+match.not.found.subheader = The details you''ve entered don't match HM Revenue and Customs'' records. Check you''ve entered the correct information.
+
+try.again = Try again

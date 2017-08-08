@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package validators
+package controllers
 
-trait Validator {
-  def isValid(value: String): Boolean
+import config.RasContextImpl
+import models.ResidencyStatusResult
+import play.api.mvc.Action
+
+import scala.concurrent.Future
+
+object GlobalErrorController extends GlobalErrorController
+
+trait GlobalErrorController extends RasController {
+
+  implicit val context: config.RasContext = RasContextImpl
+
+  def get = Action.async {
+    implicit request =>
+        Future.successful(Ok(views.html.global_error()))
+  }
+
 }
-
-object NinoValidator extends Validator {
-
-  val validNinoRegex = "^((?!(BG|GB|KN|NK|NT|TN|ZZ)|(D|F|I|Q|U|V)[A-Z]|[A-Z](D|F|I|O|Q|U|V))[A-Z]{2})[0-9]{6}[A-D]?$"
-
-  override def isValid(nino: String): Boolean = nino.replaceAll("\\s", "").toUpperCase.matches(validNinoRegex)
-}
-

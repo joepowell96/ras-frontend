@@ -14,15 +14,65 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
-@import views.html.helpers._
 
-@ras_main(title = "Mahi Mahi Mahi Mahi") {
+@ras_main(title = Messages("match.found.page.title")) {
 
-  <h1>MATCH FOUND</h1>
-  <h2>Well Done Mahi</h2>
+<div class="grid-row">
 
+  <div class="column-full">
+
+      <div>
+        <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
+      </div>
+
+      <br>
+
+      <h1 id="cy-residency-status">@residencyStatusResult.currentYearResidencyStatus</h1>
+      <p id="this-tax-year">@Messages("this.tax.year")</p>
+      <p id="tax-year-period">@Messages("tax.year.period", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
+
+
+      <table>
+        <tbody>
+
+          <tr>
+            <th id="name-label">@Messages("name").capitalize</th>
+            <td id="name">@residencyStatusResult.name</td>
+          </tr>
+
+          <tr>
+            <th id="dob-label">@Messages("dob").capitalize</th>
+            <td id="dob">@residencyStatusResult.dateOfBirth</td>
+          </tr>
+
+          <tr>
+            <th id="nino-label">@Messages("nino")</th>
+            <td id="nino">@residencyStatusResult.nino</td>
+          </tr>
+
+          <tr>
+            <th id="nty-status-label">@Messages("status.for.next.tax.year", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</th>
+            <td id="nty-status">@residencyStatusResult.nextYearResidencyStatus</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div>
+        <a id="find-another-member" href="@routes.MemberDetailsController.get">@Messages("find.another.member")</a>
+      </div>
+
+      <br>
+
+      <div>
+        <a id="finish" class="button" href="" role="button" >@Messages("finish")</a>
+      </div>
+
+  </div>
+
+</div>
 }

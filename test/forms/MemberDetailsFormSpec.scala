@@ -243,7 +243,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("","1","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("day"))))))
     }
 
     "return an error when month field is empty" in {
@@ -253,7 +253,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("month"))))))
     }
 
     "return an error when year field is empty" in {
@@ -263,19 +263,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","1",""))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
-    }
-
-    "return an error when all date fields are empty" in {
-      val formData = Json.obj(
-        "firstName" -> "Ramin",
-        "lastName" -> "Esfandiari",
-        "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("","",""))
-      val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("year"))))))
     }
 
     "return an error when day is a non number" in {
@@ -285,7 +273,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("a","1","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("day"))))))
     }
 
     "return an error when month is a non number" in {
@@ -295,7 +283,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","a","1984"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("month"))))))
     }
 
     "return an error when year is a non number" in {
@@ -305,7 +293,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "nino" -> RandomNino.generate,
         "dateOfBirth" -> RasDate("1","2","198asasas4"))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number")))))
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number", Messages("year"))))))
     }
 
     "return an error when day is smaller than range" in {
@@ -409,6 +397,86 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
                                  (futureDate.getYear + 1).toString))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.dob.invalid.future")))))
+    }
+
+    "return an error when nino with wrong number of characters and digits is passed" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB1234 56 56 C",
+        "dateOfBirth" -> RasDate("1","2","1422"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.length")))))
+    }
+
+    "return an error when nino with special character is passed" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> "AB£56 56 C",
+        "dateOfBirth" -> RasDate("1","2","1422"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.special.character")))))
+    }
+
+    "return error when february and day larger than 29" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("30","2","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb")))))
+    }
+
+    "return error when April and day larger than 30" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("31","4","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when June and day larger than 30" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("31","6","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when September and day larger than 30" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("31","9","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when November and day larger than 30" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("31","11","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return no error when January and day larger than 30" in {
+      val formData = Json.obj(
+        "firstName" -> "Ramin",
+        "lastName" -> "Esfandiari",
+        "nino" -> RandomNino.generate,
+        "dateOfBirth" -> RasDate("31","1","1984"))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.isEmpty)
     }
 
   }

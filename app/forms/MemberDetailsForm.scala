@@ -20,8 +20,7 @@ import helpers.helpers.I18nHelper
 import models.{MemberDetails, RasDate}
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import validators.NinoValidator
+import validators.{DateValidator, NinoValidator}
 
 object MemberDetailsForm extends I18nHelper{
 
@@ -29,30 +28,6 @@ object MemberDetailsForm extends I18nHelper{
   val NAME_REGEX = """^[a-zA-Z &`\-\'^]{1,35}$"""
   val NINO_SUFFIX_REGEX = "[A-D]"
   val TEMP_NINO = "TN"
-  val YEAR_FIELD_LENGTH: Int = 4
-
-  val ninoConstraint : Constraint[String] = Constraint("nino") ({
-    text =>
-      val ninoText = text.replaceAll("\\s", "")
-      if (ninoText.length == 0)
-        Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("nino")))))
-      else if (!NinoValidator.isValid(ninoText.toUpperCase()))
-        Invalid(Seq(ValidationError(Messages("error.nino.invalid"))))
-      else
-        Valid
-  })
-
-  val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
-    dob => {
-      try{
-        if(dob.isInFuture)
-          Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
-        else
-          Valid
-      }
-      catch { case e: Exception => Valid }
-    }
-  })
 
   val form = Form(
     mapping(
@@ -65,53 +40,17 @@ object MemberDetailsForm extends I18nHelper{
         .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH)
         .verifying(Messages("error.name.invalid", Messages("last.name")), x => x.length == 0 || x.matches(NAME_REGEX)),
       "nino" -> text
-        .verifying(ninoConstraint),
+        .verifying(NinoValidator.ninoConstraint),
       "dateOfBirth" -> mapping(
         "day" -> text,
         "month" -> text,
         "year" -> text
       )(RasDate.apply)(RasDate.unapply)
-        .verifying(Messages("error.date.non.number"), x => checkForNumber(x.day) && checkForNumber(x.month) && checkForNumber(x.year))
-        .verifying(Messages("error.day.invalid"), x => checkDayRange(x.day))
-        .verifying(Messages("error.month.invalid"), x => checkMonthRange(x.month))
-        .verifying(Messages("error.year.invalid.format"), x => checkYearLength(x.year))
-        .verifying(rasDateConstraint)
+        .verifying(DateValidator.rasDateConstraint)
     )
     (MemberDetails.apply)(MemberDetails.unapply)
   )
-
-  def checkForNumber(value: String): Boolean = {
-    value forall Character.isDigit
-  }
-
-  def checkDayRange(day: String): Boolean = {
-    if(day.isEmpty)
-      false
-    else if (day forall Character.isDigit)
-      day.toInt > 0 && day.toInt < 32
-    else
-      true
-  }
-
-  def checkMonthRange(month: String): Boolean = {
-    if(month.isEmpty)
-      false
-    else if (month forall Character.isDigit)
-      month.toInt > 0 && month.toInt < 13
-    else
-      true
-  }
-
-  def checkYearLength(year: String): Boolean = {
-    if(year.isEmpty)
-      false
-    else if (year forall Character.isDigit)
-      year.length == YEAR_FIELD_LENGTH
-    else
-      true
-  }
-
-
 }
+
 
 

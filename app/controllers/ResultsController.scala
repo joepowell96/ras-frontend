@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import config.RasContextImpl
+import models.ResidencyStatusResult
+import play.api.mvc.Action
 
-case class RasDate(day: String, month: String, year: String){
+import scala.concurrent.Future
 
-  def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
+object ResultsController extends ResultsController
+
+trait ResultsController extends RasController {
+
+  implicit val context: config.RasContext = RasContextImpl
+
+  def matchFound = Action.async {
+    implicit request =>
+        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST","","","","","",""))))
   }
 
-  def isInFuture: Boolean = {
-    asLocalDate.isAfter(LocalDate.now)
+  def noMatchFound = Action.async {
+    implicit request =>
+      Future.successful(Ok(views.html.match_not_found("","","")))
   }
 
-  override def toString = year + "-" + month + "-" + day
-
-}
-
-object RasDate {
-  implicit val format = Json.format[RasDate]
 }

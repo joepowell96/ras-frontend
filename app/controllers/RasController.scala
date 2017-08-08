@@ -14,25 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package controllers
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import helpers.helpers.I18nHelper
 
-case class RasDate(day: String, month: String, year: String){
+import uk.gov.hmrc.play.frontend.controller.FrontendController
 
-  def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
-  }
+trait RasController extends FrontendController with I18nHelper
 
-  def isInFuture: Boolean = {
-    asLocalDate.isAfter(LocalDate.now)
-  }
-
-  override def toString = year + "-" + month + "-" + day
-
-}
-
-object RasDate {
-  implicit val format = Json.format[RasDate]
-}

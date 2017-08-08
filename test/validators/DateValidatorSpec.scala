@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package models
+package validators
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import org.scalatest.Matchers
+import uk.gov.hmrc.play.test.UnitSpec
 
-case class RasDate(day: String, month: String, year: String){
+class DateValidatorSpec extends UnitSpec with Matchers {
 
-  def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
+  "date validator" should{
+
+    "return false when day is non digit" in {
+      DateValidator.checkDayRange("a","b") shouldBe false
+    }
+
+    "return false when month is non digit" in {
+      DateValidator.checkMonthRange("a") shouldBe false
+    }
+
+    "return false when year is non digit" in {
+      DateValidator.checkYearLength("a") shouldBe false
+    }
   }
 
-  def isInFuture: Boolean = {
-    asLocalDate.isAfter(LocalDate.now)
-  }
-
-  override def toString = year + "-" + month + "-" + day
-
-}
-
-object RasDate {
-  implicit val format = Json.format[RasDate]
 }

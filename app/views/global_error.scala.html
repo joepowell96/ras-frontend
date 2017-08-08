@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2017 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package models
+@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
 
-case class RasDate(day: String, month: String, year: String){
+@ras_main(title = Messages("global.error.page.title")) {
 
-  def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
-  }
+  <h1 id="header">@Messages("technical.error")</h1>
 
-  def isInFuture: Boolean = {
-    asLocalDate.isAfter(LocalDate.now)
-  }
-
-  override def toString = year + "-" + month + "-" + day
-
-}
-
-object RasDate {
-  implicit val format = Json.format[RasDate]
 }

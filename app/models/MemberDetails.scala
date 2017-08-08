@@ -16,13 +16,27 @@
 
 package models
 
-import play.api.libs.json.Json
 
-case class MemberDetails(nino: String,
-                         firstName: String,
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
+
+case class MemberDetails(firstName: String,
                          lastName: String,
+                         nino: String,
                          dateOfBirth: RasDate)
 
 object MemberDetails {
-  implicit val formats = Json.format[MemberDetails]
+  implicit val customerDetailsReads: Reads[MemberDetails] = (
+    (JsPath \ "nino").read[String] and
+      (JsPath \ "firstName").read[String]and
+      (JsPath \ "lastName").read[String] and
+      (JsPath \ "dateOfBirth").read[RasDate]
+    )(MemberDetails.apply _)
+
+  implicit val memberDetailsWrites: Writes[MemberDetails] = (
+      (JsPath \ "firstName").write[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "nino").write[String] and
+      (JsPath \ "dateOfBirth").write[String].contramap[RasDate](date => date.toString)
+    )(unlift(MemberDetails.unapply))
 }
