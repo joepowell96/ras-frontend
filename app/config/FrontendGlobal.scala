@@ -18,27 +18,34 @@ package config
 
 import akka.stream.Materializer
 import com.typesafe.config.{Config, ConfigFactory}
+import controllers.routes
 import net.ceedubs.ficus.Ficus._
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
-import play.api.mvc.{EssentialFilter, Request}
-import play.api.{Application, Configuration, Play}
+import play.api.mvc._
+import play.api._
 import play.twirl.api.Html
+import uk.gov.hmrc.auth.core.{InsufficientEnrolments, MissingBearerToken, NoActiveSession}
 import uk.gov.hmrc.auth.filter.FilterConfig
+import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import uk.gov.hmrc.play.filters.frontend.CSRFExceptionsFilter
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
 import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
+import scala.concurrent.Future
 
-object FrontendGlobal extends DefaultFrontendGlobal {
+
+object FrontendGlobal extends DefaultFrontendGlobal with MicroserviceFilterSupport with Redirects {
 
   override val auditConnector = FrontendAuditConnector
   override val loggingFilter = LoggingFilter
   override val frontendAuditFilter = AuditFilter
+
+  lazy val config = Play.current.configuration
+  lazy override val env = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 
   override def onStart(app: Application) {
     super.onStart(app)
@@ -51,6 +58,19 @@ object FrontendGlobal extends DefaultFrontendGlobal {
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
 
   override def filters: Seq[EssentialFilter] = super.filters ++ Seq(AuthorisationFilter())
+
+  override def toGGLogin(continueUrl: String): Result = super.toGGLogin(continueUrl)
+
+  override def resolveError(rh: RequestHeader, ex: Throwable) = ex match {
+
+    /*case ex: InsufficientEnrolments =>  Logger.error("Insufficient priviliges" + ex.getMessage);super.resolveError(rh, ex)
+    //Redirect(routes.GlobalErrorController.get)// Results.Unauthorized("you are not authorised to access this service")
+
+    case ex:MissingBearerToken =>  Logger.error("Missing Bearer token, user not Logged In" + ex.getMessage);
+      super.resolveError(rh, ex)*/
+    case _: NoActiveSession => Logger.error("Missing Bearer token, user not Logged In" + ex.getMessage); toGGLogin("/continue-url")//Results.Unauthorized("UNAUTHORISED")
+    case _ => super.resolveError(rh, ex)
+  }
 }
 
 object ControllerConfiguration extends ControllerConfig {

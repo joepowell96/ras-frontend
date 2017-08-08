@@ -20,6 +20,8 @@
         </encoder>
     </appender>
 
+
+
     <appender name="ACCESS_LOG_FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/access.log</file>
         <encoder>
@@ -42,6 +44,13 @@
     <logger name="com.ning.http.client.providers.netty" additivity="false">
         <appender-ref ref="STDOUT_IGNORE_NETTY" />
     </logger>
+
+    <logger name="org.asynchttpclient.netty.channel.DefaultChannelPool" additivity="false">
+        <appender-ref ref="STDOUT_IGNORE_NETTY" />
+    </logger>
+
+    <logger name="org.asynchttpclient.netty.channel" level="WARN"/>
+
 
     <logger name="com.google.inject" level="INFO"/>
 
