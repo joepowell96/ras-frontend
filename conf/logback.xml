@@ -39,9 +39,13 @@
         <appender-ref ref="ACCESS_LOG_FILE" />
     </logger>
 
-    <logger name="com.ning.http.client.providers.netty" additivity="false">
-        <appender-ref ref="STDOUT_IGNORE_NETTY" />
-    </logger>
+    <logger name="org.asynchttpclient.netty.channel" level="WARN"/>
+
+    <logger name="io.netty.handler" level="WARN"/>
+
+    <logger name="play.core.netty.utils.ServerCookieDecoder" level="WARN"/>
+
+    <logger name="org.asynchttpclient.netty.handler.HttpHandler" level="WARN"/>
 
     <logger name="com.google.inject" level="INFO"/>
 
