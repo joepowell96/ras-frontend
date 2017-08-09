@@ -13,7 +13,7 @@ usage.bullet.1 = a new member joins your pension scheme
 usage.bullet.2 = an existing member has made no contributions in the last tax year
 
 what.you.need.header = What you''ll need
-what.you.need.subheader = For each search, you’ll need the member’s:
+what.you.need.subheader = For each search, you''ll need the member''s:
 what.you.need.bullet.1 = first name
 what.you.need.bullet.2 = last name
 what.you.need.bullet.3 = National Insurance number
@@ -58,9 +58,9 @@ error.length = {0} is too long (>{1})
 error.name.invalid = Enter a {0} using only letters, hyphens, apostrophes and spaces
 error.date.non.number = Enter a {0} using numbers only
 
-tried = Tried already and can’t find them?
+tried = Tried already and can''t find them?
 tried.confirm.details = Confirm with your scheme member the details you hold are correct
-tried.guidance = If you have already done this and still can’t find them, your scheme member will need to contact HMRC themselves to
+tried.guidance = If you have already done this and still can''t find them, your scheme member will need to contact HMRC themselves to
 confirm.nino.link = confirm their National Insurance number
 
 
@@ -89,6 +89,6 @@ technical.error = There was a technical problem retrieving the results. Please t
 
 member.details.not.found = Member details not found
 
-match.not.found.subheader = The details you''ve entered don't match HM Revenue and Customs'' records. Check you''ve entered the correct information.
+match.not.found.subheader = The details you''ve entered don'"t match HM Revenue and Customs'' records. Check you''ve entered the correct information.
 
 try.again = Try again

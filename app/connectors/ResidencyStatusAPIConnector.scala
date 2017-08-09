@@ -18,6 +18,7 @@ package connectors
 
 import config.WSHttp
 import models.ResidencyStatus
+import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpReads}
 
@@ -27,15 +28,15 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
 
   val http: HttpGet = WSHttp
 
-  lazy val serviceUrl = baseUrl("ras")
+  lazy val serviceUrl = baseUrl("relief-at-source")
 
   def getResidencyStatus(uri: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
 
     val rasUri = s"$serviceUrl/${uri}"
+    val headerCarrier = hc.withExtraHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" )
 
-     val hh = hc.withExtraHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" )
-
-     http.GET[ResidencyStatus](rasUri)(implicitly[HttpReads[ResidencyStatus]],hc = hh)
+    Logger.debug(s"[ResidencyStatusAPIConnector][getResidencyStatus] Calling Residency Status api at: ${rasUri.substring(0,50)}********")
+    http.GET[ResidencyStatus](rasUri)(implicitly[HttpReads[ResidencyStatus]],hc = headerCarrier)
 
   }
 

@@ -18,8 +18,9 @@ package connectors
 
 import config.WSHttp
 import models._
+import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
 
@@ -28,11 +29,13 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
   val http: HttpPost = WSHttp
 
   lazy val serviceUrl = baseUrl("customer-matching")
+  lazy val environmentSuffix = getString("customer-matching-environment-suffix")
 
   def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
 
-    val matchingUri = s"$serviceUrl/match"
+    val matchingUri = s"$serviceUrl/$environmentSuffix"
 
+    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at: ${matchingUri}")
     http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
 
   }
