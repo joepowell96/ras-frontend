@@ -28,7 +28,7 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
 
   val http: HttpGet = WSHttp
 
-  lazy val serviceUrl = baseUrl("ras")
+  lazy val serviceUrl = baseUrl("relief-at-source")
 
   def getResidencyStatus(uri: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
 
