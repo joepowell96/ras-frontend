@@ -95,7 +95,7 @@ trait MemberDetailsController extends RasController {
             val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
             Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino))
           case e:Throwable =>
-            Logger.error("[MemberDetailsController][getResult] Customer Matching failed")
+            Logger.error("[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage )
             Redirect(routes.GlobalErrorController.get)
         }
       }
