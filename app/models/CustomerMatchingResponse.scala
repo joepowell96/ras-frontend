@@ -16,13 +16,20 @@
 
 package models
 
-import play.api.libs.json.Json
+import org.joda.time.DateTime
+import play.api.libs.json.{JsPath, Json, Reads}
 
-case class CustomerMatchingResponse (_links: List[Link])
+sealed abstract class CustomerMatchingResponse (_links: Option[List[Link]])
 
-object CustomerMatchingResponse {
-  implicit val format = Json.format[CustomerMatchingResponse]
-  implicit val formatLink = Json.format[Link]
+case class MatchedResponse(_links: List[Link]) extends CustomerMatchingResponse(Some(_links))
+
+case object NoMatchResponse extends CustomerMatchingResponse(_links = None)
+
+case object ErrorResponse extends CustomerMatchingResponse(_links = None)
+
+object MatchedResponse {
+  implicit val ccmrReads: Reads[MatchedResponse] = (JsPath \ "_links").read[MatchedResponse]
+  (MatchedResponse.apply _)
 }
 
 

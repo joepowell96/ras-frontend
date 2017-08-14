@@ -18,25 +18,21 @@ package connectors
 
 import javax.inject.Inject
 
-import config.WSHttp
 import models._
 import play.api.Logger
-import play.api.libs.json.Reads
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
-
+import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CustomerMatchingAPIConnector @Inject() (ws: WSClient) extends ServicesConfig {
 
-//  val http: HttpPost = WSHttp
-
   lazy val serviceUrl = baseUrl("customer-matching")
   lazy val environmentSuffix = getString("customer-matching-environment-suffix")
 
-  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[WSResponse] = {
+  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
 
     val matchingUri = s"$serviceUrl/$environmentSuffix"
 
@@ -44,18 +40,24 @@ class CustomerMatchingAPIConnector @Inject() (ws: WSClient) extends ServicesConf
 
     val request: WSRequest = ws.url(matchingUri).withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
 
-    val futureResponse: Future[WSResponse] = request.post(data)
+    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Submitting request to Customer Matching.")
 
-    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Customer Matching response: ${futureResponse}")
+    request.post(data).map( response =>
 
-    futureResponse
+      response.status match {
 
+        case 200 =>
+          Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Match found.")
+          response.json.as[MatchedResponse](MatchedResponse.ccmrReads)
+        case 403 =>
+          Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Match not found.")
+          NoMatchResponse
+        case _ =>
+          Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Customer Matching failed ${response.status}" )
+          ErrorResponse
+      }
 
-
-
-//
-//    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at: ${matchingUri}")
-//    http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
+    )
 
   }
 
