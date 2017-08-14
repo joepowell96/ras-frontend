@@ -16,15 +16,18 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import config.RasContextImpl
 import helpers.helpers.I18nHelper
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+
 import scala.concurrent.Future
 
 object StartPageController extends StartPageController
 
-trait StartPageController extends FrontendController with I18nHelper {
+class StartPageController @Inject() extends FrontendController with I18nHelper {
 
   implicit val context: config.RasContext = RasContextImpl
 

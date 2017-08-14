@@ -16,26 +16,23 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import config.RasContextImpl
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
 import forms.MemberDetailsForm._
-import models.{CustomerMatchingResponse, Link, ResidencyStatus, ResidencyStatusResult}
+import models.{CustomerMatchingResponse, Link, ResidencyStatusResult}
 import play.api.Logger
+import play.api.libs.ws.WSResponse
 import play.api.mvc.Action
 import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
-object MemberDetailsController extends MemberDetailsController{
-  override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
-  override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-}
+class MemberDetailsController @Inject() (customerMatchingAPIConnector: CustomerMatchingAPIConnector) extends RasController {
 
-trait MemberDetailsController extends RasController {
-
-  val customerMatchingAPIConnector: CustomerMatchingAPIConnector
-  val residencyStatusAPIConnector : ResidencyStatusAPIConnector
+  val residencyStatusAPIConnector = ResidencyStatusAPIConnector
 
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
@@ -102,8 +99,9 @@ trait MemberDetailsController extends RasController {
      )
   }
 
-  private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
-    customerMatchingResponse._links.filter( _.name == RAS).head.href
+  private def extractResidencyStatusLink(wsResponse: WSResponse): String ={
+    val res = wsResponse.json.as[CustomerMatchingResponse]
+    res._links.filter( _.name == RAS).head.href
   }
 
   private def extractResidencyStatus(residencyStatus: String) : String = {

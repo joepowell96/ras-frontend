@@ -16,27 +16,46 @@
 
 package connectors
 
+import javax.inject.Inject
+
 import config.WSHttp
 import models._
 import play.api.Logger
+import play.api.libs.json.Reads
+import play.api.libs.json.Json
+import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
 
-trait CustomerMatchingAPIConnector extends ServicesConfig{
+class CustomerMatchingAPIConnector @Inject() (ws: WSClient) extends ServicesConfig {
 
-  val http: HttpPost = WSHttp
+//  val http: HttpPost = WSHttp
 
   lazy val serviceUrl = baseUrl("customer-matching")
   lazy val environmentSuffix = getString("customer-matching-environment-suffix")
 
-  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
+  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[WSResponse] = {
 
     val matchingUri = s"$serviceUrl/$environmentSuffix"
 
-    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at: ${matchingUri}")
-    http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
+    val data = Json.toJson(memberDetails)
+
+    val request: WSRequest = ws.url(matchingUri).withHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json")
+
+    val futureResponse: Future[WSResponse] = request.post(data)
+
+    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Customer Matching response: ${futureResponse}")
+
+    futureResponse
+
+
+
+
+//
+//    Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at: ${matchingUri}")
+//    http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
 
   }
 
@@ -44,4 +63,3 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
 }
 
-object CustomerMatchingAPIConnector extends CustomerMatchingAPIConnector

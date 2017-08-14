@@ -16,15 +16,16 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import config.RasContextImpl
-import models.ResidencyStatusResult
 import play.api.mvc.Action
 
 import scala.concurrent.Future
 
 object GlobalErrorController extends GlobalErrorController
 
-trait GlobalErrorController extends RasController {
+class GlobalErrorController @Inject() extends RasController {
 
   implicit val context: config.RasContext = RasContextImpl
 
