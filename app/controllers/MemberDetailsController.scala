@@ -59,32 +59,40 @@ class MemberDetailsController @Inject() (customerMatchingAPIConnector: CustomerM
 
         customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>
 
-          residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).flatMap { rasResponse =>
+          if(customerMatchingResponse.status == 403)
+            throw Upstream4xxResponse.apply("",403,403)
+          else{
+            val residencyStatusLink = extractResidencyStatusLink(customerMatchingResponse)
 
-            val name = memberDetails.firstName + " " + memberDetails.lastName
-            val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-            val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
-            val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+            residencyStatusAPIConnector.getResidencyStatus(residencyStatusLink).flatMap { rasResponse =>
 
-            if (cyResidencyStatus.isEmpty || nyResidencyStatus.isEmpty){
-              Logger.info("[MemberDetailsController][post] An unknown residency status was returned")
-              Future.successful(Redirect(routes.GlobalErrorController.get))
+              val name = memberDetails.firstName + " " + memberDetails.lastName
+              val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+              val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
+              val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+
+              if (cyResidencyStatus.isEmpty || nyResidencyStatus.isEmpty){
+                Logger.info("[MemberDetailsController][post] An unknown residency status was returned")
+                Future.successful(Redirect(routes.GlobalErrorController.get))
+              }
+              else {
+
+                Logger.info("[MemberDetailsController][post] Match found")
+
+                val residencyStatusResult = ResidencyStatusResult(cyResidencyStatus, nyResidencyStatus,
+                  TaxYearResolver.currentTaxYear.toString, (TaxYearResolver.currentTaxYear + 1).toString,
+                  name, dateOfBirth, memberDetails.nino)
+
+                Future.successful(Ok(views.html.match_found(residencyStatusResult)))
+              }
+            }.recover{
+              case e:Throwable =>
+                Logger.error("[MemberDetailsController][getResult] Residency status failed")
+                Redirect(routes.GlobalErrorController.get)
             }
-            else {
-
-              Logger.info("[MemberDetailsController][post] Match found")
-
-              val residencyStatusResult = ResidencyStatusResult(cyResidencyStatus, nyResidencyStatus,
-                TaxYearResolver.currentTaxYear.toString, (TaxYearResolver.currentTaxYear + 1).toString,
-                name, dateOfBirth, memberDetails.nino)
-
-              Future.successful(Ok(views.html.match_found(residencyStatusResult)))
-            }
-          }.recover{
-            case e:Throwable =>
-              Logger.error("[MemberDetailsController][getResult] Residency status failed")
-              Redirect(routes.GlobalErrorController.get)
           }
+
+
         }.recover{
           case e:Upstream4xxResponse if(e.upstreamResponseCode == FORBIDDEN) =>
             Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
