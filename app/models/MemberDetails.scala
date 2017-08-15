@@ -26,7 +26,7 @@ case class MemberDetails(firstName: String,
                          dateOfBirth: RasDate)
 
 object MemberDetails {
-  implicit val customerDetailsReads: Reads[MemberDetails] = (
+  implicit val memberDetailsReads: Reads[MemberDetails] = (
     (JsPath \ "nino").read[String] and
       (JsPath \ "firstName").read[String]and
       (JsPath \ "lastName").read[String] and
@@ -36,7 +36,7 @@ object MemberDetails {
   implicit val memberDetailsWrites: Writes[MemberDetails] = (
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
-      (JsPath \ "nino").write[String] and
+      (JsPath \ "nino").write[String].contramap[String](nino => nino.toUpperCase) and
       (JsPath \ "dateOfBirth").write[String].contramap[RasDate](date => date.toString)
     )(unlift(MemberDetails.unapply))
 }
