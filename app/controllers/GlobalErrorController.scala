@@ -17,7 +17,6 @@
 package controllers
 
 import config.RasContextImpl
-import models.ResidencyStatusResult
 import play.api.mvc.Action
 
 import scala.concurrent.Future

@@ -103,7 +103,9 @@ trait MemberDetailsController extends RasController {
   }
 
   private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
-    customerMatchingResponse._links.filter( _.name == RAS).head.href
+    try{
+      customerMatchingResponse._links.filter( _.name == RAS).head.href
+    } catch { case e:Exception => ""}
   }
 
   private def extractResidencyStatus(residencyStatus: String) : String = {
