@@ -16,6 +16,8 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import config.RasContextImpl
 import models.ResidencyStatusResult
 import play.api.mvc.Action
@@ -24,7 +26,7 @@ import scala.concurrent.Future
 
 object ResultsController extends ResultsController
 
-trait ResultsController extends RasController {
+class ResultsController @Inject() extends RasController {
 
   implicit val context: config.RasContext = RasContextImpl
 
