@@ -25,7 +25,7 @@ import scala.concurrent.Future
 
 object GlobalErrorController extends GlobalErrorController
 
-class GlobalErrorController @Inject() extends RasController {
+trait GlobalErrorController extends RasController {
 
   implicit val context: config.RasContext = RasContextImpl
 
