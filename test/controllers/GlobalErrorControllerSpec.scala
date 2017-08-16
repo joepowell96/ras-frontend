@@ -45,7 +45,7 @@ class GlobalErrorControllerSpec extends UnitSpec with WithFakeApplication with I
 
     "return 200" in {
       val result = TestGlobalErrorController.get(fakeRequest)
-      status(result) shouldBe Status.OK
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
     "return HTML" in {

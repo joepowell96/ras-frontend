@@ -31,7 +31,7 @@ trait GlobalErrorController extends RasController {
 
   def get = Action.async {
     implicit request =>
-        Future.successful(Ok(views.html.global_error()))
+        Future.successful(InternalServerError(views.html.global_error()))
   }
 
 }
