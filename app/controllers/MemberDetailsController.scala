@@ -16,12 +16,13 @@
 
 package controllers
 
-import config.RasContextImpl
-import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
+import config.{FrontendAuthConnector, RasContext, RasContextImpl}
+import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import forms.MemberDetailsForm._
-import models.{CustomerMatchingResponse, Link, ResidencyStatus, ResidencyStatusResult}
-import play.api.Logger
+import models.{CustomerMatchingResponse, Link, ResidencyStatusResult}
+import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
+import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -30,6 +31,11 @@ import scala.concurrent.Future
 object MemberDetailsController extends MemberDetailsController{
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
+  val authConnector: AuthConnector = FrontendAuthConnector
+  override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+
 }
 
 trait MemberDetailsController extends RasController {
@@ -45,21 +51,24 @@ trait MemberDetailsController extends RasController {
   val NO_MATCH_CMR = CustomerMatchingResponse(List(Link(RAS,NO_MATCH)))
 
 
-  implicit val context: config.RasContext = RasContextImpl
+  implicit val context: RasContext = RasContextImpl
 
   def get = Action.async { implicit request =>
-    Future.successful(Ok(views.html.member_details(form)))
+    isAuthorised.flatMap { case Right(userInfo) => Logger.debug("[MemberDetailsController][get] user authorised")
+      Future.successful(Ok(views.html.member_details(form)))
+    case Left(resp) =>  Logger.debug("[MemberDetailsController][get] user Not authorised"); resp
+    }
   }
 
   def post = Action.async { implicit request =>
-
+    isAuthorised.flatMap{ case Right(userInfo) =>
     form.bindFromRequest.fold(
       formWithErrors => {
         Logger.debug("[MemberDetailsController][post] Invalid form field passed")
         Future.successful(BadRequest(views.html.member_details(formWithErrors)))
       },
       memberDetails => {
-
+        Logger.debug("[MemberDetailsController][post] valid form")
         customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>
 
           residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).flatMap { rasResponse =>
@@ -69,7 +78,7 @@ trait MemberDetailsController extends RasController {
             val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
             val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
 
-            if (cyResidencyStatus.isEmpty || nyResidencyStatus.isEmpty){
+            if (cyResidencyStatus.isEmpty || nyResidencyStatus.isEmpty) {
               Logger.info("[MemberDetailsController][post] An unknown residency status was returned")
               Future.successful(Redirect(routes.GlobalErrorController.get))
             }
@@ -83,23 +92,25 @@ trait MemberDetailsController extends RasController {
 
               Future.successful(Ok(views.html.match_found(residencyStatusResult)))
             }
-          }.recover{
-            case e:Throwable =>
+          }.recover {
+            case e: Throwable =>
               Logger.error("[MemberDetailsController][getResult] Residency status failed")
               Redirect(routes.GlobalErrorController.get)
           }
-        }.recover{
-          case e:Upstream4xxResponse if(e.upstreamResponseCode == FORBIDDEN) =>
+        }.recover {
+          case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
             Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
             val name = memberDetails.firstName + " " + memberDetails.lastName
             val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
             Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino))
-          case e:Throwable =>
-            Logger.error("[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage )
+          case e: Throwable =>
+            Logger.error("[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage)
             Redirect(routes.GlobalErrorController.get)
         }
       }
-     )
+    )
+    case Left(res) => res
+  }
   }
 
   private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={

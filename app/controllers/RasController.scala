@@ -16,9 +16,51 @@
 
 package controllers
 
+import config.ApplicationConfig
+import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
-
+import play.api.Logger
+import play.api.mvc.{AnyContent, Request}
+import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.Retrievals._
+import uk.gov.hmrc.auth.core._
 
-trait RasController extends FrontendController with I18nHelper
+import scala.concurrent.Future
+
+trait RasController extends FrontendController with I18nHelper with AuthorisedFunctions with Redirects
+{
+  val userDetailsConnector:UserDetailsConnector
+
+  def isAuthorised()(implicit request: Request[AnyContent]) = {
+    authorised(AuthProviders(GovernmentGateway) and (Enrolment("HMRC-PSA-ORG") or Enrolment("HMRC-PP-ORG"))).retrieve(internalId and userDetailsUri)
+    {case (id ~ uri) =>
+      Logger.warn("User authorised");
+
+      val userId = id.getOrElse(Left(userInfoNotFond("userId")))
+      val userUri = uri.getOrElse(throw new RuntimeException("No userDetailsUri for user"))
+
+      userDetailsConnector.getUserDetails(userUri)(hc) map{Right(_)}
+    } recover {
+      case _ : NoActiveSession => Left(notLogged)
+      case _ : AuthorisationException => Left(unAuthorise)
+    }
+  }
+
+  def notLogged() = {Logger.warn("User not logged in - no active session found");Future.successful(toGGLogin(ApplicationConfig.loginCallback))}
+
+  def unAuthorise() = {
+    Logger.warn("User not authorised");
+    Future.successful(Redirect(routes.GlobalErrorController.notAuthorised))
+  }
+
+  def userInfoNotFond(idName:String) = {
+    Logger.warn(s"${idName} not found");
+    Future.successful(Redirect(routes.GlobalErrorController.get))
+  }
+
+
+
+}
 

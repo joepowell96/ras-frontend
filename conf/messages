@@ -92,3 +92,6 @@ member.details.not.found = Member details not found
 match.not.found.subheader = The details you''ve entered don'"t match HM Revenue and Customs'' records. Check you''ve entered the correct information.
 
 try.again = Try again
+
+unauthorised.error.page.title = Un-Authorised - GOV.UK
+unauthorised.error = you are not authorised to access this service , you need Pension scheme administrator or pension scheme provider enrolments.
