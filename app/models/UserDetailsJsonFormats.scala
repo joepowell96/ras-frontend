@@ -21,5 +21,4 @@ import play.api.libs.json._
 trait UserDetailsJsonFormats {
 
   implicit val userDetailsFormats: OFormat[UserDetails] = Json.format[UserDetails]
-
 }

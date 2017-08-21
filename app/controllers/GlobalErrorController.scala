@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 object GlobalErrorController extends GlobalErrorController
 
-trait GlobalErrorController  extends FrontendController with I18nHelper {
+trait GlobalErrorController extends FrontendController with I18nHelper {
 
   implicit val context: config.RasContext = RasContextImpl
 
