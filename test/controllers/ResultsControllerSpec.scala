@@ -64,7 +64,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
-    "respond to GET /relief-at-source/match-found" in {
+/*    "respond to GET /relief-at-source/match-found" in {
       val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-found"))
       status(result.get) should not equal (NOT_FOUND)
     }
@@ -72,7 +72,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     "respond to GET /relief-at-source/match-not-found" in {
       val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-not-found"))
       status(result.get) should not equal (NOT_FOUND)
-    }
+    }*/
 
     "return 200 when match found" in {
       val result = TestResultsController.matchFound(fakeRequest)
