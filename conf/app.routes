@@ -12,3 +12,5 @@ GET         /match-found                  controllers.ResultsController.matchFou
 GET         /match-not-found              controllers.ResultsController.noMatchFound
 
 GET         /global-error                 controllers.GlobalErrorController.get
+
+GET        /notauthorised                controllers.GlobalErrorController.notAuthorised

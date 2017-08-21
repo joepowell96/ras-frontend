@@ -16,26 +16,53 @@
 
 package controllers
 
+import java.io.File
+
+import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
+import models.UserDetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatest.mockito.MockitoSugar
+import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
+import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
 
-class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper {
+class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
 
   val fakeRequest = FakeRequest("GET", "/")
 
-  object TestResultsController extends ResultsController
+  val mockConfig: Configuration = mock[Configuration]
+  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
+  val mockAuthConnector = mock[AuthConnector]
+  val mockUserDetailsConnector = mock[UserDetailsConnector]
+  val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
+  object TestResultsController extends ResultsController
+{
+  val authConnector: AuthConnector = mockAuthConnector
+  override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
+
+  override val config: Configuration = mockConfig
+  override val env: Environment = mockEnvironment
+
+}
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
   "Results Controller" should {
+    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+      thenReturn(successfulRetrieval)
+
+    when(mockUserDetailsConnector.getUserDetails(any())(any())).
+      thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
     "respond to GET /relief-at-source/match-found" in {
       val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-found"))

@@ -22,6 +22,12 @@ import uk.gov.hmrc.play.config.ServicesConfig
 trait ApplicationConfig {
   val analyticsToken: String
   val analyticsHost: String
+  val reportAProblemPartialUrl: String
+  val reportAProblemNonJSUrl: String
+  val signOutUrl: String
+  val betaFeedbackUrl: String
+  val betaFeedbackUnauthenticatedUrl: String
+  val loginCallback:String
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -29,8 +35,19 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
   private val contactHost = configuration.getString(s"contact-frontend.host").getOrElse("")
-  private val contactFormServiceIdentifier = "ras"
+  private val contactFormServiceIdentifier = "RAS"
+  private val caFrontendHost = configuration.getString("ca-frontend.host").getOrElse("")
 
   override lazy val analyticsToken = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"google-analytics.host")
+
+  private val logoutCallback = configuration.getString("gg-urls.logout-callback.url").getOrElse("/lifetime-isa")
+
+  override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
+  override lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+  override lazy val signOutUrl = s"$caFrontendHost/gg/sign-out?continue=$logoutCallback"
+  override lazy val betaFeedbackUrl: String = s"$contactHost/contact/beta-feedback"
+  override lazy val betaFeedbackUnauthenticatedUrl: String = s"$contactHost/contact/beta-feedback-unauthenticated"
+  override lazy val loginCallback: String = configuration.getString("gg-urls.login-callback.url").getOrElse("/lifetime-isa")
+
 }

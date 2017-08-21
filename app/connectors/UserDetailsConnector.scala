@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-package controllers
+package connectors
 
-import javax.inject.Inject
-
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import config.WSHttp
+import models._
+import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http._
 
 import scala.concurrent.Future
 
-object GlobalErrorController extends GlobalErrorController
+trait UserDetailsConnector extends ServicesConfig with UserDetailsJsonFormats {
 
-trait GlobalErrorController extends FrontendController with I18nHelper {
+  val httpGet: HttpGet = WSHttp
 
-  implicit val context: config.RasContext = RasContextImpl
-
-  def get = Action.async {
-    implicit request =>
-        Future.successful(InternalServerError(views.html.global_error()))
+  def getUserDetails(url: String)(implicit hc: HeaderCarrier): Future[UserDetails] = {
+    httpGet.GET[UserDetails](url)(implicitly, hc)
   }
 
-  def notAuthorised = Action.async {
-    implicit request =>
-      Future.successful(Ok(views.html.unauthorised()))
-  }
 }
+
+object UserDetailsConnector extends UserDetailsConnector

@@ -16,26 +16,42 @@
 
 package controllers
 
-import config.RasContextImpl
+import config.{FrontendAuthConnector, RasContext, RasContextImpl}
+import connectors.UserDetailsConnector
 import models.ResidencyStatusResult
+import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
+import uk.gov.hmrc.auth.core.AuthConnector
 
 import scala.concurrent.Future
 
 object ResultsController extends ResultsController
+{
+  val authConnector: AuthConnector = FrontendAuthConnector
+  override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+
+}
 
 trait ResultsController extends RasController {
 
-  implicit val context: config.RasContext = RasContextImpl
+  implicit val context: RasContext = RasContextImpl
 
   def matchFound = Action.async {
     implicit request =>
-        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST","","","","","",""))))
+      isAuthorised.flatMap { case Right(userInfo) =>
+        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST", "", "", "", "", "", ""))))
+        case Left(res) => res
+      }
   }
 
   def noMatchFound = Action.async {
     implicit request =>
-      Future.successful(Ok(views.html.match_not_found("","","")))
+      isAuthorised.flatMap { case Right(userInfo) =>
+        Future.successful(Ok(views.html.match_not_found("","","")))
+      case Left(res) => res
+      }
   }
 
 }

@@ -16,9 +16,10 @@
 
 package controllers
 
+import java.io.File
 import javax.inject.Inject
 
-import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector}
+import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models._
@@ -26,12 +27,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
+import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
+import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.time.TaxYearResolver
@@ -57,10 +60,21 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       Link("ras", s"/relief-at-source/customer/${uuid}/residency-status")
     )
   )
+  val mockConfig: Configuration = mock[Configuration]
+  val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
+  val mockAuthConnector = mock[AuthConnector]
+  val mockUserDetailsConnector = mock[UserDetailsConnector]
 
   object TestMemberDetailsController extends MemberDetailsController{
     override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mock[CustomerMatchingAPIConnector]
     override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mock[ResidencyStatusAPIConnector]
+    val authConnector: AuthConnector = mockAuthConnector
+    override val userDetailsConnector: UserDetailsConnector = mockUserDetailsConnector
+
+    override val config: Configuration = mockConfig
+    override val env: Environment = mockEnvironment
+
+
 
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
@@ -69,8 +83,16 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
   // and finally the tests
+  val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
   "MemberDetailsController" should {
+
+    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+      thenReturn(successfulRetrieval)
+
+    when(mockUserDetailsConnector.getUserDetails(any())(any())).
+      thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
 
     "respond to GET /relief-at-source/member-details" in {
       val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/member-details"))
