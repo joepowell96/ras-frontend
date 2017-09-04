@@ -26,7 +26,11 @@ trait DateValidator {
 
   val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
     x => {
-      if (x.day.isEmpty)
+
+      if (x.day.isEmpty && x.month.isEmpty && x.year.isEmpty)
+        Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("dob")))))
+
+      else if (x.day.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("day")))))
 
       else if (x.month.isEmpty)
