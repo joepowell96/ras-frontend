@@ -76,7 +76,10 @@
 
                 @views.html.helpers.groupError(memberDetailsForm("dateOfBirth"))
 
-                @if(memberDetailsForm.errors.toString.contains("day")){
+                @if(!memberDetailsForm.data.isEmpty &&
+                    memberDetailsForm.data("dateOfBirth.day") == "" &&
+                    memberDetailsForm.data("dateOfBirth.month") == "" &&
+                    memberDetailsForm.data("dateOfBirth.year") == ""){
                   <div class="dob-field">
                     @rasInput(memberDetailsForm("dateOfBirth.day"),
                     '_label -> Html(Messages("day")),
@@ -84,16 +87,6 @@
                     '_inputClass -> "form-control form-control-error",
                     '_maxLength -> 2)
                   </div>
-                } else {
-                  <div class="dob-field">
-                    @rasInput(memberDetailsForm("dateOfBirth.day"),
-                    '_label -> Html(Messages("day")),
-                    '_id -> "dob-day",
-                    '_maxLength -> 2)
-                  </div>
-                }
-
-                @if(memberDetailsForm.errors.toString.contains("month")){
                   <div class="dob-field">
                     @rasInput(memberDetailsForm("dateOfBirth.month"),
                     '_label -> Html(Messages("month")),
@@ -101,17 +94,6 @@
                     '_inputClass -> "form-control form-control-error",
                     '_maxLength -> 2)
                   </div>
-                } else {
-                  <div class="dob-field">
-                    @rasInput(memberDetailsForm("dateOfBirth.month"),
-                    '_label -> Html(Messages("month")),
-                    '_id -> "dob-month",
-                    '_maxLength -> 2)
-                  </div>
-                }
-
-
-                @if(memberDetailsForm.errors.toString.contains("year")){
                   <div class="dob-field">
                     @rasInput(memberDetailsForm("dateOfBirth.year"),
                     '_label -> Html(Messages("year")),
@@ -120,15 +102,59 @@
                     '_maxLength ->4)
                   </div>
                 } else {
-                  <div class="dob-field">
-                    @rasInput(memberDetailsForm("dateOfBirth.year"),
-                    '_label -> Html(Messages("year")),
-                    '_id -> "dob-year",
-                    '_maxLength ->4,
-                    '_inputClass -> " form-control year-input")
-                  </div>
-                }
 
+                  @if(memberDetailsForm.errors.toString.contains("day")){
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.day"),
+                      '_label -> Html(Messages("day")),
+                      '_id -> "dob-day",
+                      '_inputClass -> "form-control form-control-error",
+                      '_maxLength -> 2)
+                    </div>
+                  } else {
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.day"),
+                      '_label -> Html(Messages("day")),
+                      '_id -> "dob-day",
+                      '_maxLength -> 2)
+                    </div>
+                  }
+
+                  @if(memberDetailsForm.errors.toString.contains("month")){
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.month"),
+                      '_label -> Html(Messages("month")),
+                      '_id -> "dob-month",
+                      '_inputClass -> "form-control form-control-error",
+                      '_maxLength -> 2)
+                    </div>
+                  } else {
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.month"),
+                      '_label -> Html(Messages("month")),
+                      '_id -> "dob-month",
+                      '_maxLength -> 2)
+                    </div>
+                  }
+
+                  @if(memberDetailsForm.errors.toString.contains("year")){
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.year"),
+                      '_label -> Html(Messages("year")),
+                      '_id -> "dob-year",
+                      '_inputClass -> "form-control form-control-error",
+                      '_maxLength ->4)
+                    </div>
+                  } else {
+                    <div class="dob-field">
+                      @rasInput(memberDetailsForm("dateOfBirth.year"),
+                      '_label -> Html(Messages("year")),
+                      '_id -> "dob-year",
+                      '_maxLength ->4,
+                      '_inputClass -> " form-control year-input")
+                    </div>
+                  }
+                }
 
               </div>
 
