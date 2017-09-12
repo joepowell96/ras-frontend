@@ -21,6 +21,7 @@ import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
+import services.SessionService
 import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -32,6 +33,7 @@ import scala.concurrent.Future
 trait RasController extends FrontendController with I18nHelper with AuthorisedFunctions with Redirects
 {
   val userDetailsConnector:UserDetailsConnector
+  val sessionService: SessionService = SessionService
 
   def isAuthorised()(implicit request: Request[AnyContent]) = {
     authorised(AuthProviders(GovernmentGateway) and (Enrolment("HMRC-PSA-ORG") or Enrolment("HMRC-PP-ORG"))).retrieve(internalId and userDetailsUri)

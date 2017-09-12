@@ -53,11 +53,19 @@ trait MemberDetailsController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
 
-  def get = Action.async { implicit request =>
-    isAuthorised.flatMap { case Right(userInfo) => Logger.debug("[MemberDetailsController][get] user authorised")
-      Future.successful(Ok(views.html.member_details(form)))
-    case Left(resp) =>  Logger.debug("[MemberDetailsController][get] user Not authorised"); resp
-    }
+  def get = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          Logger.debug("[MemberDetailsController][get] user authorised")
+          sessionService.fetchMemberDetails() map {
+            case Some(md) => Ok(views.html.member_details(form.fill(md)))
+            case _ => Ok(views.html.member_details(form))
+          }
+        case Left(resp) =>
+          Logger.debug("[MemberDetailsController][get] user Not authorised")
+          resp
+      }
   }
 
   def post = Action.async { implicit request =>
