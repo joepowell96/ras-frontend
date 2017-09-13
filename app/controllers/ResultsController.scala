@@ -50,7 +50,7 @@ trait ResultsController extends RasController {
                 Ok(views.html.match_found(s.residencyStatusResult))
               case _ =>
                 Logger.error("[ResultsController][matchFound] failed to retrieve ras session")
-                Ok(views.html.global_error)
+                Redirect(routes.GlobalErrorController.get())
             }
           }
         case Left(res) => res
@@ -70,7 +70,7 @@ trait ResultsController extends RasController {
                 Ok(views.html.match_not_found(name,dateOfBirth,s.memberDetails.nino))
               case _ =>
                 Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
-                Ok(views.html.global_error)
+                Redirect(routes.GlobalErrorController.get())
             }
 
           }

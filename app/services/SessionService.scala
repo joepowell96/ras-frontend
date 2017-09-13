@@ -28,7 +28,7 @@ import scala.concurrent.Future
 object SessionService extends SessionService
 
 
-trait SessionService extends SessionCacheWiring {
+class SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
   val cleanSession = RasSession(MemberDetails("","","",RasDate("","","")),ResidencyStatusResult("","","","","","",""))
