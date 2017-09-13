@@ -102,6 +102,8 @@ trait MemberDetailsController extends RasController {
                     TaxYearResolver.currentTaxYear.toString, (TaxYearResolver.currentTaxYear + 1).toString,
                     name, dateOfBirth, memberDetails.nino)
 
+                  sessionService.cacheResidencyStatusResult(residencyStatusResult)
+
                   Redirect(routes.ResultsController.matchFound())
                 }
               }.recover {
