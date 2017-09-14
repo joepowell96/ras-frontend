@@ -18,7 +18,7 @@ package services
 
 import config.SessionCacheWiring
 import models._
-import play.api.Logger
+import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.http.HeaderCarrier
 
@@ -28,7 +28,7 @@ import scala.concurrent.Future
 object SessionService extends SessionService
 
 
-class SessionService extends SessionCacheWiring {
+trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
   val cleanSession = RasSession(MemberDetails("","","",RasDate("","","")),ResidencyStatusResult("","","","","","",""))
@@ -54,6 +54,13 @@ class SessionService extends SessionCacheWiring {
     }
 
     result.map(cacheMap => {
+      val a = cacheMap.data
+      val b = a("ras_session")
+      b.validate[MemberDetails] match {
+        case s: JsSuccess[MemberDetails] => println(Console.YELLOW + "Success " + s.value + Console.WHITE)
+        case e: JsError => println(Console.YELLOW + "Invalid JS" + Console.WHITE)
+      }
+      println(Console.YELLOW + b + Console.WHITE)
       cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
     })
   }
@@ -89,6 +96,8 @@ class SessionService extends SessionCacheWiring {
       }
     }
   }
+
+
 
 
 }

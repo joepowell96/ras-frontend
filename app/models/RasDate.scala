@@ -17,7 +17,8 @@
 package models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Reads, Writes}
 
 case class RasDate(day: String, month: String, year: String){
 
@@ -34,5 +35,18 @@ case class RasDate(day: String, month: String, year: String){
 }
 
 object RasDate {
-  implicit val format = Json.format[RasDate]
+
+  implicit val rasDateReads: Reads[RasDate] = (
+    (JsPath \ "day").read[String] and
+      (JsPath \ "month").read[String]and
+      (JsPath \ "year").read[String]
+    )(RasDate.apply _)
+
+  implicit val rasDateWrites: Writes[RasDate] = (
+    (JsPath \ "day").write[String] and
+      (JsPath \ "month").write[String]and
+      (JsPath \ "year").write[String]
+    )(unlift(RasDate.unapply))
+
+
 }
