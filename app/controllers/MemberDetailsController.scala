@@ -78,7 +78,7 @@ trait MemberDetailsController extends RasController {
       memberDetails => {
         Logger.debug("[MemberDetailsController][post] valid form")
 
-        sessionService.cacheMemberDetails(memberDetails) flatMap {
+        sessionService.cacheMemberDetails(memberDetails.asMemberDetailsWithLocalDate) flatMap {
           case Some(session) => {
 
             customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>

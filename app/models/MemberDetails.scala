@@ -17,13 +17,19 @@
 package models
 
 
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads, Writes}
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class MemberDetails(firstName: String,
                          lastName: String,
                          nino: String,
-                         dateOfBirth: RasDate)
+                         dateOfBirth: RasDate) {
+
+  def asMemberDetailsWithLocalDate: MemberDetailsWithLocalDate = {
+    MemberDetailsWithLocalDate(firstName, lastName, nino, dateOfBirth.asLocalDate)
+  }
+}
 
 object MemberDetails {
   implicit val memberDetailsReads: Reads[MemberDetails] = (
@@ -34,11 +40,21 @@ object MemberDetails {
     )(MemberDetails.apply _)
 
   implicit val memberDetailsWrites: Writes[MemberDetails] = (
-      (JsPath \ "firstName").write[String] and
+    (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
       (JsPath \ "nino").write[String].contramap[String](nino => nino.toUpperCase) and
       (JsPath \ "dateOfBirth").write[String].contramap[RasDate](date => date.toString)
     )(unlift(MemberDetails.unapply))
+}
+
+
+case class MemberDetailsWithLocalDate(firstName: String,
+                                      lastName: String,
+                                      nino: String,
+                                      dateOfBirth: LocalDate)
+
+object MemberDetailsWithLocalDate{
+  implicit val format = Json.format[MemberDetailsWithLocalDate]
 }
 
 case class UserDetails(authProviderId: Option[String],

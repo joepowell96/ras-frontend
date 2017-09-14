@@ -31,7 +31,7 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetails("","","",RasDate("","","")),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberDetailsWithLocalDate("","","",RasDate("","","").asLocalDate),ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -42,7 +42,7 @@ trait SessionService extends SessionCacheWiring {
   }
 
 
-  def cacheMemberDetails(memberDetails: MemberDetails)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def cacheMemberDetails(memberDetails: MemberDetailsWithLocalDate)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 
     val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
@@ -65,7 +65,7 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
-  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
+  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetailsWithLocalDate]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
         _.memberDetails
