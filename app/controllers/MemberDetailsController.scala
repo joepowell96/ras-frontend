@@ -54,7 +54,6 @@ trait MemberDetailsController extends RasController {
     implicit request =>
       isAuthorised.flatMap {
         case Right(userInfo) =>
-          println(Console.YELLOW + "got this farrrrrrrrrrrrrrrr" + Console.WHITE)
           Logger.debug("[MemberDetailsController][get] user authorised")
           sessionService.fetchMemberDetails() map {
             case Some(md) => Ok(views.html.member_details(form.fill(md)))
