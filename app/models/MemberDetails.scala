@@ -51,7 +51,15 @@ object MemberDetails {
 case class MemberDetailsWithLocalDate(firstName: String,
                                       lastName: String,
                                       nino: String,
-                                      dateOfBirth: LocalDate)
+                                      dateOfBirth: LocalDate){
+  def asMemberDetails: MemberDetails = {
+    MemberDetails(firstName, lastName, nino,
+      RasDate(dateOfBirth.dayOfMonth().toString,
+              dateOfBirth.monthOfYear().toString,
+              dateOfBirth.year().toString))
+  }
+
+}
 
 object MemberDetailsWithLocalDate{
   implicit val format = Json.format[MemberDetailsWithLocalDate]

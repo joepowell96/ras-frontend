@@ -23,12 +23,12 @@ import play.api.libs.json.{JsPath, Reads, Writes}
 case class RasDate(day: String, month: String, year: String){
 
   def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
+    new LocalDate(2000, 12, 12)
   }
 
-  def isInFuture: Boolean = {
-    asLocalDate.isAfter(LocalDate.now)
-  }
+//  def isInFuture: Boolean = {
+//    asLocalDate.isAfter(LocalDate.now)
+//  }
 
   override def toString = year + "-" + month + "-" + day
 

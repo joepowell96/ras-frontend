@@ -42,33 +42,26 @@ trait SessionService extends SessionCacheWiring {
   }
 
 
-  def cacheMemberDetails(memberDetails: MemberDetailsWithLocalDate)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def cacheMemberDetails(memberDetailsWithLocalDate: MemberDetailsWithLocalDate)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 
     val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
-          case Some(returnedSession) => returnedSession.copy(memberDetails = memberDetails)
-          case None => cleanSession.copy(memberDetails = memberDetails)
+          case Some(returnedSession) => returnedSession.copy(memberDetailsWithLocalDate = memberDetailsWithLocalDate)
+          case None => cleanSession.copy(memberDetailsWithLocalDate = memberDetailsWithLocalDate)
         }
       )
     }
 
     result.map(cacheMap => {
-      val a = cacheMap.data
-      val b = a("ras_session")
-      b.validate[MemberDetails] match {
-        case s: JsSuccess[MemberDetails] => println(Console.YELLOW + "Success " + s.value + Console.WHITE)
-        case e: JsError => println(Console.YELLOW + "Invalid JS" + Console.WHITE)
-      }
-      println(Console.YELLOW + b + Console.WHITE)
       cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
     })
   }
 
-  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetailsWithLocalDate]] = {
+  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
-        _.memberDetails
+        _.memberDetailsWithLocalDate.asMemberDetails
       }
     }
   }

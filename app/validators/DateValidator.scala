@@ -65,7 +65,8 @@ trait DateValidator {
 
       else {
         try {
-          if (x.isInFuture)
+//          if (x.isInFuture)
+          if (false)
             Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
           else
             Valid

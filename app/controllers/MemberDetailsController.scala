@@ -28,18 +28,18 @@ import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
-object MemberDetailsController extends MemberDetailsController{
+object MemberDetailsController extends MemberDetailsController {
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-
 }
 
 trait MemberDetailsController extends RasController {
 
+  implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
 
@@ -50,13 +50,11 @@ trait MemberDetailsController extends RasController {
   val EMPTY_CMR = CustomerMatchingResponse(List(Link(RAS,"")))
   val NO_MATCH_CMR = CustomerMatchingResponse(List(Link(RAS,NO_MATCH)))
 
-
-  implicit val context: RasContext = RasContextImpl
-
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
         case Right(userInfo) =>
+          println(Console.YELLOW + "got this farrrrrrrrrrrrrrrr" + Console.WHITE)
           Logger.debug("[MemberDetailsController][get] user authorised")
           sessionService.fetchMemberDetails() map {
             case Some(md) => Ok(views.html.member_details(form.fill(md)))
@@ -86,7 +84,7 @@ trait MemberDetailsController extends RasController {
               residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).map { rasResponse =>
 
                 val name = memberDetails.firstName + " " + memberDetails.lastName
-                val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val dateOfBirth = memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy")
                 val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
                 val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
 

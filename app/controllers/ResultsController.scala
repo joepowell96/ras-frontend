@@ -18,13 +18,11 @@ package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
-import models.ResidencyStatusResult
 import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
 
-import scala.concurrent.Future
 
 object ResultsController extends ResultsController
 {
@@ -64,10 +62,10 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(s) =>
-                val name = s.memberDetails.firstName + " " + s.memberDetails.lastName
-                val dateOfBirth = s.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val name = s.memberDetailsWithLocalDate.firstName + " " + s.memberDetailsWithLocalDate.lastName
+                val dateOfBirth = s.memberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy")
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
-                Ok(views.html.match_not_found(name,dateOfBirth,s.memberDetails.nino))
+                Ok(views.html.match_not_found(name,dateOfBirth,s.memberDetailsWithLocalDate.nino))
               case _ =>
                 Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())
