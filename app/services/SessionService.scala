@@ -18,6 +18,7 @@ package services
 
 import config.SessionCacheWiring
 import models._
+import org.joda.time.LocalDate
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -31,7 +32,7 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetailsWithLocalDate("","","",RasDate("","","").asLocalDate),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberDetailsWithLocalDate("","","",LocalDate.now),ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -40,7 +41,6 @@ trait SessionService extends SessionCacheWiring {
   def resetRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.cache[RasSession](RAS_SESSION_KEY, cleanSession) map (cacheMap => Some(cleanSession))
   }
-
 
   def cacheMemberDetails(memberDetailsWithLocalDate: MemberDetailsWithLocalDate)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 

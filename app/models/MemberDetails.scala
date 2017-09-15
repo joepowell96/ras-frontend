@@ -17,7 +17,7 @@
 package models
 
 
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.LocalDate
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
