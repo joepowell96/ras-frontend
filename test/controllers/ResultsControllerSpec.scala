@@ -37,12 +37,14 @@ import play.api.test.Helpers.{contentAsString, _}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
 class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
 
   val fakeRequest = FakeRequest("GET", "/")
+  val currentTaxYear = TaxYearResolver.currentTaxYear
 
   val SCOTTISH = "Scottish taxpayer"
   val NON_SCOTTISH = "Non-Scottish taxpayer"
@@ -119,11 +121,59 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       doc.getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
     }
 
-    "return residency status for non scottish taxpayer" in {
-      when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(Some(RasSession(memberDetails.asMemberDetailsWithLocalDate,ResidencyStatusResult(NON_SCOTTISH,"","","","","","")))))
+    "contain customer details and residency status when match found" in {
+      when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(
+        Some(
+          RasSession(memberDetails.asMemberDetailsWithLocalDate,
+          ResidencyStatusResult(
+            NON_SCOTTISH,SCOTTISH,
+            currentTaxYear.toString,(currentTaxYear + 1).toString,
+            memberDetails.firstName +" " + memberDetails.lastName,
+            memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy"),
+            memberDetails.nino)))
+      ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
+      doc(result).getElementById("this-tax-year").text() shouldBe Messages("this.tax.year")
+      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)
+      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
+      doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
+      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
+      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
+      doc(result).getElementById("nino").text() shouldBe memberDetails.nino
+      doc(result).getElementById("nty-status-label").text() shouldBe Messages("status.for.next.tax.year", currentTaxYear.toString, (currentTaxYear + 1).toString)
+      doc(result).getElementById("nty-status").text() shouldBe Messages("scottish.taxpayer")
+      doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
+      doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
+      doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
+      doc(result).getElementById("find-another-member").attr("href") shouldBe "/relief-at-source/member-details"
+      doc(result).getElementById("finish").text() shouldBe Messages("finish")
+
     }
+  }
+
+  "contain customer details and residency status when match not found" in {
+    when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(
+      Some(
+        RasSession(memberDetails.asMemberDetailsWithLocalDate,
+          ResidencyStatusResult(
+            "", "",
+            currentTaxYear.toString, (currentTaxYear + 1).toString,
+            memberDetails.firstName + " " + memberDetails.lastName,
+            memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy"),
+            memberDetails.nino)))
+    ))
+    val result = TestResultsController.noMatchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+    doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
+    doc(result).getElementById("subheader").text shouldBe Messages("match.not.found.subheader")
+    doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
+    doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
+    doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
+    doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+    doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
+    doc(result).getElementById("nino").text() shouldBe memberDetails.nino
+    doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
   }
 
 }
