@@ -30,6 +30,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
@@ -43,6 +44,8 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
 
   val fakeRequest = FakeRequest("GET", "/")
 
+  val SCOTTISH = "Scottish taxpayer"
+  val NON_SCOTTISH = "Non-Scottish taxpayer"
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockAuthConnector = mock[AuthConnector]
@@ -53,6 +56,8 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   val dob = RasDate("1", "1", "1999")
   val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
+  val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
+
 
   val rasSession = RasSession(memberDetails.asMemberDetailsWithLocalDate,residencyStatusResult)
 
@@ -67,7 +72,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   override val env: Environment = mockEnvironment
 
   override val sessionService = mockSessionService
-  
+
   when(mockSessionService.fetchRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 }
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
@@ -84,8 +89,19 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       status(result) shouldBe Status.OK
     }
 
+    "return 200 when match not found" in {
+      val result = TestResultsController.noMatchFound(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+
     "return HTML when match found" in {
       val result = TestResultsController.matchFound(fakeRequest)
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+    }
+
+    "return HTML when match not found" in {
+      val result = TestResultsController.noMatchFound(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
@@ -96,22 +112,17 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       doc.title shouldBe Messages("match.found.page.title")
     }
 
-    "return 200 when match not found" in {
-      val result = TestResultsController.noMatchFound(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
-
-    "return HTML when match not found" in {
-      val result = TestResultsController.noMatchFound(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-    }
-
     "contain correct title when match not found" in {
       val result = TestResultsController.noMatchFound(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
       doc.title shouldBe Messages("match.not.found.page.title")
       doc.getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
+    }
+
+    "return residency status for non scottish taxpayer" in {
+      when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(Some(rasSession.copy(residencyStatusResult = residencyStatusResult.copy(currentYearResidencyStatus = NON_SCOTTISH)))))
+      val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
     }
   }
 
