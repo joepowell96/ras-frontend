@@ -19,10 +19,12 @@ package controllers
 import java.io.File
 
 import connectors.UserDetailsConnector
+import helpers.RandomNino
 import helpers.helpers.I18nHelper
-import models.UserDetails
+import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
@@ -31,6 +33,7 @@ import play.api.http.Status
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
+import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -45,6 +48,15 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   val mockAuthConnector = mock[AuthConnector]
   val mockUserDetailsConnector = mock[UserDetailsConnector]
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+  val mockSessionService = mock[SessionService]
+  val nino = RandomNino.generate
+  val dob = RasDate("1", "1", "1999")
+  val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
+  val residencyStatusResult = ResidencyStatusResult("","","","","","","")
+
+  val rasSession = RasSession(memberDetails.asMemberDetailsWithLocalDate,residencyStatusResult)
+
+
 
   object TestResultsController extends ResultsController
 {
@@ -54,6 +66,9 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   override val config: Configuration = mockConfig
   override val env: Environment = mockEnvironment
 
+  override val sessionService = mockSessionService
+  
+  when(mockSessionService.fetchRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 }
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
@@ -63,16 +78,6 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
-/*    "respond to GET /relief-at-source/match-found" in {
-      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-found"))
-      status(result.get) should not equal (NOT_FOUND)
-    }
-
-    "respond to GET /relief-at-source/match-not-found" in {
-      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/match-not-found"))
-      status(result.get) should not equal (NOT_FOUND)
-    }*/
 
     "return 200 when match found" in {
       val result = TestResultsController.matchFound(fakeRequest)

@@ -17,25 +17,23 @@
 package controllers
 
 import java.io.File
-import javax.inject.Inject
 
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
-import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
+import play.api.{Configuration, Environment, Mode}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
@@ -174,75 +172,14 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result) should equal(BAD_REQUEST)
     }
 
-    "return ok" in {
+    "redirect" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) should equal(OK)
+      status(result) should equal(SEE_OTHER)
     }
 
-    "return residency status for scottish taxpayer" in {
+    "save details to cahche" in {
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("cy-residency-status").text() shouldBe Messages("scottish.taxpayer")
-    }
-
-    "return residency status for non scottish taxpayer" in {
-      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).
-        thenReturn(Future.successful(ResidencyStatus(NON_SCOTTISH, SCOTTISH)))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
-    }
-
-    "contain current year's date and period" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("this-tax-year").text() shouldBe Messages("this.tax.year")
-      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)
-    }
-
-    "contain the correct title" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).title shouldBe Messages("match.found.page.title")
-    }
-
-    "contain entered member's name" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
-      doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
-    }
-
-    "contain entered member's date of birth" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-    }
-
-    "contain entered member's nino" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-      doc(result).getElementById("nino").text() shouldBe memberDetails.nino
-    }
-
-    "contain entered member's next year residency status forecast name" in {
-      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any()))
-        .thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("nty-status-label").text() shouldBe Messages("status.for.next.tax.year", currentTaxYear.toString, (currentTaxYear + 1).toString)
-      doc(result).getElementById("nty-status").text() shouldBe Messages("non.scottish.taxpayer")
-    }
-
-    "contain 'print this page' link" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
-      doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
-    }
-
-    "contain find another member details link" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
-      doc(result).getElementById("find-another-member").attr("href") shouldBe "/relief-at-source/member-details"
-    }
-
-    "contain finish button" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("finish").text() shouldBe Messages("finish")
+      verify(mockSessionService, atLeastOnce()).cacheMemberDetails(Matchers.any())(Matchers.any(), Matchers.any())
     }
 
     "redirect if unknown current year residency status is returned" in {
@@ -270,44 +207,6 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       status(result) shouldBe 303
     }
 
-    "return no match found with correct page header" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) shouldBe 200
-      doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
-    }
-
-    "return description and entered member details" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("subheader").text shouldBe Messages("match.not.found.subheader")
-    }
-
-    "contain entered member's name when no match found" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
-      doc(result).getElementById("name").text() shouldBe (memberDetails.firstName + " " + memberDetails.lastName)
-    }
-
-    "contain entered member's date of birth when no match found" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-      doc(result).getElementById("dob").text() shouldBe memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-    }
-
-    "contain entered member's nino when no match found" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Upstream4xxResponse("",403,403,Map())))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-      doc(result).getElementById("nino").text() shouldBe memberDetails.nino
-    }
-
-    "contain try again button" in {
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
-    }
   }
 
 }
