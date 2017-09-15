@@ -120,7 +120,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     }
 
     "return residency status for non scottish taxpayer" in {
-      when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(Some(rasSession.copy(residencyStatusResult = residencyStatusResult.copy(currentYearResidencyStatus = NON_SCOTTISH)))))
+      when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(Some(RasSession(memberDetails.asMemberDetailsWithLocalDate,ResidencyStatusResult(NON_SCOTTISH,"","","","","","")))))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
     }
