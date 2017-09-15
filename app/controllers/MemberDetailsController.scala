@@ -69,9 +69,14 @@ trait MemberDetailsController extends RasController {
       },
       memberDetails => {
         Logger.debug("[MemberDetailsController][post] valid form")
-        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>
+        customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { uuid =>
 
-          residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).flatMap { rasResponse =>
+          if (!uuid.isDefined) {
+            Logger.info("[MemberDetailsController][post] UUID not contained in the Location header")
+            Future.successful(Redirect(routes.GlobalErrorController.get))
+          }
+
+          residencyStatusAPIConnector.getResidencyStatus(uuid.get).flatMap { rasResponse =>
 
             val name = memberDetails.firstName + " " + memberDetails.lastName
             val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
@@ -104,7 +109,7 @@ trait MemberDetailsController extends RasController {
             val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
             Ok(views.html.match_not_found(name, dateOfBirth, memberDetails.nino))
           case e: Throwable =>
-            Logger.error("[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage)
+            Logger.error("##################[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage + " ||||| " + e.printStackTrace() + " ||||||| ")
             Redirect(routes.GlobalErrorController.get)
         }
       }

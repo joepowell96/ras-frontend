@@ -16,11 +16,16 @@
 
 package config
 
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.auth.core.PlayAuthConnector
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector => Auditing}
 import uk.gov.hmrc.play.config.{AppName, RunMode, ServicesConfig}
-import uk.gov.hmrc.play.http.ws.{WSDelete, WSGet, WSPost, WSPut}
+import uk.gov.hmrc.play.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.http.ws._
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object FrontendAuditConnector extends Auditing with AppName {
   override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
@@ -28,6 +33,10 @@ object FrontendAuditConnector extends Auditing with AppName {
 
 object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode {
   override val hooks = NoneRequired
+
+  override def doPost[A](url: String, body: A, headers: Seq[(String, String)])(implicit rds: Writes[A], hc: HeaderCarrier): Future[HttpResponse] = {
+    buildRequest(url).withFollowRedirects(false).withHeaders(headers: _*).post(Json.toJson(body)).map(new WSHttpResponse(_))
+  }
 }
 
 object FrontendAuthConnector extends PlayAuthConnector with ServicesConfig {

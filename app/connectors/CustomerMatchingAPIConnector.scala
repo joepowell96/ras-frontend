@@ -20,7 +20,7 @@ import config.WSHttp
 import models._
 import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.play.http._
 
 import scala.concurrent.Future
 
@@ -30,15 +30,32 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
   lazy val serviceUrl = baseUrl("customer-matching")
   lazy val environmentSuffix = getString("customer-matching-environment-suffix")
+  lazy val linksSuffix = getString("customer-matching-links-suffix")
 
-  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[CustomerMatchingResponse] = {
+  /**
+    * Lookup a tax payers details and if matched return a UUID.
+    * @param memberDetails
+    * @param hc
+    * @return a UUID
+    */
+  def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[Option[String]] = {
 
     val matchingUri = s"$serviceUrl/$environmentSuffix"
 
     Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at ${matchingUri}")
 
-    http.POST[MemberDetails,CustomerMatchingResponse](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))
+    http.POST[MemberDetails, Option[String]](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
+  }
 
+  private val responseHandler = new HttpReads[Option[String]] {
+    override def read(method: String, url: String, response: HttpResponse): Option[String] = {
+      response.status match {
+        case 303 => response.header("Location").map{locationHeader =>
+          "[0-9A-Fa-f]{8}(-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}".r.findFirstIn(locationHeader)}.getOrElse(None)
+        case 403 => throw new Upstream4xxResponse("Member not found", 403, 500, response.allHeaders)
+        case _ => None
+      }
+    }
   }
 
 }

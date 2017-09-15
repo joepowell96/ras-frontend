@@ -45,11 +45,9 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
 
       val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate("1","1","1999"))
 
-      val expectedResponse = CustomerMatchingResponse(List(
-        Link("self","/customer/matched/633e0ee7-315b-49e6-baed-d79c3dffe467"),
-        Link("relief-at-source","/relief-at-source/customer/633e0ee7-315b-49e6-baed-d79c3dffe467/residency-status")))
+      val expectedResponse = Some("633e0ee7-315b-49e6-baed-d79c3dffe467")
 
-      when(TestConnector.http.POST[MemberDetails, CustomerMatchingResponse](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
+      when(TestConnector.http.POST[MemberDetails, Option[String]](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
 
       val result = await(TestConnector.findMemberDetails(memberDetails))
 
