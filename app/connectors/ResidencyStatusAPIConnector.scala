@@ -29,10 +29,12 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
   val http: HttpGet = WSHttp
 
   lazy val serviceUrl = baseUrl("relief-at-source")
+  lazy val residencyStatusUrl = getString("residency-status-url")
 
-  def getResidencyStatus(uri: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
+  def getResidencyStatus(uuid: String)(implicit hc: HeaderCarrier): Future[ResidencyStatus] = {
 
-    val rasUri = s"$serviceUrl/${uri}"
+    val rasUri = s"$serviceUrl/${String.format(residencyStatusUrl, uuid)}"
+
     val headerCarrier = hc.withExtraHeaders("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" )
 
     Logger.debug(s"[ResidencyStatusAPIConnector][getResidencyStatus] Calling Residency Status api")
