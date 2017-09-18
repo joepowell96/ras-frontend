@@ -176,4 +176,17 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
   }
 
+  "redirect to global error page when no session data is returned on match found" in {
+    when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(None))
+    val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("global-error")
+  }
+
+  "redirect to global error page when no session data is returned on match not found" in {
+    when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(None))
+    val result = TestResultsController.noMatchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("global-error")
+  }
 }

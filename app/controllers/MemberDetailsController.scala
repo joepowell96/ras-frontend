@@ -117,7 +117,7 @@ trait MemberDetailsController extends RasController {
                 Redirect(routes.GlobalErrorController.get)
             }
           }
-          case _ => throw new RuntimeException
+          case _ => Future.successful(Redirect(routes.GlobalErrorController.get))
         }
       }
     )
