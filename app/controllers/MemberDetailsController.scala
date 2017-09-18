@@ -20,7 +20,6 @@ import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import forms.MemberDetailsForm._
 import models._
-import org.joda.time.LocalDate
 import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core._
@@ -79,9 +78,14 @@ trait MemberDetailsController extends RasController {
         sessionService.cacheMemberDetails(memberDetails.asMemberDetailsWithLocalDate) flatMap {
           case Some(session) => {
 
-            customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { customerMatchingResponse =>
+            customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { uuid =>
 
-              residencyStatusAPIConnector.getResidencyStatus(extractResidencyStatusLink(customerMatchingResponse)).map { rasResponse =>
+              if (!uuid.isDefined) {
+                Logger.info("[MemberDetailsController][post] UUID not contained in the Location header")
+                Future.successful(Redirect(routes.GlobalErrorController.get))
+              }
+
+              residencyStatusAPIConnector.getResidencyStatus(uuid.get).map { rasResponse =>
 
                 val name = memberDetails.firstName + " " + memberDetails.lastName
                 val dateOfBirth = memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy")
@@ -114,11 +118,11 @@ trait MemberDetailsController extends RasController {
                 Logger.info("[MemberDetailsController][getResult] No match found from customer matching")
                 Redirect(routes.ResultsController.noMatchFound())
               case e: Throwable =>
-                Logger.error("[MemberDetailsController][getResult] Customer Matching failed: " + e.getMessage)
+                Logger.error(s"[MemberDetailsController][getResult] Customer Matching failed: ${e.getMessage}")
                 Redirect(routes.GlobalErrorController.get)
             }
           }
-          case _ => Future.successful(Redirect(routes.GlobalErrorController.get))
+          case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
         }
       }
     )

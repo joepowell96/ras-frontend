@@ -55,6 +55,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val dob = RasDate("1", "1", "1999")
   val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
+
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockAuthConnector = mock[AuthConnector]
@@ -84,7 +85,8 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     when(mockSessionService.cacheMemberDetails(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.cacheResidencyStatusResult(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.fetchMemberDetails()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-    when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
+
+    when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
   }
 
@@ -237,6 +239,12 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       redirectLocation(result).get should include("global-error")
     }
 
+    "redirect to technical error page if ras fails to return a response joe" in {
+      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
+      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+    }
 
   }
 
