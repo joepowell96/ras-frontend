@@ -52,11 +52,13 @@ case class MemberDetailsWithLocalDate(firstName: String,
                                       lastName: String,
                                       nino: String,
                                       dateOfBirth: LocalDate){
+
   def asMemberDetails: MemberDetails = {
-    MemberDetails(firstName, lastName, nino,
-      RasDate(dateOfBirth.dayOfMonth().toString,
-              dateOfBirth.monthOfYear().toString,
-              dateOfBirth.year().toString))
+    val dob = RasDate(
+      dateOfBirth.getDayOfMonth.toString,
+      dateOfBirth.getMonthOfYear.toString,
+      dateOfBirth.getYear.toString)
+    MemberDetails(firstName, lastName, nino, dob)
   }
 
 }

@@ -19,7 +19,8 @@ package controllers
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import forms.MemberDetailsForm._
-import models.{CustomerMatchingResponse, Link, ResidencyStatusResult}
+import models._
+import org.joda.time.LocalDate
 import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core._
@@ -124,6 +125,8 @@ trait MemberDetailsController extends RasController {
     case Left(res) => res
   }
   }
+
+
 
   private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
     try{
