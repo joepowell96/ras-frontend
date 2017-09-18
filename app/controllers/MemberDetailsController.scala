@@ -47,8 +47,6 @@ trait MemberDetailsController extends RasController {
   val NON_SCOTTISH = "otherUKResident"
   val RAS = "ras"
   val NO_MATCH = "noMatch"
-  val EMPTY_CMR = CustomerMatchingResponse(List(Link(RAS,"")))
-  val NO_MATCH_CMR = CustomerMatchingResponse(List(Link(RAS,NO_MATCH)))
 
   def get = Action.async {
     implicit request =>
@@ -128,14 +126,6 @@ trait MemberDetailsController extends RasController {
     )
     case Left(res) => res
   }
-  }
-
-
-
-  private def extractResidencyStatusLink(customerMatchingResponse: CustomerMatchingResponse): String ={
-    try{
-      customerMatchingResponse._links.filter( _.name == RAS).head.href
-    } catch { case e:Exception => ""}
   }
 
   private def extractResidencyStatus(residencyStatus: String) : String = {

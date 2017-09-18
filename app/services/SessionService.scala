@@ -82,16 +82,6 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
-  def fetchResidencyStatusResult()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[ResidencyStatusResult]] = {
-    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
-      currentSession.map {
-        _.residencyStatusResult
-      }
-    }
-  }
-
-
-
-
 }
+
 
