@@ -223,7 +223,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "redirect to technical error page if customer matching fails to return a response" in {
-      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Throwable()))
+      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
@@ -231,7 +231,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
 
     "redirect to technical error page if ras fails to return a response" in {
       when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
-      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Throwable))
+      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
