@@ -65,12 +65,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val mockSessionService = mock[SessionService]
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
   val rasSession = RasSession(memberDetails.asMemberDetailsWithLocalDate,residencyStatusResult)
-  val customerMatchingResponse = CustomerMatchingResponse(
-    List(
-      Link("self", s"/customer/matched/${uuid}"),
-      Link("ras", s"/relief-at-source/customer/${uuid}/residency-status")
-    )
-  )
+
 
   object TestMemberDetailsController extends MemberDetailsController{
     override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mockRasConnector
@@ -232,18 +227,11 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
     }
 
     "redirect to technical error page if ras fails to return a response" in {
-      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(customerMatchingResponse))
+      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
       when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
-    }
-
-    "redirect to technical error page if ras fails to return a response joe" in {
-      when(TestMemberDetailsController.customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
-      when(TestMemberDetailsController.residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
-      val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) shouldBe 303
     }
 
   }
