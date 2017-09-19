@@ -147,7 +147,6 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
       doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
       doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
-      doc(result).getElementById("find-another-member").attr("href") shouldBe "/relief-at-source/member-details"
       doc(result).getElementById("finish").text() shouldBe Messages("finish")
 
     }
