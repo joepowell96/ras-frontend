@@ -19,10 +19,10 @@ package models
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
 
-case class RasDate(day: String, month: String, year: String){
+case class RasDate(day: Option[String], month: Option[String], year: Option[String]){
 
   def asLocalDate: LocalDate = {
-    new LocalDate(year.toInt, month.toInt, day.toInt)
+    new LocalDate(year.get.toInt, month.get.toInt, day.get.toInt)
   }
 
   def isInFuture: Boolean = {

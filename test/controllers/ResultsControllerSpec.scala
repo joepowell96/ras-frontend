@@ -55,13 +55,13 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
   val mockSessionService = mock[SessionService]
   val nino = RandomNino.generate
-  val dob = RasDate("1", "1", "1999")
+  val dob = RasDate(Some("1"), Some("1"), Some("1999"))
   val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
 
 
-  val rasSession = RasSession(memberDetails.asMemberDetailsWithLocalDate,residencyStatusResult)
+  val rasSession = RasSession(memberDetails,residencyStatusResult)
 
 
 
@@ -124,12 +124,12 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     "contain customer details and residency status when match found" in {
       when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(
         Some(
-          RasSession(memberDetails.asMemberDetailsWithLocalDate,
+          RasSession(memberDetails,
           ResidencyStatusResult(
             NON_SCOTTISH,SCOTTISH,
             currentTaxYear.toString,(currentTaxYear + 1).toString,
             memberDetails.firstName +" " + memberDetails.lastName,
-            memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy"),
+            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             memberDetails.nino)))
       ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
@@ -156,12 +156,12 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   "contain customer details and residency status when match not found" in {
     when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(
       Some(
-        RasSession(memberDetails.asMemberDetailsWithLocalDate,
+        RasSession(memberDetails,
           ResidencyStatusResult(
             "", "",
             currentTaxYear.toString, (currentTaxYear + 1).toString,
             memberDetails.firstName + " " + memberDetails.lastName,
-            memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy"),
+            memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             memberDetails.nino)))
     ))
     val result = TestResultsController.noMatchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))

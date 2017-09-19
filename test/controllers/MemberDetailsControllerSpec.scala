@@ -36,7 +36,7 @@ import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.{Configuration, Environment, Mode}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
-import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -52,7 +52,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val SCOTTISH = "scotResident"
   val NON_SCOTTISH = "otherUKResident"
   val nino = RandomNino.generate
-  val dob = RasDate("1", "1", "1999")
+  val dob = RasDate(Some("1"), Some("1"), Some("1999"))
   val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
 
@@ -64,7 +64,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val mockMatchingConnector = mock[CustomerMatchingAPIConnector]
   val mockSessionService = mock[SessionService]
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
-  val rasSession = RasSession(memberDetails.asMemberDetailsWithLocalDate,residencyStatusResult)
+  val rasSession = RasSession(memberDetails,residencyStatusResult)
 
 
   object TestMemberDetailsController extends MemberDetailsController{
@@ -158,9 +158,9 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
       doc(result).getElementById("firstName").value.toString should include(memberDetails.firstName)
       doc(result).getElementById("lastName").value.toString should include(memberDetails.lastName)
       doc(result).getElementById("nino").value.toString should include(memberDetails.nino)
-      doc(result).getElementById("dob-year").value.toString should include(memberDetails.dateOfBirth.year)
-      doc(result).getElementById("dob-month").value.toString should include(memberDetails.dateOfBirth.month)
-      doc(result).getElementById("dob-day").value.toString should include(memberDetails.dateOfBirth.day)
+      doc(result).getElementById("dob-year").value.toString should include(memberDetails.dateOfBirth.year.getOrElse("0"))
+      doc(result).getElementById("dob-month").value.toString should include(memberDetails.dateOfBirth.month.getOrElse("0"))
+      doc(result).getElementById("dob-day").value.toString should include(memberDetails.dateOfBirth.day.getOrElse("0"))
     }
   }
 
@@ -176,7 +176,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
         "firstName" -> "",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1", "1", "1999"))
+        "dateOfBirth" -> RasDate(Some("1"), Some("1"), Some("1999")))
 
       val result = TestMemberDetailsController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) should equal(BAD_REQUEST)

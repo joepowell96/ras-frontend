@@ -39,28 +39,28 @@ trait DateValidator {
       else if (x.year.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("year")))))
 
-      else if (!DateValidator.checkForNumber(x.day))
+      else if (!DateValidator.checkForNumber(x.day.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("day")))))
 
-      else if (!DateValidator.checkForNumber(x.month))
+      else if (!DateValidator.checkForNumber(x.month.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("month")))))
 
-      else if (!DateValidator.checkForNumber(x.year))
+      else if (!DateValidator.checkForNumber(x.year.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
 
-      else if (!DateValidator.checkDayRange(x.day, x.month)) {
-        if(x.month.toInt == 2)
+      else if (!DateValidator.checkDayRange(x.day.getOrElse("0"), x.month.getOrElse("0"))) {
+        if(x.month.getOrElse("0").toInt == 2)
           Invalid(Seq(ValidationError(Messages("error.day.invalid.feb"))))
-        else if(List(4,6,9,11).contains(x.month.toInt))
+        else if(List(4,6,9,11).contains(x.month.getOrElse("0").toInt))
           Invalid(Seq(ValidationError(Messages("error.day.invalid.thirty"))))
         else
           Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
       }
 
-      else if (!DateValidator.checkMonthRange(x.month))
+      else if (!DateValidator.checkMonthRange(x.month.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.month.invalid"))))
 
-      else if (!DateValidator.checkYearLength(x.year))
+      else if (!DateValidator.checkYearLength(x.year.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.year.invalid.format"))))
 
       else {

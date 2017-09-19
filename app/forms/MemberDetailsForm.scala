@@ -43,9 +43,9 @@ object MemberDetailsForm extends I18nHelper{
       "nino" -> text
         .verifying(NinoValidator.ninoConstraint),
       "dateOfBirth" -> mapping(
-        "day" -> text,
-        "month" -> text,
-        "year" -> text
+        "day" -> optional(text),
+        "month" -> optional(text),
+        "year" -> optional(text)
       )(RasDate.apply)(RasDate.unapply)
         .verifying(DateValidator.rasDateConstraint)
     )

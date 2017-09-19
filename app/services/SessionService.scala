@@ -32,7 +32,7 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetailsWithLocalDate("","","",LocalDate.now),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberDetails("","","",RasDate(None,None,None)),ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -42,13 +42,13 @@ trait SessionService extends SessionCacheWiring {
     sessionCache.cache[RasSession](RAS_SESSION_KEY, cleanSession) map (cacheMap => Some(cleanSession))
   }
 
-  def cacheMemberDetails(memberDetailsWithLocalDate: MemberDetailsWithLocalDate)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def cacheMemberDetails(memberDetails: MemberDetails)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 
     val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
-          case Some(returnedSession) => returnedSession.copy(memberDetailsWithLocalDate = memberDetailsWithLocalDate)
-          case None => cleanSession.copy(memberDetailsWithLocalDate = memberDetailsWithLocalDate)
+          case Some(returnedSession) => returnedSession.copy(memberDetails = memberDetails)
+          case None => cleanSession.copy(memberDetails = memberDetails)
         }
       )
     }
@@ -61,7 +61,7 @@ trait SessionService extends SessionCacheWiring {
   def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
-        _.memberDetailsWithLocalDate.asMemberDetails
+        _.memberDetails
       }
     }
   }

@@ -73,7 +73,7 @@ trait MemberDetailsController extends RasController {
       memberDetails => {
         Logger.debug("[MemberDetailsController][post] valid form")
 
-        sessionService.cacheMemberDetails(memberDetails.asMemberDetailsWithLocalDate) flatMap {
+        sessionService.cacheMemberDetails(memberDetails) flatMap {
           case Some(session) => {
 
             customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { uuid =>
@@ -86,7 +86,7 @@ trait MemberDetailsController extends RasController {
               residencyStatusAPIConnector.getResidencyStatus(uuid.get).map { rasResponse =>
 
                 val name = memberDetails.firstName + " " + memberDetails.lastName
-                val dateOfBirth = memberDetails.asMemberDetailsWithLocalDate.dateOfBirth.toString("d MMMM yyyy")
+                val dateOfBirth = memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
                 val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
 
