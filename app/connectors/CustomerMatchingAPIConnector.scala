@@ -45,7 +45,7 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
     Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at ${matchingUri}")
 
-    http.POST[JsValue, Option[String]](matchingUri, modifyPayload(memberDetails), Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
+    http.POST[JsValue, Option[String]](matchingUri, memberDetails.asCustomerDetailsPayload, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
   }
 
   private val responseHandler = new HttpReads[Option[String]] {
@@ -57,17 +57,6 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
         case _ => None
       }
     }
-  }
-
-  private def modifyPayload(memberDetails: MemberDetails) = {
-    Json.parse(
-      s"""{
-          "nino":"${memberDetails.nino}",
-          "firstName":"${memberDetails.firstName}",
-          "lastName":"${memberDetails.lastName}",
-          "dateOfBirth":"${memberDetails.dateOfBirth.asLocalDate.toString("yyyy-MM-d")}"
-        }
-      """)
   }
 
 }

@@ -18,12 +18,23 @@ package models
 
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads, Writes}
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class MemberDetails(firstName: String,
                          lastName: String,
                          nino: String,
                          dateOfBirth: RasDate) {
+
+  def asCustomerDetailsPayload = {
+    Json.parse(
+      s"""{
+          "nino":"${nino}",
+          "firstName":"${firstName}",
+          "lastName":"${lastName}",
+          "dateOfBirth":"${dateOfBirth.asLocalDate.toString("yyyy-MM-d")}"
+        }
+      """)
+  }
 }
 
 object MemberDetails {
