@@ -19,6 +19,7 @@ package connectors
 import config.WSHttp
 import models._
 import play.api.Logger
+import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
@@ -44,7 +45,7 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
     Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at ${matchingUri}")
 
-    http.POST[MemberDetails, Option[String]](matchingUri, memberDetails, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
+    http.POST[JsValue, Option[String]](matchingUri, modifyPayload(memberDetails), Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
   }
 
   private val responseHandler = new HttpReads[Option[String]] {
@@ -56,6 +57,17 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
         case _ => None
       }
     }
+  }
+
+  private def modifyPayload(memberDetails: MemberDetails) = {
+    Json.parse(
+      s"""{
+          "nino":"${memberDetails.nino}",
+          "firstName":"${memberDetails.firstName}",
+          "lastName":"${memberDetails.lastName}",
+          "dateOfBirth":"${memberDetails.dateOfBirth.asLocalDate.toString("yyyy-MM-d")}"
+        }
+      """)
   }
 
 }
