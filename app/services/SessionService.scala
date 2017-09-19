@@ -32,7 +32,7 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetails("","","",RasDate(None,None,None)),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberDetails("","","",RasDate(Some(""),Some(""),Some(""))),ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)

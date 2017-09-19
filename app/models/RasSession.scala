@@ -19,7 +19,7 @@ package models
 import play.api.libs.json.Json
 
 
-case class RasSession(memberDetails: MemberDetails , residencyStatusResult: ResidencyStatusResult)
+case class RasSession(memberDetails: MemberDetails, residencyStatusResult: ResidencyStatusResult)
 
 object RasSession{
   implicit val format = Json.format[RasSession]
