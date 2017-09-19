@@ -28,9 +28,9 @@ case class MemberDetails(firstName: String,
 
 object MemberDetails {
   implicit val memberDetailsReads: Reads[MemberDetails] = (
-    (JsPath \ "nino").read[String] and
       (JsPath \ "firstName").read[String]and
       (JsPath \ "lastName").read[String] and
+      (JsPath \ "nino").read[String] and
       (JsPath \ "dateOfBirth").read[RasDate]
     )(MemberDetails.apply _)
 
