@@ -77,6 +77,7 @@
                 @views.html.helpers.groupError(memberDetailsForm("dateOfBirth"))
 
                 @if(!memberDetailsForm.data.isEmpty &&
+                    !memberDetailsForm.data.exists(_ == ("nino","")) &&
                     memberDetailsForm.data("dateOfBirth.day") == "" &&
                     memberDetailsForm.data("dateOfBirth.month") == "" &&
                     memberDetailsForm.data("dateOfBirth.year") == ""){
