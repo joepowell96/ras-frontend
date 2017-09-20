@@ -16,9 +16,9 @@
 
 package controllers
 
-import config.FrontendAuthConnector
+import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
-import play.api.{Configuration, Environment, Play}
+import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
 
@@ -31,11 +31,23 @@ object SessionController extends SessionController {
 
 trait SessionController extends RasController {
 
+  implicit val context: RasContext = RasContextImpl
+  val MEMBER_DETAILS = "member-details"
+
   def cleanAndRedirect(target: String) = Action.async {
     implicit request =>
-      sessionService.resetRasSession().map {
-        case Some(session) => Redirect(routes.MemberDetailsController.get())
-        case _ => Redirect(routes.MemberDetailsController.get())
+      sessionService.resetRasSession() map {
+        case Some(session) =>
+          target match {
+            case MEMBER_DETAILS => Redirect(routes.MemberDetailsController.get())
+            case _ =>
+              Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
+              Redirect(routes.GlobalErrorController.get())
+          }
+
+        case _ =>
+          Logger.error("[SessionController][cleanAndRedirect] No session found")
+          Redirect(routes.GlobalErrorController.get())
       }
   }
 
