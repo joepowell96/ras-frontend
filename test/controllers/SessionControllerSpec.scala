@@ -18,19 +18,19 @@ package controllers
 
 import java.io.File
 
-import config.{RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
 import helpers.RandomNino
 import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate, RasSession, ResidencyStatusResult}
+import models._
 import org.mockito.Matchers
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, _}
 import play.api.{Configuration, Environment, Mode}
 import services.SessionService
-import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -60,28 +60,29 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     override val sessionService = mockSessionService
   }
 
-  "redirect to target" when {
-    "cleanAndRedirect is called with member-details" in {
-      when(mockSessionService.resetRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-      val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
-      redirectLocation(result).get should include("member-details")
+  "SessionController" should {
+    "redirect to target" when {
+      "cleanAndRedirect is called with member-details" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
+        redirectLocation(result).get should include("member-details")
+      }
+    }
+
+    "redirect to global error page" when {
+      "no ras session is returned (target is irrelevant here)" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
+        redirectLocation(result).get should include("global-error")
+      }
+
+      "ras session is returned but target is not recognised" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.cleanAndRedirect("blah blah")(FakeRequest()))
+        redirectLocation(result).get should include("global-error")
+      }
     }
   }
-
-  "redirect to global error page" when {
-    "no ras session is returned (target is irrelevant here)" in {
-      when(mockSessionService.resetRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(None))
-      val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
-      redirectLocation(result).get should include("global-error")
-    }
-
-    "ras session is returned but target is not recognised" in {
-      when(mockSessionService.resetRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-      val result = await(TestSessionController.cleanAndRedirect("blah blah")(FakeRequest()))
-      redirectLocation(result).get should include("global-error")
-    }
-  }
-
 
 
 }
