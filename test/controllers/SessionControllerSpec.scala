@@ -68,7 +68,19 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     }
   }
 
-  
+  "redirect to global error page" when {
+    "no ras session is returned (target is irrelevant here)" in {
+      when(mockSessionService.resetRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(None))
+      val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
+      redirectLocation(result).get should include("global-error")
+    }
+
+    "ras session is returned but target is not recognised" in {
+      when(mockSessionService.resetRasSession()(Matchers.any(),Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = await(TestSessionController.cleanAndRedirect("blah blah")(FakeRequest()))
+      redirectLocation(result).get should include("global-error")
+    }
+  }
 
 
 
