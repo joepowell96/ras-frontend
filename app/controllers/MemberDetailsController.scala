@@ -54,7 +54,7 @@ trait MemberDetailsController extends RasController {
         case Right(userInfo) =>
           Logger.debug("[MemberDetailsController][get] user authorised")
           sessionService.fetchMemberDetails() map {
-            case Some(md) => Ok(views.html.member_details(form.fill(md)))
+            case Some(memberDetails) => Ok(views.html.member_details(form.fill(memberDetails)))
             case _ => Ok(views.html.member_details(form))
           }
         case Left(resp) =>
