@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package models
+package config
 
-import play.api.libs.json.Json
+import uk.gov.hmrc.http.cache.client.SessionCache
+import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 
-case class CustomerMatchingResponse (_links: List[Link])
-
-object CustomerMatchingResponse {
-  implicit val format = Json.format[CustomerMatchingResponse]
-  implicit val formatLink = Json.format[Link]
+trait SessionCacheWiring {
+  def sessionCache: SessionCache = RasSessionCache
 }
 
-
+object RasSessionCache extends SessionCache with AppName with ServicesConfig {
+  override lazy val http = WSHttp
+  override lazy val defaultSource = appName
+  override lazy val baseUri = baseUrl("keystore")
+  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+}

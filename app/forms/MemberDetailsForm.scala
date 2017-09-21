@@ -18,6 +18,7 @@ package forms
 
 import helpers.helpers.I18nHelper
 import models.{MemberDetails, RasDate}
+import org.joda.time.LocalDate
 import play.api.data.Form
 import play.api.data.Forms._
 import validators.{DateValidator, NinoValidator}
@@ -42,9 +43,9 @@ object MemberDetailsForm extends I18nHelper{
       "nino" -> text
         .verifying(NinoValidator.ninoConstraint),
       "dateOfBirth" -> mapping(
-        "day" -> text,
-        "month" -> text,
-        "year" -> text
+        "day" -> optional(text),
+        "month" -> optional(text),
+        "year" -> optional(text)
       )(RasDate.apply)(RasDate.unapply)
         .verifying(DateValidator.rasDateConstraint)
     )

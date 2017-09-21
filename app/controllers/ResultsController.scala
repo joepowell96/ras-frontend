@@ -18,12 +18,11 @@ package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
-import models.ResidencyStatusResult
+import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
 
-import scala.concurrent.Future
 
 object ResultsController extends ResultsController
 {
@@ -40,16 +39,40 @@ trait ResultsController extends RasController {
 
   def matchFound = Action.async {
     implicit request =>
-      isAuthorised.flatMap { case Right(userInfo) =>
-        Future.successful(Ok(views.html.match_found(ResidencyStatusResult("TEST", "", "", "", "", "", ""))))
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map { session =>
+            session match {
+              case Some(s) =>
+                Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
+                Ok(views.html.match_found(s.residencyStatusResult))
+              case _ =>
+                Logger.error("[ResultsController][matchFound] failed to retrieve ras session")
+                Redirect(routes.GlobalErrorController.get())
+            }
+          }
         case Left(res) => res
       }
   }
 
   def noMatchFound = Action.async {
     implicit request =>
-      isAuthorised.flatMap { case Right(userInfo) =>
-        Future.successful(Ok(views.html.match_not_found("","","")))
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map { session =>
+            session match {
+              case Some(rasSess) =>
+                val name = rasSess.memberDetails.firstName + " " + rasSess.memberDetails.lastName
+                val dateOfBirth = rasSess.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
+                Ok(views.html.match_not_found(name,dateOfBirth,rasSess.memberDetails.nino))
+              case _ =>
+                Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
+                Redirect(routes.GlobalErrorController.get())
+            }
+
+          }
+
       case Left(res) => res
       }
   }

@@ -18,26 +18,38 @@ package models
 
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Reads, Writes}
+import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
 case class MemberDetails(firstName: String,
                          lastName: String,
                          nino: String,
-                         dateOfBirth: RasDate)
+                         dateOfBirth: RasDate) {
+
+  def asCustomerDetailsPayload = {
+    Json.parse(
+      s"""{
+          "nino":"${nino}",
+          "firstName":"${firstName}",
+          "lastName":"${lastName}",
+          "dateOfBirth":"${dateOfBirth.asLocalDate.toString("yyyy-MM-d")}"
+        }
+      """)
+  }
+}
 
 object MemberDetails {
   implicit val memberDetailsReads: Reads[MemberDetails] = (
-    (JsPath \ "nino").read[String] and
       (JsPath \ "firstName").read[String]and
       (JsPath \ "lastName").read[String] and
+      (JsPath \ "nino").read[String] and
       (JsPath \ "dateOfBirth").read[RasDate]
     )(MemberDetails.apply _)
 
   implicit val memberDetailsWrites: Writes[MemberDetails] = (
-      (JsPath \ "firstName").write[String] and
+    (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
       (JsPath \ "nino").write[String].contramap[String](nino => nino.toUpperCase) and
-      (JsPath \ "dateOfBirth").write[String].contramap[RasDate](date => date.toString)
+      (JsPath \ "dateOfBirth").write[RasDate]
     )(unlift(MemberDetails.unapply))
 }
 

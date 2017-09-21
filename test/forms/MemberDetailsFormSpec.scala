@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
 
-  val dateOfBirth = RasDate("1","1","1984")
+  val dateOfBirth = RasDate(Some("1"),Some("1"),Some("1984"))
   val MAX_NAME_LENGTH = 35
 
   "Find member details form" should {
@@ -241,7 +241,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("","",""))
+        "dateOfBirth" -> RasDate(None,None,None))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("dob"))))))
     }
@@ -251,7 +251,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("","1","1984"))
+        "dateOfBirth" -> RasDate(None,Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("day"))))))
     }
@@ -261,7 +261,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","","1984"))
+        "dateOfBirth" -> RasDate(Some("1"),None,Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("month"))))))
     }
@@ -271,7 +271,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","1",""))
+        "dateOfBirth" -> RasDate(Some("1"),Some("1"),None))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.mandatory", Messages("year"))))))
     }
@@ -281,7 +281,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("a","1","1984"))
+        "dateOfBirth" -> RasDate(Some("a"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("day"))))))
     }
@@ -291,7 +291,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","a","1984"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("a"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("month"))))))
     }
@@ -301,7 +301,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","2","198asasas4"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("198asasas4")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number", Messages("year"))))))
     }
@@ -311,7 +311,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("0","1","1984"))
+        "dateOfBirth" -> RasDate(Some("0"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
     }
@@ -321,7 +321,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("32","1","1984"))
+        "dateOfBirth" -> RasDate(Some("32"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
     }
@@ -331,7 +331,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("15","1","1984"))
+        "dateOfBirth" -> RasDate(Some("15"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(!validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
     }
@@ -341,7 +341,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","0","1984"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("0"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
     }
@@ -351,7 +351,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","13","1984"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("13"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
     }
@@ -361,7 +361,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("15","1","1984"))
+        "dateOfBirth" -> RasDate(Some("15"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(!validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
     }
@@ -371,7 +371,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","2","19842"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("19842")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
@@ -381,7 +381,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("1","2","142"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("142")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
     }
@@ -391,7 +391,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> "AB 12 34 56 C",
-        "dateOfBirth" -> RasDate("1","2","1422"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("1422")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -402,9 +402,9 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate(futureDate.getDayOfMonth.toString,
-                                 futureDate.getMonthOfYear.toString,
-                                 (futureDate.getYear + 1).toString))
+        "dateOfBirth" -> RasDate(Some(futureDate.getDayOfMonth.toString),
+                                 Some(futureDate.getMonthOfYear.toString),
+                                 Some((futureDate.getYear + 1).toString)))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.dob.invalid.future")))))
     }
@@ -414,7 +414,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> "AB1234 56 56 C",
-        "dateOfBirth" -> RasDate("1","2","1422"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("1422")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.length")))))
     }
@@ -424,7 +424,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> "AB£56 56 C",
-        "dateOfBirth" -> RasDate("1","2","1422"))
+        "dateOfBirth" -> RasDate(Some("1"),Some("2"),Some("1422")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("nino", List(Messages("error.nino.special.character")))))
     }
@@ -434,7 +434,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("30","2","1984"))
+        "dateOfBirth" -> RasDate(Some("30"),Some("2"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb")))))
     }
@@ -444,7 +444,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("31","4","1984"))
+        "dateOfBirth" -> RasDate(Some("31"),Some("4"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
     }
@@ -454,7 +454,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("31","6","1984"))
+        "dateOfBirth" -> RasDate(Some("31"),Some("6"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
     }
@@ -464,7 +464,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("31","9","1984"))
+        "dateOfBirth" -> RasDate(Some("31"),Some("9"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
     }
@@ -474,7 +474,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("31","11","1984"))
+        "dateOfBirth" -> RasDate(Some("31"),Some("11"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
     }
@@ -484,7 +484,7 @@ class MemberDetailsFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite
         "firstName" -> "Ramin",
         "lastName" -> "Esfandiari",
         "nino" -> RandomNino.generate,
-        "dateOfBirth" -> RasDate("31","1","1984"))
+        "dateOfBirth" -> RasDate(Some("31"),Some("1"),Some("1984")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
