@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
 
-  val dateOfBirth = RasDate(Some("1"),Some("1"),Some("1984"))
+  val dateOfBirth = RasDate(Some("1"), Some("1"), Some("1984"))
   val MAX_NAME_LENGTH = 35
 
   "Find member details form" should {
@@ -36,7 +36,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return no error when valid data is entered" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -44,7 +44,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return an error when first name field is empty" in {
       val formData = Json.obj(
         "firstName" -> "",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.mandatory", Messages("first.name"))))))
     }
@@ -52,7 +52,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return an error when last name field is empty" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> ""
+        "lastName" -> "")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.mandatory", Messages("last.name"))))))
     }
@@ -60,23 +60,23 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return error when first name is longer max allowed length" in {
       val formData = Json.obj(
         "firstName" -> "r" * (MAX_NAME_LENGTH + 1),
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.length",Messages("first.name"), MAX_NAME_LENGTH)))))
+      assert(validatedForm.errors.contains(FormError("firstName", List(Messages("error.length", Messages("first.name"), MAX_NAME_LENGTH)))))
     }
 
     "return error when last name is longer max allowed length" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "e" * (MAX_NAME_LENGTH + 1)
+        "lastName" -> "e" * (MAX_NAME_LENGTH + 1))
       val validatedForm = form.bind(formData)
-      assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.length",Messages("last.name"), MAX_NAME_LENGTH)))))
+      assert(validatedForm.errors.contains(FormError("lastName", List(Messages("error.length", Messages("last.name"), MAX_NAME_LENGTH)))))
     }
 
     "return no error when first name is of minimum allowed length" in {
       val formData = Json.obj(
         "firstName" -> "r",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -84,7 +84,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return no error when last name is of minimum allowed length" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "E"
+        "lastName" -> "E")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -92,7 +92,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return no error when first name max allowed length" in {
       val formData = Json.obj(
         "firstName" -> "r" * MAX_NAME_LENGTH,
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -100,7 +100,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return no error when last name max allowed length" in {
       val formData = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "E" * MAX_NAME_LENGTH
+        "lastName" -> "E" * MAX_NAME_LENGTH)
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -108,11 +108,11 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "return an error when name contains a digit" in {
       val formData1 = Json.obj(
         "firstName" -> "Ramin1",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm1 = form.bind(formData1)
       val formData2 = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "Esfandiar3i"
+        "lastName" -> "Esfandiar3i")
       val validatedForm2 = form.bind(formData2)
       assert(validatedForm1.errors.contains(FormError("firstName", List(Messages("error.name.invalid", Messages("first.name"))))))
       assert(validatedForm2.errors.contains(FormError("lastName", List(Messages("error.name.invalid", Messages("last.name"))))))
@@ -121,11 +121,11 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "allow apostrophes" in {
       val formData1 = Json.obj(
         "firstName" -> "R'n",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm1 = form.bind(formData1)
       val formData2 = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "Esfa'ndiari"
+        "lastName" -> "Esfa'ndiari")
       val validatedForm2 = form.bind(formData2)
       assert(validatedForm1.errors.isEmpty)
       assert(validatedForm2.errors.isEmpty)
@@ -134,7 +134,7 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "allow hyphens" in {
       val formData = Json.obj(
         "firstName" -> "Ram-in",
-        "lastName" -> "Esfa-ndiari"
+        "lastName" -> "Esfa-ndiari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
@@ -142,11 +142,11 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "disallow other special characters" in {
       val formData1 = Json.obj(
         "firstName" -> "Ra$min",
-        "lastName" -> "Esfandiari"
+        "lastName" -> "Esfandiari")
       val validatedForm1 = form.bind(formData1)
       val formData2 = Json.obj(
         "firstName" -> "Ramin",
-        "lastName" -> "Esfan@diari"
+        "lastName" -> "Esfan@diari")
       val validatedForm2 = form.bind(formData2)
       assert(validatedForm1.errors.contains(FormError("firstName", List(Messages("error.name.invalid", Messages("first.name"))))))
       assert(validatedForm2.errors.contains(FormError("lastName", List(Messages("error.name.invalid", Messages("last.name"))))))
@@ -155,8 +155,9 @@ class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
     "allow whitespace" in {
       val formData = Json.obj(
         "firstName" -> "Ra min",
-        "lastName" -> "Esfand iari"
+        "lastName" -> "Esfand iari")
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.isEmpty)
     }
+  }
 }

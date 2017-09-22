@@ -43,7 +43,7 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
 
     "send a post request to customer matching service" in {
 
-      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate(Some("1"),Some("1"),Some("1999")))
+      val memberDetails = MemberDetails(MemberName("Ramin", "Esfandiari"),RandomNino.generate, RasDate(Some("1"),Some("1"),Some("1999")))
 
       val expectedResponse = Some("633e0ee7-315b-49e6-baed-d79c3dffe467")
 
