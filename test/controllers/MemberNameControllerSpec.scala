@@ -64,6 +64,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
 
     when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberName)))
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
   }
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
@@ -112,35 +113,19 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       assert(doc(result).getElementById("firstName").attr("input") != null)
       assert(doc(result).getElementById("lastName").attr("input") != null)
     }
-//
-//    "contain continue button" in {
-//      val result = TestMemberNameController.get(fakeRequest)
-//      doc(result).getElementById("continue").text shouldBe Messages("continue")
-//    }
-//
-//    "contain a date field" in {
-//      val result = TestMemberNameController.get(fakeRequest)
-//      doc(result).getElementById("dob-day_label").text shouldBe Messages("day")
-//      doc(result).getElementById("dob-month_label").text shouldBe Messages("month")
-//      doc(result).getElementById("dob-year_label").text shouldBe Messages("year")
-//    }
-//
-//    "contain hint text for national insurance and date of birth fields" in {
-//      val result = TestMemberNameController.get(fakeRequest)
-//      doc(result).getElementById("nino_hint").text shouldBe Messages("nino.hint")
-//      doc(result).getElementById("dob_hint").text shouldBe Messages("dob.hint")
-//    }
-//
-//    "fill in form if cache data is returned" in {
-//      when(mockSessionService.fetchMemberDetails()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDetails)))
-//      val result = TestMemberNameController.get(fakeRequest)
-//      doc(result).getElementById("firstName").value.toString should include(memberDetails.firstName)
-//      doc(result).getElementById("lastName").value.toString should include(memberDetails.lastName)
-//      doc(result).getElementById("nino").value.toString should include(memberDetails.nino)
-//      doc(result).getElementById("dob-year").value.toString should include(memberDetails.dateOfBirth.year.getOrElse("0"))
-//      doc(result).getElementById("dob-month").value.toString should include(memberDetails.dateOfBirth.month.getOrElse("0"))
-//      doc(result).getElementById("dob-day").value.toString should include(memberDetails.dateOfBirth.day.getOrElse("0"))
-//    }
+
+    "contain continue button" in {
+      val result = TestMemberNameController.get(fakeRequest)
+      doc(result).getElementById("continue").text shouldBe Messages("continue")
+    }
+
+
+    "fill in form if cache data is returned" in {
+//      when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDetails)))
+      val result = TestMemberNameController.get(fakeRequest)
+      doc(result).getElementById("firstName").value.toString should include(memberName.firstName)
+      doc(result).getElementById("lastName").value.toString should include(memberName.lastName)
+    }
   }
 
 //  "Member details controller form submission" should {
