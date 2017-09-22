@@ -16,7 +16,7 @@
 
 package validators
 
-import forms.MemberDetailsForm.Messages
+import forms.MemberNameForm.Messages
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
 trait NinoValidator {

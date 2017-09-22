@@ -18,7 +18,7 @@ package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
-import forms.MemberDetailsForm._
+import forms.MemberNameForm._
 import models._
 import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
