@@ -34,14 +34,14 @@ object SessionController extends SessionController {
 trait SessionController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
-  val MEMBER_DETAILS = "member-details"
+  val MEMBER_NAME = "member-name"
 
   def cleanAndRedirect(target: String) = Action.async {
     implicit request =>
       sessionService.resetRasSession() map {
         case Some(session) =>
           target match {
-            case MEMBER_DETAILS => Redirect(routes.MemberDetailsController.get())
+            case MEMBER_NAME => Redirect(routes.MemberNameController.get())
             case _ =>
               Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
               Redirect(routes.GlobalErrorController.get())

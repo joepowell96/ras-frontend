@@ -5,8 +5,8 @@ GET         /assets/*file                 @controllers.AssetsController.at(path=
 GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
 
-GET         /member-details               controllers.MemberDetailsController.get
-POST        /member-details               controllers.MemberDetailsController.post
+GET         /member-name                  controllers.MemberNameController.get
+POST        /member-name                  controllers.MemberNameController.post
 
 GET         /match-found                  controllers.ResultsController.matchFound
 GET         /match-not-found              controllers.ResultsController.noMatchFound

@@ -17,7 +17,7 @@
 package forms
 
 import helpers.helpers.I18nHelper
-import models.Name
+import models.MemberName
 import play.api.data.Form
 import play.api.data.Forms._
 
@@ -38,7 +38,7 @@ object MemberNameForm extends I18nHelper{
         .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0)
         .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH)
         .verifying(Messages("error.name.invalid", Messages("last.name")), x => x.length == 0 || x.matches(NAME_REGEX))
-    )(Name.apply)(Name.unapply)
+    )(MemberName.apply)(MemberName.unapply)
   )
 }
 

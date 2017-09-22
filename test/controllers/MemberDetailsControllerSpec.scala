@@ -67,7 +67,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
   val rasSession = RasSession(memberDetails,residencyStatusResult)
 
 
-  object TestMemberDetailsController extends MemberDetailsController{
+  object TestMemberDetailsController extends MemberNameController{
     override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mockRasConnector
     override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mockMatchingConnector
     val authConnector: AuthConnector = mockAuthConnector

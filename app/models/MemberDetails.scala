@@ -20,7 +20,7 @@ package models
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads, Writes}
 
-case class MemberDetails(name: Name,
+case class MemberDetails(name: MemberName,
                          nino: String,
                          dateOfBirth: RasDate) {
 
@@ -38,13 +38,13 @@ case class MemberDetails(name: Name,
 
 object MemberDetails {
   implicit val memberDetailsReads: Reads[MemberDetails] = (
-      (JsPath \ "name").read[Name]and
+      (JsPath \ "name").read[MemberName]and
       (JsPath \ "nino").read[String] and
       (JsPath \ "dateOfBirth").read[RasDate]
     )(MemberDetails.apply _)
 
   implicit val memberDetailsWrites: Writes[MemberDetails] = (
-    (JsPath \ "name").write[Name] and
+    (JsPath \ "name").write[MemberName] and
       (JsPath \ "nino").write[String].contramap[String](nino => nino.toUpperCase) and
       (JsPath \ "dateOfBirth").write[RasDate]
     )(unlift(MemberDetails.unapply))

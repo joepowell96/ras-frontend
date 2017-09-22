@@ -35,7 +35,8 @@ import scala.concurrent.{Await, Future}
 class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutures with MockitoSugar {
 
   val mockSessionCache = mock[SessionCache]
-  val memberDetails = MemberDetails("John", "Johnson",RandomNino.generate,RasDate(Some("1"),Some("1"),Some("1999")))
+
+  val memberDetails = MemberDetails(MemberName("John", "Johnson"),RandomNino.generate,RasDate(Some("1"),Some("1"),Some("1999")))
   val rasSession = RasSession(memberDetails,ResidencyStatusResult("","","","","","",""))
 
   object TestSessionService extends SessionService {
@@ -43,6 +44,24 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
   }
 
   "Session service" should {
+
+    "fetch Name" when {
+      "member name page is loaded" in{
+        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = Await.result(TestSessionService.fetchName()(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(memberDetails)
+      }
+    }
+
+    "cache Name" when {
+      "submitted when no session is retrieved" in {
+        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(None))
+        val json = Json.toJson[RasSession](rasSession.copy(memberDetails = memberDetails))
+        when(mockSessionCache.cache[RasSession](any(), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
+        val result = Await.result(TestSessionService.cacheName(memberDetails)(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(rasSession.copy(memberDetails = memberDetails))
+      }
+    }
 
     "fetch member details" when {
       "member details page is loaded" in {
@@ -55,19 +74,17 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
     "cache member details" when {
       "member details is submitted via the form when no returned session" in {
         when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(None))
-        val md = memberDetails.copy(firstName = "Jack")
-        val json = Json.toJson[RasSession](rasSession.copy(memberDetails = md))
+        val json = Json.toJson[RasSession](rasSession.copy(memberDetails = memberDetails))
         when(mockSessionCache.cache[RasSession](any(), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
-        val result = Await.result(TestSessionService.cacheMemberDetails(md)(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(rasSession.copy(memberDetails = md))
+        val result = Await.result(TestSessionService.cacheMemberDetails(memberDetails)(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(rasSession.copy(memberDetails = memberDetails))
       }
       "member details is submitted via the form when some returned session" in {
         when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
-        val md = memberDetails.copy(firstName = "Jack")
-        val json = Json.toJson[RasSession](rasSession.copy(memberDetails = md))
+        val json = Json.toJson[RasSession](rasSession.copy(memberDetails = memberDetails))
         when(mockSessionCache.cache[RasSession](any(), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
-        val result = Await.result(TestSessionService.cacheMemberDetails(md)(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(rasSession.copy(memberDetails = md))
+        val result = Await.result(TestSessionService.cacheMemberDetails(memberDetails)(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(rasSession.copy(memberDetails = memberDetails))
       }
     }
 

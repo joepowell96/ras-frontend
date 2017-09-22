@@ -62,10 +62,10 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(rasSess) =>
-                val name = rasSess.memberDetails.firstName + " " + rasSess.memberDetails.lastName
-                val dateOfBirth = rasSess.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val name = rasSess.name.firstName + " " + rasSess.name.lastName
+//                val dateOfBirth = rasSess.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
-                Ok(views.html.match_not_found(name,dateOfBirth,rasSess.memberDetails.nino))
+                Ok(views.html.match_not_found(name,"",""))
               case _ =>
                 Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())

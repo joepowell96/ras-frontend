@@ -32,7 +32,8 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetails("","","",RasDate(Some(""),Some(""),Some(""))),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberName("",""),
+                                ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -42,13 +43,13 @@ trait SessionService extends SessionCacheWiring {
     sessionCache.cache[RasSession](RAS_SESSION_KEY, cleanSession) map (cacheMap => Some(cleanSession))
   }
 
-  def cacheMemberDetails(memberDetails: MemberDetails)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def cacheName(name: MemberName)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 
     val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
-          case Some(returnedSession) => returnedSession.copy(memberDetails = memberDetails)
-          case None => cleanSession.copy(memberDetails = memberDetails)
+          case Some(returnedSession) => returnedSession.copy(name = name)
+          case None => cleanSession.copy(name = name)
         }
       )
     }
@@ -58,10 +59,10 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
-  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
+  def fetchName()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberName]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
-        _.memberDetails
+        _.name
       }
     }
   }
