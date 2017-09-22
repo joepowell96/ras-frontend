@@ -53,7 +53,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
   val mockConfig = mock[Configuration]
   val mockEnvironment = mock[Environment]
 
-  val rasSession = RasSession(MemberName("Jackie","Chan"),ResidencyStatusResult("","","","","","",""))
+  val memberName = MemberName("Jackie","Chan")
+  val rasSession = RasSession(memberName, ResidencyStatusResult("","","","","","",""))
 
   object TestMemberNameController extends MemberNameController{
     val authConnector: AuthConnector = mockAuthConnector
@@ -61,7 +62,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val sessionService = mockSessionService
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    when(mockSessionService.cacheResidencyStatusResult(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
+    when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberName)))
   }
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
@@ -95,23 +97,21 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     "contain correct title and header" in {
       val result = TestMemberNameController.get(fakeRequest)
       doc(result).title shouldBe Messages("member.name.page.title")
-      doc(result).getElementById("header").text shouldBe Messages("member.details.page.header")
+      doc(result).getElementById("header").text shouldBe Messages("member.name.page.header")
+      doc(result).getElementById("sub-header").text shouldBe Messages("member.name.page.sub-header")
     }
 
-//    "contain correct field labels" in {
-//      val result = TestMemberNameController.get(fakeRequest)
-//      doc(result).getElementById("firstName_label").text shouldBe Messages("first.name").capitalize
-//      doc(result).getElementById("lastName_label").text shouldBe Messages("last.name").capitalize
-//      doc(result).getElementById("nino_label").text should include(Messages("nino"))
-//      doc(result).getElementById("dob-legend").text shouldBe Messages("dob").capitalize
-//    }
-//
-//    "contain correct input fields" in {
-//      val result = TestMemberNameController.get(fakeRequest)
-//      assert(doc(result).getElementById("firstName").attr("input") != null)
-//      assert(doc(result).getElementById("lastName").attr("input") != null)
-//      assert(doc(result).getElementById("nino").attr("input") != null)
-//    }
+    "contain correct field labels" in {
+      val result = TestMemberNameController.get(fakeRequest)
+      doc(result).getElementById("firstName_label").text shouldBe Messages("first.name").capitalize
+      doc(result).getElementById("lastName_label").text shouldBe Messages("last.name").capitalize
+    }
+
+    "contain correct input fields" in {
+      val result = TestMemberNameController.get(fakeRequest)
+      assert(doc(result).getElementById("firstName").attr("input") != null)
+      assert(doc(result).getElementById("lastName").attr("input") != null)
+    }
 //
 //    "contain continue button" in {
 //      val result = TestMemberNameController.get(fakeRequest)

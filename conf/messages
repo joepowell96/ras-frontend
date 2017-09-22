@@ -28,8 +28,9 @@ continue = Continue
 
 find.member.details = Find member details
 
-member.details.page.title = Find member details - GOV.UK
-member.details.page.header = Find member details
+member.name.page.title = Member name - GOV.UK
+member.name.page.header = What is the member''s name?
+member.name.page.sub-header = As shown on their birth certificate or passport.
 
 match.found.page.title = Match found - GOV.UK
 match.not.found.page.title = Match not found - GOV.UK

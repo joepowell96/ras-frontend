@@ -45,8 +45,8 @@ trait MemberNameController extends RasController {
         case Right(userInfo) =>
           Logger.debug("[NameController][get] user authorised")
           sessionService.fetchName() map {
-            case Some(name) => Ok(views.html.name(form.fill(name)))
-            case _ => Ok(views.html.name(form))
+            case Some(name) => Ok(views.html.member_name(form.fill(name)))
+            case _ => Ok(views.html.member_name(form))
           }
         case Left(resp) =>
           Logger.debug("[NameController][get] user Not authorised")
@@ -60,7 +60,7 @@ trait MemberNameController extends RasController {
       form.bindFromRequest.fold(
         formWithErrors => {
           Logger.debug("[NameController][post] Invalid form field passed")
-          Future.successful(BadRequest(views.html.name(formWithErrors)))
+          Future.successful(BadRequest(views.html.member_name(formWithErrors)))
         },
         memberName => {
           Logger.debug("[NameController][post] valid form")
