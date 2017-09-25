@@ -17,14 +17,11 @@
 package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
-import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
+import connectors.UserDetailsConnector
 import forms.MemberNameForm._
-import models._
-import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
+import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.play.http.Upstream4xxResponse
-import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
@@ -42,7 +39,7 @@ trait MemberNameController extends RasController {
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
-        case Right(userInfo) =>
+        case Right(_) =>
           Logger.debug("[NameController][get] user authorised")
           sessionService.fetchName() map {
             case Some(name) => Ok(views.html.member_name(form.fill(name)))
@@ -56,7 +53,7 @@ trait MemberNameController extends RasController {
 
   def post = Action.async { implicit request =>
     isAuthorised.flatMap{
-      case Right(userInfo) =>
+      case Right(_) =>
       form.bindFromRequest.fold(
         formWithErrors => {
           Logger.debug("[NameController][post] Invalid form field passed")
@@ -65,7 +62,7 @@ trait MemberNameController extends RasController {
         memberName => {
           Logger.debug("[NameController][post] valid form")
           sessionService.cacheName(memberName) flatMap {
-            case Some(name) => Future.successful(Redirect(routes.GlobalErrorController.get()))
+            case Some(name) => Future.successful(Redirect(routes.MemberNinoController.get()))
             case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
           }
         }

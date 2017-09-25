@@ -16,10 +16,7 @@
 
 package controllers
 
-import java.io.File
-
-import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
-import helpers.RandomNino
+import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
@@ -33,12 +30,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
-import play.api.{Configuration, Environment, Mode}
+import play.api.{Configuration, Environment}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
@@ -152,6 +148,12 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     "save details to cache" in {
       val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       verify(mockSessionService, atLeastOnce()).cacheName(Matchers.any())(Matchers.any(), Matchers.any())
+    }
+
+    "redirect to nino page when name cached" in {
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("member-nino")
     }
 
     "redirect to technical error page if name is not cached" in {
