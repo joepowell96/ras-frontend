@@ -137,4 +137,3 @@ trait MemberDetailsController extends RasController {
       ""
   }
 }
-
