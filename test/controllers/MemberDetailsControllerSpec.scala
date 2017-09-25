@@ -35,12 +35,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.{Configuration, Environment, Mode}
 import services.SessionService
-import uk.gov.hmrc.auth.core.{AuthConnector, ~}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
@@ -92,7 +93,7 @@ class MemberDetailsControllerSpec extends UnitSpec with WithFakeApplication with
 
   "MemberDetailsController" should {
 
-    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
       thenReturn(successfulRetrieval)
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).

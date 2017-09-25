@@ -35,7 +35,8 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import services.SessionService
-import uk.gov.hmrc.auth.core.{AuthConnector, ~}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -80,7 +81,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
   "Results Controller" should {
-    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(), any())).
       thenReturn(successfulRetrieval)
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).

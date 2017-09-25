@@ -23,10 +23,10 @@ import models._
 import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.Upstream4xxResponse
 
 object MemberDetailsController extends MemberDetailsController {
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
@@ -137,4 +137,3 @@ trait MemberDetailsController extends RasController {
       ""
   }
 }
-

@@ -17,9 +17,9 @@
 package config
 
 import connectors.ContactFrontendConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait RasContext {
   def getPageHelpPartial()(implicit hc: HeaderCarrier): Future[String]
