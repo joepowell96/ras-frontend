@@ -55,6 +55,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   val memberName = MemberName("Jackie","Chan")
   val rasSession = RasSession(memberName, ResidencyStatusResult("","","","","","",""))
+  val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill")
+
 
   object TestMemberNameController extends MemberNameController{
     val authConnector: AuthConnector = mockAuthConnector
@@ -63,6 +65,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
 
+    when(mockSessionService.cacheName(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberName)))
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
   }
@@ -126,76 +129,38 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
   }
 
-//  "Member details controller form submission" should {
-//
-//    "respond to POST /relief-at-source/member-details" in {
-//      val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-details"))
-//      status(result.get) should not equal (NOT_FOUND)
-//    }
-//
-//    "return bad request when form error present" in {
-//      val postData = Json.obj(
-//        "firstName" -> "",
-//        "lastName" -> "Esfandiari",
-//        "nino" -> RandomNino.generate,
-//        "dateOfBirth" -> RasDate(Some("1"), Some("1"), Some("1999")))
-//
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) should equal(BAD_REQUEST)
-//    }
-//
-//    "redirect" in {
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) should equal(SEE_OTHER)
-//    }
-//
-//    "redirect if current year residency status is empty" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus("", NON_SCOTTISH)))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) should equal(SEE_OTHER)
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//    "redirect if next year residency status is empty" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(NON_SCOTTISH, "")))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) should equal(SEE_OTHER)
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//    "save details to cache" in {
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      when(mockSessionService.cacheMemberDetails(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-//      verify(mockSessionService, atLeastOnce()).cacheMemberDetails(Matchers.any())(Matchers.any(), Matchers.any())
-//    }
-//
-//    "redirect if unknown current year residency status is returned" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus("blah", NON_SCOTTISH)))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//    }
-//
-//    "redirect if unknown next year residency status is returned" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, "")))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//    }
-//
-//    "redirect to technical error page if customer matching fails to return a response" in {
-//      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//    "redirect to technical error page if ras fails to return a response" in {
-//      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
-//      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//  }
+  "Member details controller form submission" should {
+
+    "respond to POST /relief-at-source/member-details" in {
+      val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-name"))
+      status(result.get) should not equal (NOT_FOUND)
+    }
+
+    "return bad request when form error present" in {
+      val postData = Json.obj(
+        "firstName" -> "",
+        "lastName" -> "Esfandiari")
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(BAD_REQUEST)
+    }
+
+    "redirect" in {
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(SEE_OTHER)
+    }
+
+    "save details to cache" in {
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      verify(mockSessionService, atLeastOnce()).cacheName(Matchers.any())(Matchers.any(), Matchers.any())
+    }
+
+    "redirect to technical error page if name is not cached" in {
+      when(mockSessionService.cacheName(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
+
+  }
 
 }
