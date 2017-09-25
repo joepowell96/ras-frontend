@@ -65,7 +65,7 @@ trait MemberNameController extends RasController {
         memberName => {
           Logger.debug("[NameController][post] valid form")
           sessionService.cacheName(memberName) flatMap {
-            case Some(session) => Future.successful(Redirect(routes.GlobalErrorController.get()))
+            case Some(name) => Future.successful(Redirect(routes.GlobalErrorController.get()))
             case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
           }
         }

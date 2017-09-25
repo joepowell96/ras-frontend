@@ -119,9 +119,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       doc(result).getElementById("continue").text shouldBe Messages("continue")
     }
 
-
     "fill in form if cache data is returned" in {
-//      when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDetails)))
       val result = TestMemberNameController.get(fakeRequest)
       doc(result).getElementById("firstName").value.toString should include(memberName.firstName)
       doc(result).getElementById("lastName").value.toString should include(memberName.lastName)
