@@ -17,15 +17,17 @@
 package controllers
 
 import connectors.UserDetailsConnector
+import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{atLeastOnce, verify, when}
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
@@ -63,13 +65,14 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
-  "MemberNinoController" should {
+  "MemberNinoController get" should {
 
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
       thenReturn(successfulRetrieval)
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
+
 
     "return ok" when {
       "called" in {
@@ -90,6 +93,24 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
     }
   }
+
+  "MemberNinoController post" should {
+
+    "respond to POST /relief-at-source/member-nino" in {
+      val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-nino"))
+      status(result.get) should not equal (NOT_FOUND)
+    }
+
+    "return bad request when form error present" in {
+      val postData = Json.obj(
+        "nino" -> RandomNino.generate.substring(3))
+      val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(BAD_REQUEST)
+    }
+
+
+  }
+
 
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))

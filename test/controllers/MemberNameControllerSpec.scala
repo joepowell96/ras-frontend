@@ -128,7 +128,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   "Member details controller form submission" should {
 
-    "respond to POST /relief-at-source/member-details" in {
+    "respond to POST /relief-at-source/member-name" in {
       val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-name"))
       status(result.get) should not equal (NOT_FOUND)
     }

@@ -26,6 +26,8 @@ continue = Continue
 
 #----------------------------------------------
 
+member = member
+
 find.member.details = Find member details
 
 member.name.page.title = Member name - GOV.UK

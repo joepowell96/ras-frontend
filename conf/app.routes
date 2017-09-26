@@ -9,6 +9,9 @@ GET         /member-name                  controllers.MemberNameController.get
 POST        /member-name                  controllers.MemberNameController.post
 
 GET         /member-nino                  controllers.MemberNinoController.get
+POST        /member-nino                  controllers.MemberNinoController.post
+
+GET         /member-date-of-birth         controllers.MemberDOBController.get
 
 GET         /match-found                  controllers.ResultsController.matchFound
 GET         /match-not-found              controllers.ResultsController.noMatchFound

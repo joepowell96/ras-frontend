@@ -18,10 +18,13 @@ package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
+import forms.MemberNinoForm.form
 import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
-import forms.MemberNinoForm._
+
+
+import scala.concurrent.Future
 
 object MemberNinoController extends MemberNinoController {
   val authConnector: AuthConnector = FrontendAuthConnector
@@ -34,17 +37,45 @@ trait MemberNinoController extends RasController{
 
   implicit val context: RasContext = RasContextImpl
 
+  var firstName = ""
+
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
           Logger.debug("[NinoController][get] user authorised")
           sessionService.fetchRasSession() map {
-            case Some(session) => Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
-            case _ => Ok(views.html.member_nino(form, ""))
+            case Some(session) =>
+              firstName = session.name.firstName
+              Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
+            case _ =>
+              Ok(views.html.member_nino(form, Messages("member")))
           }
         case Left(resp) =>
           Logger.debug("[NinoController][get] user Not authorised")
+          resp
+      }
+  }
+
+  def post = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(_) =>
+          form.bindFromRequest.fold(
+            formWithErrors => {
+              Logger.debug("[NinoController][post] Invalid form field passed")
+              Future.successful(BadRequest(views.html.member_nino(formWithErrors,firstName)))
+            },
+            nino => {
+              Logger.debug("[NinoController][post] valid form")
+              sessionService.cacheNino(nino) flatMap {
+                case Some(nino) => Future.successful(Redirect(routes.MemberDOBController.get()))
+                case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
+              }
+            }
+          )
+        case Left(resp) =>
+          Logger.debug("[NinoController][post] user Not authorised")
           resp
       }
   }
