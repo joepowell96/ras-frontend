@@ -141,11 +141,6 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       status(result) should equal(BAD_REQUEST)
     }
 
-    "redirect" in {
-      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) should equal(SEE_OTHER)
-    }
-
     "save details to cache" in {
       val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       verify(mockSessionService, atLeastOnce()).cacheName(Matchers.any())(Matchers.any(), Matchers.any())

@@ -51,6 +51,7 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
   val rasSession = RasSession(memberName, memberNino, ResidencyStatusResult("","","","","","",""))
+  val postData = Json.obj("nino" -> RandomNino.generate)
 
   object TestMemberNinoController extends MemberNinoController{
     val authConnector: AuthConnector = mockAuthConnector
@@ -60,6 +61,7 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
 
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+    when(mockSessionService.cacheNino(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
   }
 
@@ -108,6 +110,18 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       status(result) should equal(BAD_REQUEST)
     }
 
+    "redirect to dob page when nino cached" in {
+      val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("member-date-of-birth")
+    }
+
+    "redirect to technical error page if nino is not cached" in {
+      when(mockSessionService.cacheNino(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
 
   }
 
