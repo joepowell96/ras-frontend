@@ -28,7 +28,6 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class MemberNameFormSpec extends UnitSpec with I18nHelper with OneAppPerSuite {
 
-  val dateOfBirth = RasDate(Some("1"), Some("1"), Some("1984"))
   val MAX_NAME_LENGTH = 35
 
   "Find member details form" should {

@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers
 import org.mockito.Matchers.any
-import org.mockito.Mockito.{atLeastOnce, verify, when}
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
 import play.api.libs.json.Json
@@ -125,9 +125,6 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   }
 
-
-
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
-
 
 }
