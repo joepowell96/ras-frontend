@@ -39,9 +39,9 @@ trait MemberNinoController extends RasController{
       isAuthorised.flatMap {
         case Right(_) =>
           Logger.debug("[NinoController][get] user authorised")
-          sessionService.fetchNino() map {
-            case Some(nino) => Ok(views.html.member_nino(form.fill(nino)))
-            case _ => Ok(views.html.member_nino(form))
+          sessionService.fetchRasSession() map {
+            case Some(session) => Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
+            case _ => Ok(views.html.member_nino(form, ""))
           }
         case Left(resp) =>
           Logger.debug("[NinoController][get] user Not authorised")

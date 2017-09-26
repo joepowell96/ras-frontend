@@ -57,8 +57,8 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
 
-    when(mockSessionService.cacheNino(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-    when(mockSessionService.fetchNino()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberNino)))
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
   }
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
@@ -82,7 +82,7 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       "rendered" in {
         val result = TestMemberNinoController.get(fakeRequest)
         doc(result).title shouldBe Messages("member.nino.page.title")
-        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header")
+        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header","Jackie")
         doc(result).getElementById("nino_hint").text shouldBe Messages("nino.hint")
         doc(result).getElementById("nino_label").text should include(Messages("nino"))
         assert(doc(result).getElementById("nino").attr("input") != null)
@@ -91,7 +91,7 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
   }
 
-  
+
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
 
