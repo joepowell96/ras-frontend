@@ -25,8 +25,6 @@ object MemberNameForm extends I18nHelper{
 
   val MAX_LENGTH = 35
   val NAME_REGEX = """^[a-zA-Z &`\-\'^]{1,35}$"""
-  val NINO_SUFFIX_REGEX = "[A-D]"
-  val TEMP_NINO = "TN"
 
   val form = Form(
     mapping(

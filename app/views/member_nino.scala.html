@@ -14,44 +14,37 @@
  * limitations under the License.
  *@
 
-@(memberNameForm: Form[models.MemberName])(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(memberNinoForm: Form[models.MemberNino])(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.helpers._
 
-@ras_main(title = Messages("member.name.page.title")) {
+@ras_main(title = Messages("member.nino.page.title")) {
 
-@views.html.helpers.errorSummary(memberNameForm)
+@views.html.helpers.errorSummary(memberNinoForm)
 
  <div class="grid-row">
 
   <div class="column-full">
 
-   <h1 id="header" class="heading-xlarge">@Messages("member.name.page.header")</h1>
+   <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header")</h1>
 
-    <p id="sub-header">@Messages("member.name.page.sub-header")</p>
+    <p id="sub-header">@Messages("nino.hint")</p>
 
 
-     @form(action = routes.MemberNameController.post) {
+     @form(action = routes.MemberNinoController.get) {
 
        <div class="form-group">
 
-         <div>
-          @rasInput(memberNameForm("firstName"),
-          '_label -> Html(Messages("first.name").capitalize),
-           '_labelClass -> "form-label-bold",
-          '_id -> "firstName",
-          '_maxLength -> 35)
-         </div>
-
-         <div>
-          @rasInput(memberNameForm("lastName"),
-          '_label -> Html(Messages("last.name").capitalize),
-           '_labelClass -> "form-label-bold",
-          '_id -> "lastName",
-          '_maxLength -> 35)
-         </div>
+        <div>
+         @rasInput(memberNinoForm("nino"),
+         '_label -> Html(Messages("nino")),
+         '_labelClass -> "form-label-bold",
+         '_id -> "nino",
+         '_maxLength -> 15,
+         '_hintText -> Messages("nino.hint"))
+        </div>
 
        </div>
 

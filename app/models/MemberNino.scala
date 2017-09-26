@@ -18,11 +18,8 @@ package models
 
 import play.api.libs.json.Json
 
+case class MemberNino(nino :String)
 
-case class RasSession(name:MemberName,
-                      nino:MemberNino,
-                      residencyStatusResult: ResidencyStatusResult)
-
-object RasSession{
-  implicit val format = Json.format[RasSession]
+object MemberNino {
+  implicit val formats = Json.format[MemberNino]
 }

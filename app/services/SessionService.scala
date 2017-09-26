@@ -18,11 +18,8 @@ package services
 
 import config.SessionCacheWiring
 import models._
-import org.joda.time.LocalDate
-import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.Request
 import uk.gov.hmrc.play.http.HeaderCarrier
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -33,6 +30,7 @@ trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
   val cleanSession = RasSession(MemberName("",""),
+                                MemberNino(""),
                                 ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
@@ -63,6 +61,30 @@ trait SessionService extends SessionCacheWiring {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
         _.name
+      }
+    }
+  }
+
+  def cacheNino(nino: MemberNino)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(nino = nino)
+          case None => cleanSession.copy(nino = nino)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def fetchNino()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberNino]] = {
+    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
+      currentSession.map {
+        _.nino
       }
     }
   }

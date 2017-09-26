@@ -37,8 +37,9 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
   val mockSessionCache = mock[SessionCache]
 
   val name = MemberName("John", "Johnson")
+  val nino = MemberNino(RandomNino.generate)
   val memberDetails = MemberDetails(name,RandomNino.generate,RasDate(Some("1"),Some("1"),Some("1999")))
-  val rasSession = RasSession(name,ResidencyStatusResult("","","","","","",""))
+  val rasSession = RasSession(name,nino,ResidencyStatusResult("","","","","","",""))
 
   object TestSessionService extends SessionService {
     override def sessionCache: SessionCache = mockSessionCache

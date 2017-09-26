@@ -50,7 +50,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
   val mockEnvironment = mock[Environment]
 
   val memberName = MemberName("Jackie","Chan")
-  val rasSession = RasSession(memberName, ResidencyStatusResult("","","","","","",""))
+  val memberNino = MemberNino("AB123456C")
+  val rasSession = RasSession(memberName, memberNino, ResidencyStatusResult("","","","","","",""))
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill")
 
 

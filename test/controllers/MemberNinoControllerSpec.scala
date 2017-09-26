@@ -18,13 +18,20 @@ package controllers
 
 import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.scalatest.mockito.MockitoSugar
+import play.api.http.Status.OK
+import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.http.Status.{OK}
+import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
 import services.SessionService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+
+import scala.concurrent.Future
+
 
 class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
 
@@ -43,16 +50,32 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
   }
 
-  "member nino controller" should {
+  "member nino controller get" should {
 
     "return ok" when {
       "called" in {
-        val result = await(TestMemberNinoController.get.apply(fakeRequest))
+        val result = await(TestMemberNinoController.get(fakeRequest))
         status(result) shouldBe OK
       }
     }
 
+    "contain correct page elements and content" when {
+      "rendered" in {
+        val result = await(TestMemberNinoController.get(fakeRequest))
+        doc(result).title shouldBe Messages("member.nino.page.title")
+        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header")
+        doc(result).getElementById("nino_hint").text shouldBe Messages("nino.hint")
+        doc(result).getElementById("nino_label").text should include(Messages("nino"))
+        assert(doc(result).getElementById("nino").attr("input") != null)
+        doc(result).getElementById("continue").text shouldBe Messages("continue")
+      }
+    }
+
+
+
   }
+
+  private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
 
 }

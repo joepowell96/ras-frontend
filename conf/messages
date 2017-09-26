@@ -32,6 +32,9 @@ member.name.page.title = Member name - GOV.UK
 member.name.page.header = What is the member''s name?
 member.name.page.sub-header = As shown on their birth certificate or passport.
 
+member.nino.page.title = Member nino - GOV.UK
+member.nino.page.header = What is {0}''s National Insurance number?
+
 match.found.page.title = Match found - GOV.UK
 match.not.found.page.title = Match not found - GOV.UK
 global.error.page.title = Technical error - GOV.UK

@@ -19,10 +19,9 @@ package controllers
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
 import play.api.mvc.Action
-import play.api.{Configuration, Environment, Play}
+import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
-
-import scala.concurrent.Future
+import forms.MemberNinoForm._
 
 object MemberNinoController extends MemberNinoController {
   val authConnector: AuthConnector = FrontendAuthConnector
@@ -37,7 +36,17 @@ trait MemberNinoController extends RasController{
 
   def get = Action.async {
     implicit request =>
-      Future.successful(Ok)
+      isAuthorised.flatMap {
+        case Right(_) =>
+          Logger.debug("[NinoController][get] user authorised")
+          sessionService.fetchNino() map {
+            case Some(nino) => Ok(views.html.member_nino(form.fill(nino)))
+            case _ => Ok(views.html.member_nino(form))
+          }
+        case Left(resp) =>
+          Logger.debug("[NinoController][get] user Not authorised")
+          resp
+      }
   }
 
 }

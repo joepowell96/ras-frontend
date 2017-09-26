@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package forms
 
-import play.api.libs.json.Json
+import helpers.helpers.I18nHelper
+import models.MemberNino
+import play.api.data.Form
+import play.api.data.Forms._
+import validators.NinoValidator
 
-
-case class RasSession(name:MemberName,
-                      nino:MemberNino,
-                      residencyStatusResult: ResidencyStatusResult)
-
-object RasSession{
-  implicit val format = Json.format[RasSession]
+object MemberNinoForm extends I18nHelper{
+  val form = Form(mapping("nino" -> text.verifying(NinoValidator.ninoConstraint))(MemberNino.apply)(MemberNino.unapply))
 }
+
+
+
