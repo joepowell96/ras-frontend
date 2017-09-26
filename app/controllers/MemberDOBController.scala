@@ -19,8 +19,9 @@ package controllers
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
 import play.api.mvc.Action
-import play.api.{Configuration, Environment, Play}
+import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
+import forms.MemberDateOfBirthForm.form
 
 object MemberDOBController extends MemberDOBController {
   val authConnector: AuthConnector = FrontendAuthConnector
@@ -32,9 +33,23 @@ object MemberDOBController extends MemberDOBController {
 trait MemberDOBController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
+  var firstName = ""
 
   def get = Action.async {
-    implicit request => ???
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(_) =>
+          Logger.debug("[DobController][get] user authorised")
+          sessionService.fetchRasSession() map {
+            case Some(session) =>
+              firstName = session.name.firstName
+              Ok(views.html.member_dob(form.fill(session.dateOfBirth),firstName))
+            case _ => Ok(views.html.member_dob(form, firstName))
+          }
+        case Left(resp) =>
+          Logger.debug("[DobController][get] user Not authorised")
+          resp
+      }
   }
 
 }

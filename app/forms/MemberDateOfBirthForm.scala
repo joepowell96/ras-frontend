@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package models
+package forms
 
-import play.api.libs.json.Json
+import helpers.helpers.I18nHelper
+import models.{MemberDateOfBirth, MemberName, RasDate}
+import play.api.data.Form
+import play.api.data.Forms._
+import validators.DateValidator
 
+object MemberDateOfBirthForm extends I18nHelper{
 
-case class RasSession(name:MemberName,
-                      nino:MemberNino,
-                      dateOfBirth:MemberDateOfBirth,
-                      residencyStatusResult: ResidencyStatusResult)
-
-object RasSession{
-  implicit val format = Json.format[RasSession]
+  val form = Form(
+    mapping(
+      "dateOfBirth" -> mapping(
+        "day" -> optional(text),
+        "month" -> optional(text),
+        "year" -> optional(text)
+      )(RasDate.apply)(RasDate.unapply)
+        .verifying(DateValidator.rasDateConstraint)
+    )
+    (MemberDateOfBirth.apply)(MemberDateOfBirth.unapply)
+  )
 }
+
+
+

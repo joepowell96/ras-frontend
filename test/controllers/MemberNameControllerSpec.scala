@@ -51,7 +51,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
-  val rasSession = RasSession(memberName, memberNino, ResidencyStatusResult("","","","","","",""))
+  val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"),Some("2012")))
+  val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""))
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill")
 
 

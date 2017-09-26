@@ -31,6 +31,7 @@ trait SessionService extends SessionCacheWiring {
   val RAS_SESSION_KEY = "ras_session"
   val cleanSession = RasSession(MemberName("",""),
                                 MemberNino(""),
+                                MemberDateOfBirth(RasDate(None,None,None)),
                                 ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
@@ -85,6 +86,30 @@ trait SessionService extends SessionCacheWiring {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
       currentSession.map {
         _.nino
+      }
+    }
+  }
+
+  def cacheDob(dob: MemberDateOfBirth)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(dateOfBirth = dob)
+          case None => cleanSession.copy(dateOfBirth = dob)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def fetchDob()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDateOfBirth]] = {
+    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
+      currentSession.map {
+        _.dateOfBirth
       }
     }
   }

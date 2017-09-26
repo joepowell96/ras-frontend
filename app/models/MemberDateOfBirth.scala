@@ -18,12 +18,8 @@ package models
 
 import play.api.libs.json.Json
 
+case class MemberDateOfBirth(dateOfBirth: RasDate)
 
-case class RasSession(name:MemberName,
-                      nino:MemberNino,
-                      dateOfBirth:MemberDateOfBirth,
-                      residencyStatusResult: ResidencyStatusResult)
-
-object RasSession{
-  implicit val format = Json.format[RasSession]
+object MemberDateOfBirth {
+  implicit val formats = Json.format[MemberDateOfBirth]
 }

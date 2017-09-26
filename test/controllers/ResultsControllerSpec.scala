@@ -59,9 +59,10 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   val name = MemberName("Jim", "McGill")
   val nino = MemberNino(RandomNino.generate)
   val dob = RasDate(Some("1"), Some("1"), Some("1999"))
+  val memberDob = MemberDateOfBirth(dob)
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
   val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill", "nino" -> nino, "dateOfBirth" -> dob)
-  val rasSession = RasSession(name, nino, residencyStatusResult)
+  val rasSession = RasSession(name, nino, memberDob, residencyStatusResult)
 
 
 
@@ -124,7 +125,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     "contain customer details and residency status when match found" in {
       when(mockSessionService.fetchRasSession()(any(),any())).thenReturn(Future.successful(
         Some(
-          RasSession(name, nino,
+          RasSession(name, nino, memberDob,
           ResidencyStatusResult(
             NON_SCOTTISH,SCOTTISH,
             currentTaxYear.toString,(currentTaxYear + 1).toString,
@@ -155,7 +156,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   "contain customer details and residency status when match not found" in {
     when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(
       Some(
-        RasSession(name, nino,
+        RasSession(name, nino, memberDob,
           ResidencyStatusResult(
             "","",
             currentTaxYear.toString,(currentTaxYear + 1).toString,

@@ -37,6 +37,9 @@ member.name.page.sub-header = As shown on their birth certificate or passport.
 member.nino.page.title = Member nino - GOV.UK
 member.nino.page.header = What is {0}''s National Insurance number?
 
+member.dob.page.title = Member date of birth - GOV.UK
+member.dob.page.header = What is {0}''s date of birth?
+
 match.found.page.title = Match found - GOV.UK
 match.not.found.page.title = Match not found - GOV.UK
 global.error.page.title = Technical error - GOV.UK
