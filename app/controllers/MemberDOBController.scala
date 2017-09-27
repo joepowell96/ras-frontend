@@ -22,7 +22,7 @@ import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import forms.MemberDateOfBirthForm.form
-import models.{MemberDetails, MemberName, ResidencyStatusResult}
+import models.{MemberDetails, ResidencyStatusResult}
 import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -68,9 +68,11 @@ trait MemberDOBController extends RasController {
   }
 
 
-  def post = Action.async { implicit request =>
-    isAuthorised.flatMap{ case Right(userInfo) =>
-      form.bindFromRequest.fold(
+  def post = Action.async {
+    implicit request =>
+    isAuthorised.flatMap{
+      case Right(_) =>
+        form.bindFromRequest.fold(
         formWithErrors => {
           Logger.debug("[DobController][post] Invalid form field passed")
           Future.successful(BadRequest(views.html.member_dob(formWithErrors, firstName)))
@@ -136,7 +138,7 @@ trait MemberDOBController extends RasController {
           }
         }
       )
-    case Left(res) => res
+      case Left(res) => res
     }
   }
 

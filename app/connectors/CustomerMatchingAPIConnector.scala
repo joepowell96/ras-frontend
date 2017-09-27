@@ -40,7 +40,7 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
     * @return a UUID
     */
   def findMemberDetails(memberDetails: MemberDetails)(implicit hc: HeaderCarrier): Future[Option[String]] = {
-
+    
     val matchingUri = s"$serviceUrl/$environmentSuffix"
 
     Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at ${matchingUri}")
