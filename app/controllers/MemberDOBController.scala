@@ -17,22 +17,37 @@
 package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
-import connectors.UserDetailsConnector
+import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import forms.MemberDateOfBirthForm.form
+import models.{MemberDetails, MemberName, ResidencyStatusResult}
+import uk.gov.hmrc.play.http.Upstream4xxResponse
+import uk.gov.hmrc.time.TaxYearResolver
+
+import scala.concurrent.Future
 
 object MemberDOBController extends MemberDOBController {
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+
+  override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
+  override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
+
 }
 
 trait MemberDOBController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
+  val customerMatchingAPIConnector: CustomerMatchingAPIConnector
+  val residencyStatusAPIConnector : ResidencyStatusAPIConnector
+  val SCOTTISH = "scotResident"
+  val NON_SCOTTISH = "otherUKResident"
+  val RAS = "ras"
+  val NO_MATCH = "noMatch"
   var firstName = ""
 
   def get = Action.async {
@@ -50,6 +65,88 @@ trait MemberDOBController extends RasController {
           Logger.debug("[DobController][get] user Not authorised")
           resp
       }
+  }
+
+
+  def post = Action.async { implicit request =>
+    isAuthorised.flatMap{ case Right(userInfo) =>
+      form.bindFromRequest.fold(
+        formWithErrors => {
+          Logger.debug("[DobController][post] Invalid form field passed")
+          Future.successful(BadRequest(views.html.member_dob(formWithErrors, firstName)))
+        },
+        dateOfBirth => {
+          Logger.debug("[DobController][post] valid form")
+
+          sessionService.cacheDob(dateOfBirth) flatMap {
+            case Some(session) => {
+
+              val name = session.name
+              val nino = session.nino.nino
+              val memberDetails = MemberDetails(name,nino,dateOfBirth.dateOfBirth)
+
+              customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { uuid =>
+
+                if (!uuid.isDefined) {
+                  Logger.info("[DobController][post] UUID not contained in the Location header")
+                  Future.successful(Redirect(routes.GlobalErrorController.get))
+                }
+
+                residencyStatusAPIConnector.getResidencyStatus(uuid.get).map { rasResponse =>
+
+                  val formattedName = name.firstName + " " + name.lastName
+                  val formattedDob = dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                  val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
+                  val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
+
+                  if (cyResidencyStatus.isEmpty) {
+                    Logger.info("[DobController][post] An unknown residency status was returned")
+                    Redirect(routes.GlobalErrorController.get)
+                  }
+                  else {
+
+                    Logger.info("[DobController][post] Match found")
+
+                    val residencyStatusResult =
+                      ResidencyStatusResult(
+                        cyResidencyStatus, nyResidencyStatus,
+                        TaxYearResolver.currentTaxYear.toString,
+                        (TaxYearResolver.currentTaxYear + 1).toString,
+                        formattedName, formattedDob, memberDetails.nino)
+
+                    sessionService.cacheResidencyStatusResult(residencyStatusResult)
+
+                    Redirect(routes.ResultsController.matchFound())
+                  }
+                }.recover {
+                  case e: Throwable =>
+                    Logger.error("[DobController][getResult] Residency status failed")
+                    Redirect(routes.GlobalErrorController.get)
+                }
+              }.recover {
+                case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
+                  Logger.info("[DobController][getResult] No match found from customer matching")
+                  Redirect(routes.ResultsController.noMatchFound())
+                case e: Throwable =>
+                  Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
+                  Redirect(routes.GlobalErrorController.get)
+              }
+            }
+            case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
+          }
+        }
+      )
+    case Left(res) => res
+    }
+  }
+
+  private def extractResidencyStatus(residencyStatus: String) : String = {
+    if(residencyStatus == SCOTTISH)
+      Messages("scottish.taxpayer")
+    else if(residencyStatus == NON_SCOTTISH)
+      Messages("non.scottish.taxpayer")
+    else
+      ""
   }
 
 }

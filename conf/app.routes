@@ -12,6 +12,7 @@ GET         /member-nino                  controllers.MemberNinoController.get
 POST        /member-nino                  controllers.MemberNinoController.post
 
 GET         /member-date-of-birth         controllers.MemberDOBController.get
+GET         /member-date-of-birth         controllers.MemberDOBController.post
 
 GET         /match-found                  controllers.ResultsController.matchFound
 GET         /match-not-found              controllers.ResultsController.noMatchFound

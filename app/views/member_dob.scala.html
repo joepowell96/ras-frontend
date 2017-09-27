@@ -30,8 +30,7 @@
 
   <h1 id="header" class="heading-xlarge">@Messages("member.dob.page.header",name)</h1>
 
-  @form(action = routes.MemberDOBController.get) {
-  
+  @form(action = routes.MemberDOBController.post) {
 
        @if(memberDobForm.errors.toString.contains("dateOfBirth")){
            <div id="dob-error" class="form-group form-field--error">

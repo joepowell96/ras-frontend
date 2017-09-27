@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.UserDetailsConnector
+import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
@@ -45,6 +45,8 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
   val mockSessionService = mock[SessionService]
   val mockConfig = mock[Configuration]
   val mockEnvironment = mock[Environment]
+  val mockRasConnector = mock[ResidencyStatusAPIConnector]
+  val mockMatchingConnector = mock[CustomerMatchingAPIConnector]
 
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
@@ -58,6 +60,8 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     override val sessionService = mockSessionService
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
+    override val residencyStatusAPIConnector: ResidencyStatusAPIConnector = mockRasConnector
+    override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mockMatchingConnector
 
     when(mockSessionService.cacheDob(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.fetchDob()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDob)))
