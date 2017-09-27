@@ -90,7 +90,6 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
         doc(result).title shouldBe Messages("member.nino.page.title")
         doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header","Jackie")
         doc(result).getElementById("nino_hint").text shouldBe Messages("nino.hint")
-        doc(result).getElementById("nino_label").text should include(Messages("nino"))
         assert(doc(result).getElementById("nino").attr("input") != null)
         doc(result).getElementById("continue").text shouldBe Messages("continue")
       }
