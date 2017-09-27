@@ -30,9 +30,7 @@ object MemberDateOfBirthForm extends I18nHelper{
         "day" -> optional(text),
         "month" -> optional(text),
         "year" -> optional(text)
-      )(RasDate.apply)(RasDate.unapply)
-        .verifying(DateValidator.rasDateConstraint)
-    )
+      )(RasDate.apply)(RasDate.unapply).verifying(DateValidator.rasDateConstraint))
     (MemberDateOfBirth.apply)(MemberDateOfBirth.unapply)
   )
 }
