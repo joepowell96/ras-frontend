@@ -69,6 +69,48 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
         redirectLocation(result).get should include("member-name")
       }
 
+      "redirect is called with member-nino and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-nino",true)(FakeRequest()))
+        redirectLocation(result).get should include("member-nino")
+      }
+
+      "redirect is called with member-dob and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-dob",true)(FakeRequest()))
+        redirectLocation(result).get should include("member-date-of-birth")
+      }
+
+      "redirect is called with start and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("start",true)(FakeRequest()))
+        redirectLocation(result).get should include("relief-at-source")
+      }
+
+      "redirect is called with member-name" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-name",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-name")
+      }
+
+      "redirect is called with member-nino" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-nino",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-nino")
+      }
+
+      "redirect is called with member-dob" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-dob",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-date-of-birth")
+      }
+
+      "redirect is called with start" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("start",false)(FakeRequest()))
+        redirectLocation(result).get should include("relief-at-source")
+      }
+
     }
 
     "redirect to global error page" when {
