@@ -17,14 +17,13 @@
 package controllers
 
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
-import helpers.RandomNino
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{when, _}
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
 import play.api.libs.json.Json
@@ -35,7 +34,6 @@ import play.api.{Configuration, Environment}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-
 
 import scala.concurrent.Future
 
@@ -54,9 +52,10 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
   val uuid = "b5a4c95d-93ff-4054-b416-79c8a7e6f712"
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
-  val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"),Some("2012")))
+  val dob = RasDate(Some("12"),Some("12"),Some("2012"))
+  val memberDob = MemberDateOfBirth(dob)
   val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""))
-  val postData = Json.obj("firstName" -> "Jim", "lastName" -> "McGill")
+  val postData = Json.obj("dateOfBirth" -> dob)
 
   object TestMemberDobController extends MemberDOBController{
     val authConnector: AuthConnector = mockAuthConnector
@@ -135,46 +134,34 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
       status(result) should equal(SEE_OTHER)
       redirectLocation(result).get should include("global-error")
     }
-//
-//    "redirect if next year residency status is empty" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(NON_SCOTTISH, "")))
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) should equal(SEE_OTHER)
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//    "save details to cache" in {
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      when(mockSessionService.cacheDob(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-//      verify(mockSessionService, atLeastOnce()).cacheDob(Matchers.any())(Matchers.any(), Matchers.any())
-//    }
-//
-//    "redirect if unknown current year residency status is returned" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus("blah", NON_SCOTTISH)))
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//    }
-//
-//    "redirect if unknown next year residency status is returned" in {
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, "")))
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//    }
-//
-//    "redirect to technical error page if customer matching fails to return a response" in {
-//      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//      redirectLocation(result).get should include("global-error")
-//    }
-//
-//    "redirect to technical error page if ras fails to return a response" in {
-//      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
-//      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
-//      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-//      status(result) shouldBe 303
-//      redirectLocation(result).get should include("global-error")
-//    }
+
+    "save details to cache" in {
+      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      when(mockSessionService.cacheDob(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      verify(mockSessionService, atLeastOnce()).cacheDob(Matchers.any())(Matchers.any(), Matchers.any())
+    }
+
+    "redirect if unknown current year residency status is returned" in {
+      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus("blah", NON_SCOTTISH)))
+      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
+
+    "redirect to technical error page if customer matching fails to return a response" in {
+      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
+
+    "redirect to technical error page if ras fails to return a response" in {
+      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
+      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
 
   }
 

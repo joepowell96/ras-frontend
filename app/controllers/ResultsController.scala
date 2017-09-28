@@ -43,9 +43,9 @@ trait ResultsController extends RasController {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map { session =>
             session match {
-              case Some(s) =>
+              case Some(session) =>
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
-                Ok(views.html.match_found(s.residencyStatusResult))
+                Ok(views.html.match_found(session.residencyStatusResult))
               case _ =>
                 Logger.error("[ResultsController][matchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())
