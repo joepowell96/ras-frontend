@@ -95,7 +95,7 @@ status.for.next.tax.year = Status for next tax year, {0} to {1}
 tax.year.period = 6 April {0} to 5 April {1}
 
 print.this.page = Print this page
-find.another.member = Find another member
+check.another.person = Check another person
 finish = Finish
 
 technical.error = There was a technical problem retrieving the results. Please try again later.
@@ -111,3 +111,10 @@ unauthorised.error = you are not authorised to access this service , you need Pe
 
 tax.year = Tax year
 location = Location
+
+tax.year.period = {0} to {1}
+
+scotland = Scotland
+uk = UK
+
+sign.out = Sign out

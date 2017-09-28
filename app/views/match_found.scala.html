@@ -49,13 +49,8 @@
         </tr>
 
         <tr>
-          <td>@currentTaxYear To @nextTaxYear</td>
-          <td>@currentYearResidencyStatus</td>
-        </tr>
-
-        <tr>
-          <td>@nextTaxYear To (@nextTaxYear + 1)</td>
-          <td>-</td>
+          <td id="cy-tax-year-period">@Messages(currentTaxYear.toString, (currentTaxYear + 1).toString)</td>
+          <td id="cy-residency-status">@currentYearResidencyStatus</td>
         </tr>
 
 
@@ -63,13 +58,13 @@
       </table>
 
       <div>
-        <a id="find-another-member" href="@routes.SessionController.redirect("member-name",true)">Check another person</a>
+        <a id="check-another-person" href="@routes.SessionController.redirect("member-name",true)">@Messages("check.another.person")</a>
       </div>
 
       <br>
 
       <div>
-        <a id="finish" class="button" href="" role="button" >@Messages("finish")</a>
+        <a id="sign-out" class="button" href="" role="button" >@Messages("sign.out")</a>
       </div>
 
   </div>
