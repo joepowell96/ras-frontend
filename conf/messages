@@ -74,6 +74,7 @@ tried.confirm.details = Confirm with your scheme member the details you hold are
 tried.guidance = If you have already done this and still can''t find them, your scheme member will need to contact HMRC themselves to
 confirm.nino.link = confirm their National Insurance number
 
+match.found.header = {0}''s details
 
 error.day.invalid = Enter a day between 1 and 31
 error.day.invalid.feb = Enter a day between 1 and 29

@@ -30,46 +30,40 @@
 
   <div class="column-full">
 
-    <div>
-      <a href="@routes.SessionController.redirect("member-dob",false)">@Messages("back")</a>
-    </div>
-
-
       <div>
-        <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
+        <a id="back" href="@routes.SessionController.redirect("member-dob",false)">@Messages("back")</a>
       </div>
 
       <br>
 
-      <h1 id="cy-residency-status">@currentYearResidencyStatus</h1>
-      <p id="this-tax-year">@Messages("this.tax.year")</p>
-      <p id="tax-year-period">@Messages("tax.year.period", currentTaxYear, nextTaxYear)</p>
+      <h1 id="header">@Messages(name,"match.found.header")</h1>
 
+      <p id="details">pays their tax in Scotland for the current tax year of 2017 to 2018. They are expected to pay tax outside of Scotland in the next tax year of 2018 to 2019.</p>
 
       <table>
         <tbody>
 
-          <tr>
-            <th id="name-label">@Messages("name").capitalize</th>
-            <td id="name">@name</td>
-          </tr>
+        <tr>
+          <th>Tax year</th>
+          <th>Location</th>
+        </tr>
 
-          <tr>
-            <th id="dob-label">@Messages("dob").capitalize</th>
-            <td id="dob">@dateOfBirth</td>
-          </tr>
+        <tr>
+          <td>@currentTaxYear To @nextTaxYear</td>
+          <td>@currentYearResidencyStatus</td>
+        </tr>
 
-          <tr>
-            <th id="nino-label">@Messages("nino")</th>
-            <td id="nino">@nino</td>
-          </tr>
+        <tr>
+          <td>@nextTaxYear To (@nextTaxYear + 1)</td>
+          <td>-</td>
+        </tr>
 
 
         </tbody>
       </table>
 
       <div>
-        <a id="find-another-member" href="@routes.SessionController.redirect("member-name",true)">@Messages("find.another.member")</a>
+        <a id="find-another-member" href="@routes.SessionController.redirect("member-name",true)">Check another person</a>
       </div>
 
       <br>

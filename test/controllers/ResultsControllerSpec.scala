@@ -134,19 +134,10 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
             "")))
       ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      doc(result).getElementById("cy-residency-status").text() shouldBe Messages("non.scottish.taxpayer")
-      doc(result).getElementById("this-tax-year").text() shouldBe Messages("this.tax.year")
-      doc(result).getElementById("tax-year-period").text() shouldBe Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)
-      doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
-      doc(result).getElementById("name").text() shouldBe (name.firstName + " " + name.lastName)
-      doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-      doc(result).getElementById("dob").text() shouldBe memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-      doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-      doc(result).getElementById("nino").text() shouldBe nino.nino
-      doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
-      doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
-      doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
-      doc(result).getElementById("finish").text() shouldBe Messages("finish")
+
+      doc(result).getElementById("back").attr("href") should include("/relief-at-source/redirect/member-dob")
+      doc(result).getElementById("header").text shouldBe Messages(name.firstName, "match.found.header")
+
 
     }
   }

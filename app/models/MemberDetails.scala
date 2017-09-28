@@ -27,9 +27,9 @@ case class MemberDetails(name: MemberName,
   def asCustomerDetailsPayload = {
     Json.parse(
       s"""{
-          "nino":"${nino}",
-          "firstName":"${name.firstName}",
-          "lastName":"${name.lastName}",
+          "nino":"${nino.toUpperCase}",
+          "firstName":"${name.firstName.capitalize}",
+          "lastName":"${name.lastName.capitalize}",
           "dateOfBirth":"${dateOfBirth.asLocalDate.toString("yyyy-MM-d")}"
         }
       """)

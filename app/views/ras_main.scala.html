@@ -25,8 +25,7 @@
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
-  supportLinkEnabled: Boolean = true,
-  linkElement : Option[Html] = None)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
+  supportLinkEnabled: Boolean = true)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
 
 
 @getHelpForm = {

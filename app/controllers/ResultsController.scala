@@ -46,7 +46,7 @@ trait ResultsController extends RasController {
             session match {
               case Some(session) =>
 
-                val name = session.name.firstName + " " + session.name.lastName
+                val name = session.name.firstName
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
                 val currentTaxYear = TaxYearResolver.currentTaxYear.toString
@@ -76,7 +76,7 @@ trait ResultsController extends RasController {
             session match {
               case Some(session) =>
 
-                val name = session.name.firstName + " " + session.name.lastName
+                val name = session.name.firstName
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
 

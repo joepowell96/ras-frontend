@@ -44,7 +44,7 @@
 
        <fieldset id="dateOfBirth_label">
 
-       <legend  id="dob-legend">@Messages("dob").capitalize</legend>
+
        <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
 
        <div class="form-date">
@@ -59,21 +59,21 @@
 
             <div class="dob-field">
              @rasInput(memberDobForm("dateOfBirth.day"),
-             '_label -> Html(Messages("day")),
+             '_label -> Html(Messages("day").capitalize),
              '_id -> "dob-day",
              '_inputClass -> "form-control form-control-error",
              '_maxLength -> 2)
             </div>
             <div class="dob-field">
              @rasInput(memberDobForm("dateOfBirth.month"),
-             '_label -> Html(Messages("month")),
+             '_label -> Html(Messages("month").capitalize),
              '_id -> "dob-month",
              '_inputClass -> "form-control form-control-error",
              '_maxLength -> 2)
             </div>
             <div class="dob-field">
              @rasInput(memberDobForm("dateOfBirth.year"),
-             '_label -> Html(Messages("year")),
+             '_label -> Html(Messages("year").capitalize),
              '_id -> "dob-year",
              '_inputClass -> "form-control form-control-error",
              '_maxLength ->4)
@@ -84,7 +84,7 @@
             @if(memberDobForm.errors.toString.contains("day")){
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.day"),
-                 '_label -> Html(Messages("day")),
+                 '_label -> Html(Messages("day").capitalize),
                  '_id -> "dob-day",
                  '_inputClass -> "form-control form-control-error",
                  '_maxLength -> 2)
@@ -92,7 +92,7 @@
             } else {
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.day"),
-                 '_label -> Html(Messages("day")),
+                 '_label -> Html(Messages("day").capitalize),
                  '_id -> "dob-day",
                  '_maxLength -> 2)
                 </div>
@@ -101,7 +101,7 @@
             @if(memberDobForm.errors.toString.contains("month")){
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.month"),
-                 '_label -> Html(Messages("month")),
+                 '_label -> Html(Messages("month").capitalize),
                  '_id -> "dob-month",
                  '_inputClass -> "form-control form-control-error",
                  '_maxLength -> 2)
@@ -109,7 +109,7 @@
             } else {
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.month"),
-                 '_label -> Html(Messages("month")),
+                 '_label -> Html(Messages("month").capitalize),
                  '_id -> "dob-month",
                  '_maxLength -> 2)
                 </div>
@@ -118,7 +118,7 @@
             @if(memberDobForm.errors.toString.contains("year")){
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.year"),
-                 '_label -> Html(Messages("year")),
+                 '_label -> Html(Messages("year").capitalize),
                  '_id -> "dob-year",
                  '_inputClass -> "form-control form-control-error",
                  '_maxLength ->4)
@@ -126,7 +126,7 @@
             } else {
                 <div class="dob-field">
                  @rasInput(memberDobForm("dateOfBirth.year"),
-                 '_label -> Html(Messages("year")),
+                 '_label -> Html(Messages("year").capitalize),
                  '_id -> "dob-year",
                  '_maxLength ->4,
                  '_inputClass -> " form-control year-input")
