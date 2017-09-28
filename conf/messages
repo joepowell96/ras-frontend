@@ -87,8 +87,8 @@ error.dob.invalid.future = Enter a date of birth that is not in the future
 
 generic.errors_heading = There is a problem with the form
 
-scottish.taxpayer = Scottish taxpayer
-non.scottish.taxpayer = Non-Scottish taxpayer
+scottish.taxpayer = Scotland
+non.scottish.taxpayer = not Scotland
 
 this.tax.year = This tax year
 status.for.next.tax.year = Status for next tax year, {0} to {1}
@@ -113,8 +113,5 @@ tax.year = Tax year
 location = Location
 
 tax.year.period = {0} to {1}
-
-scotland = Scotland
-uk = UK
 
 sign.out = Sign out

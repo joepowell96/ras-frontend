@@ -29,6 +29,7 @@ import org.mockito.Matchers
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.{Configuration, Environment, Mode}
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -42,13 +43,13 @@ import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future
 
-class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
+class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
   val fakeRequest = FakeRequest("GET", "/")
   val currentTaxYear = TaxYearResolver.currentTaxYear
 
-  val SCOTTISH = "Scottish taxpayer"
-  val NON_SCOTTISH = "Non-Scottish taxpayer"
+  val SCOTTISH = "Scotland"
+  val NON_SCOTTISH = "not Scotland"
   val mockConfig: Configuration = mock[Configuration]
   val mockEnvironment: Environment = Environment(mock[File], mock[ClassLoader], Mode.Test)
   val mockAuthConnector = mock[AuthConnector]
@@ -136,15 +137,15 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
 
       doc(result).getElementById("back").attr("href") should include("/relief-at-source/redirect/member-dob")
-      doc(result).getElementById("header").text shouldBe Messages(name.firstName.capitalize, "match.found.header")
-      doc(result).getElementById("sub-header").text shouldBe Messages(name.firstName.capitalize,"match.found.sub-header",
+      doc(result).getElementById("header").text shouldBe Messages("match.found.header",name.firstName.capitalize)
+      doc(result).getElementById("sub-header").text shouldBe Messages("match.found.sub-header",name.firstName.capitalize,
         currentTaxYear.toString,(currentTaxYear + 1).toString,(currentTaxYear + 2).toString)
       doc(result).getElementById("tax-year-header").text shouldBe Messages("tax.year")
       doc(result).getElementById("location-header").text shouldBe Messages("location")
       doc(result).getElementById("cy-tax-year-period").text shouldBe Messages("tax.year.period",currentTaxYear.toString , (currentTaxYear + 1).toString)
-      doc(result).getElementById("cy-residency-status").text shouldBe Messages("scotland")
+      doc(result).getElementById("cy-residency-status").text shouldBe Messages("scottish.taxpayer")
       doc(result).getElementById("check-another-person").text shouldBe Messages("check.another.person")
-      doc(result).getElementById("sign-out").text shouldBe Messages("sign-out")
+      doc(result).getElementById("sign-out").text shouldBe Messages("sign.out")
     }
   }
 
