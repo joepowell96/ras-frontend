@@ -14,7 +14,12 @@
  * limitations under the License.
  *@
 
-@(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(name: String,
+  dateOfBirth:String,
+  nino:String,
+  currentYearResidencyStatus: String,
+  currentTaxYear:String,
+  nextTaxYear:String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -31,9 +36,9 @@
 
       <br>
 
-      <h1 id="cy-residency-status">@residencyStatusResult.currentYearResidencyStatus</h1>
+      <h1 id="cy-residency-status">@currentYearResidencyStatus</h1>
       <p id="this-tax-year">@Messages("this.tax.year")</p>
-      <p id="tax-year-period">@Messages("tax.year.period", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</p>
+      <p id="tax-year-period">@Messages("tax.year.period", currentTaxYear, nextTaxYear)</p>
 
 
       <table>
@@ -41,29 +46,25 @@
 
           <tr>
             <th id="name-label">@Messages("name").capitalize</th>
-            <td id="name">@residencyStatusResult.name</td>
+            <td id="name">@name</td>
           </tr>
 
           <tr>
             <th id="dob-label">@Messages("dob").capitalize</th>
-            <td id="dob">@residencyStatusResult.dateOfBirth</td>
+            <td id="dob">@dateOfBirth</td>
           </tr>
 
           <tr>
             <th id="nino-label">@Messages("nino")</th>
-            <td id="nino">@residencyStatusResult.nino</td>
+            <td id="nino">@nino</td>
           </tr>
 
-          <tr>
-            <th id="nty-status-label">@Messages("status.for.next.tax.year", residencyStatusResult.currentTaxYear, residencyStatusResult.nextTaxYear)</th>
-            <td id="nty-status">@residencyStatusResult.nextYearResidencyStatus</td>
-          </tr>
 
         </tbody>
       </table>
 
       <div>
-        <a id="find-another-member" href="@routes.SessionController.cleanAndRedirect("member-details")">@Messages("find.another.member")</a>
+        <a id="find-another-member" href="@routes.SessionController.cleanAndRedirect("member-name")">@Messages("find.another.member")</a>
       </div>
 
       <br>

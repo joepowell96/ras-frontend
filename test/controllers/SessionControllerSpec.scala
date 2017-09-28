@@ -62,11 +62,13 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
 
   "SessionController" should {
     "redirect to target" when {
-      "cleanAndRedirect is called with member-details" in {
+
+      "cleanAndRedirect is called with member-name" in {
         when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
-        redirectLocation(result).get should include("member-details")
+        val result = await(TestSessionController.cleanAndRedirect("member-name")(FakeRequest()))
+        redirectLocation(result).get should include("member-name")
       }
+
     }
 
     "redirect to global error page" when {

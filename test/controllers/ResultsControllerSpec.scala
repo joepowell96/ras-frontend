@@ -130,7 +130,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
             NON_SCOTTISH,SCOTTISH,
             currentTaxYear.toString,(currentTaxYear + 1).toString,
             name.firstName +" " + name.lastName,
-            LocalDate.now.toString("d MMMM yyyy"),
+            memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             "")))
       ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
@@ -140,11 +140,9 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
       doc(result).getElementById("name").text() shouldBe (name.firstName + " " + name.lastName)
       doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-      doc(result).getElementById("dob").text() shouldBe LocalDate.now.toString("d MMMM yyyy")
+      doc(result).getElementById("dob").text() shouldBe memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
       doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-      doc(result).getElementById("nino").text() shouldBe ""
-      doc(result).getElementById("nty-status-label").text() shouldBe Messages("status.for.next.tax.year", currentTaxYear.toString, (currentTaxYear + 1).toString)
-      doc(result).getElementById("nty-status").text() shouldBe Messages("scottish.taxpayer")
+      doc(result).getElementById("nino").text() shouldBe nino.nino
       doc(result).getElementById("print-this-page").text() shouldBe Messages("print.this.page")
       doc(result).getElementById("print-this-page").attr("href") shouldBe "javascript:window.print();"
       doc(result).getElementById("find-another-member").text() shouldBe Messages("find.another.member")
@@ -161,7 +159,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
             "","",
             currentTaxYear.toString,(currentTaxYear + 1).toString,
             name.firstName +" " + name.lastName,
-            LocalDate.now.toString("d MMMM yyyy"),
+            memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
             "")))
     ))
     val result = TestResultsController.noMatchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
@@ -170,9 +168,9 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
     doc(result).getElementById("name").text() shouldBe (name.firstName + " " + name.lastName)
     doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-    doc(result).getElementById("dob").text() shouldBe LocalDate.now.toString("d MMMM yyyy")
+    doc(result).getElementById("dob").text() shouldBe memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
     doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-    doc(result).getElementById("nino").text() shouldBe ""
+    doc(result).getElementById("nino").text() shouldBe nino.nino
     doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
   }
 

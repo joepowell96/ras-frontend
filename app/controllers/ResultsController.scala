@@ -22,6 +22,7 @@ import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.time.TaxYearResolver
 
 
 object ResultsController extends ResultsController
@@ -44,8 +45,20 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
+
+                val name = session.name.firstName + " " + session.name.lastName
+                val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val nino = session.nino.nino
+                val currentTaxYear = TaxYearResolver.currentTaxYear.toString
+                val nextTaxYear = (TaxYearResolver.currentTaxYear + 1).toString
+                val currentYearResidencyStatus = session.residencyStatusResult.currentYearResidencyStatus
+
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
-                Ok(views.html.match_found(session.residencyStatusResult))
+                Ok(views.html.match_found(
+                  name, dateOfBirth, nino,
+                  currentYearResidencyStatus,
+                  currentTaxYear,nextTaxYear))
+
               case _ =>
                 Logger.error("[ResultsController][matchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())
@@ -61,11 +74,14 @@ trait ResultsController extends RasController {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map { session =>
             session match {
-              case Some(rasSess) =>
-                val name = rasSess.name.firstName + " " + rasSess.name.lastName
-//                val dateOfBirth = rasSess.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+              case Some(session) =>
+
+                val name = session.name.firstName + " " + session.name.lastName
+                val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val nino = session.nino.nino
+
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
-                Ok(views.html.match_not_found(name,"",""))
+                Ok(views.html.match_not_found(name,dateOfBirth,nino))
               case _ =>
                 Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())

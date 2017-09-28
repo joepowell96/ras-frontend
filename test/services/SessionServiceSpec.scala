@@ -52,7 +52,7 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
       "member name page is loaded" in{
         when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
         val result = Await.result(TestSessionService.fetchName()(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(memberDetails)
+        result shouldBe Some(name)
       }
     }
 
