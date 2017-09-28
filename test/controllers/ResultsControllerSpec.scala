@@ -157,7 +157,7 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
     doc(result).getElementById("subheader").text shouldBe Messages("match.not.found.subheader")
     doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
-    doc(result).getElementById("name").text() shouldBe (name.firstName + " " + name.lastName)
+    doc(result).getElementById("name").text() shouldBe (name.firstName)
     doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
     doc(result).getElementById("dob").text() shouldBe memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
     doc(result).getElementById("nino-label").text() shouldBe Messages("nino")

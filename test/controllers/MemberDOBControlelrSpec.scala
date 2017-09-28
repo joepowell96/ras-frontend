@@ -98,9 +98,9 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
         doc(result).getElementById("header").text shouldBe Messages("member.dob.page.header","Jackie")
         doc(result).getElementById("dob_hint").text shouldBe Messages("dob.hint")
         doc(result).getElementById("continue").text shouldBe Messages("continue")
-        doc(result).getElementById("dob-day_label").text shouldBe Messages("day")
-        doc(result).getElementById("dob-month_label").text shouldBe Messages("month")
-        doc(result).getElementById("dob-year_label").text shouldBe Messages("year")
+        doc(result).getElementById("dob-day_label").text shouldBe Messages("Day")
+        doc(result).getElementById("dob-month_label").text shouldBe Messages("Month")
+        doc(result).getElementById("dob-year_label").text shouldBe Messages("Year")
       }
     }
 
