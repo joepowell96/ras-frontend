@@ -28,6 +28,10 @@
 
   <div class="column-full">
 
+   <div>
+    <a href="@routes.SessionController.redirect("member-name",false)">@Messages("back")</a>
+   </div>
+
    <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header", name.capitalize)</h1>
 
      @form(action = routes.MemberNinoController.post) {

@@ -57,6 +57,8 @@ year = year
 dob.hint = For example, 21 2 1983
 nino.hint = For example, 'QQ 12 34 56 C'
 
+back = back
+
 error.mandatory = Enter a {0}
 
 error.nino.invalid = The National Insurance number you have entered does not have the correct number of letters and numbers

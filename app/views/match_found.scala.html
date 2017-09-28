@@ -30,6 +30,11 @@
 
   <div class="column-full">
 
+    <div>
+      <a href="@routes.SessionController.redirect("member-dob",false)">@Messages("back")</a>
+    </div>
+
+
       <div>
         <a id="print-this-page" href="javascript:window.print();">@Messages("print.this.page")</a>
       </div>
@@ -64,7 +69,7 @@
       </table>
 
       <div>
-        <a id="find-another-member" href="@routes.SessionController.cleanAndRedirect("member-name")">@Messages("find.another.member")</a>
+        <a id="find-another-member" href="@routes.SessionController.redirect("member-name",true)">@Messages("find.another.member")</a>
       </div>
 
       <br>

@@ -25,6 +25,10 @@
 
   <div class="column-full">
 
+    <div>
+      <a href="@routes.SessionController.redirect("member-dob",false)">@Messages("back")</a>
+    </div>
+
       <br>
       <h1 id="match-not-found">@Messages("member.details.not.found")</h1>
 
@@ -53,7 +57,7 @@
       </table>
 
       <div>
-       <a id="try-again" class="button" href="@routes.SessionController.cleanAndRedirect("member-details")" role="button" >@Messages("try.again")</a>
+       <a id="try-again" class="button" href="@routes.SessionController.redirect("member-name",true)" role="button" >@Messages("try.again")</a>
       </div>
 
       <br>

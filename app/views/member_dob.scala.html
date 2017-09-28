@@ -28,6 +28,10 @@
 
  <div class="column-full">
 
+   <div>
+     <a href="@routes.SessionController.redirect("member-nino",false)">@Messages("back")</a>
+   </div>
+
   <h1 id="header" class="heading-xlarge">@Messages("member.dob.page.header",name.capitalize)</h1>
 
   @form(action = routes.MemberDOBController.post) {
