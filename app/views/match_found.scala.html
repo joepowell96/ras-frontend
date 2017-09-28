@@ -18,8 +18,8 @@
   dateOfBirth:String,
   nino:String,
   currentYearResidencyStatus: String,
-  currentTaxYear:String,
-  nextTaxYear:String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+  currentTaxYear:Int,
+  nextTaxYear:Int)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -38,7 +38,7 @@
 
       <h1 id="header">@Messages(name,"match.found.header")</h1>
 
-      <p id="details">pays their tax in Scotland for the current tax year of 2017 to 2018. They are expected to pay tax outside of Scotland in the next tax year of 2018 to 2019.</p>
+      <p id="sub-header">@Messages(name,"match.found.sub-header",currentTaxYear.toString,(currentTaxYear + 1).toString,(currentTaxYear + 2).toString)</p>
 
       <table>
         <tbody>

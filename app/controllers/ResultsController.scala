@@ -46,11 +46,11 @@ trait ResultsController extends RasController {
             session match {
               case Some(session) =>
 
-                val name = session.name.firstName
+                val name = session.name.firstName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
-                val currentTaxYear = TaxYearResolver.currentTaxYear.toString
-                val nextTaxYear = (TaxYearResolver.currentTaxYear + 1).toString
+                val currentTaxYear = TaxYearResolver.currentTaxYear
+                val nextTaxYear = TaxYearResolver.currentTaxYear + 1
                 val currentYearResidencyStatus = session.residencyStatusResult.currentYearResidencyStatus
 
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
@@ -76,7 +76,7 @@ trait ResultsController extends RasController {
             session match {
               case Some(session) =>
 
-                val name = session.name.firstName
+                val name = session.name.firstName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
 

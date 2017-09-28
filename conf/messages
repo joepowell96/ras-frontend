@@ -75,6 +75,7 @@ tried.guidance = If you have already done this and still can''t find them, your 
 confirm.nino.link = confirm their National Insurance number
 
 match.found.header = {0}''s details
+match.found.sub-header = {0} pays their tax in Scotland for the current tax year of {1} to {2}. They are expected to pay tax outside of Scotland in the next tax year of {2} to {3}.
 
 error.day.invalid = Enter a day between 1 and 31
 error.day.invalid.feb = Enter a day between 1 and 29
