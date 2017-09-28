@@ -108,3 +108,6 @@ try.again = Try again
 
 unauthorised.error.page.title = Un-Authorised - GOV.UK
 unauthorised.error = you are not authorised to access this service , you need Pension scheme administrator or pension scheme provider enrolments.
+
+tax.year = Tax year
+location = Location

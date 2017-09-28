@@ -139,6 +139,8 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       doc(result).getElementById("header").text shouldBe Messages(name.firstName.capitalize, "match.found.header")
       doc(result).getElementById("sub-header").text shouldBe Messages(name.firstName.capitalize,"match.found.sub-header",
         currentTaxYear.toString,(currentTaxYear + 1).toString,(currentTaxYear + 2).toString)
+      doc(result).getElementById("tax-year-header").text shouldBe Messages("tax.year")
+      doc(result).getElementById("location-header").text shouldBe Messages("location")
 
 
 
