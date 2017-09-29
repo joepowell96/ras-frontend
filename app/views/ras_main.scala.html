@@ -25,6 +25,7 @@
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
+  signOutEnabled: Boolean = true,
   supportLinkEnabled: Boolean = true)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
 
 
@@ -54,5 +55,6 @@
                mainContent = layouts.article(mainContent),
                serviceInfoContent = serviceInfoContent,
                scriptElem = scriptElem,
+               signOutEnabled = signOutEnabled,
                linkElement = Some(linkElement)
 )
