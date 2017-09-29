@@ -24,12 +24,12 @@
 
 @views.html.helpers.errorSummary(memberNinoForm)
 
- <div class="grid-row">
-
-  <div class="column-full">
+<div class="grid-layout--no-gutter">
+ <div class="grid-layout__column">
+  <div class="grid-layout__column--3-4">
 
    <div>
-    <a href="@routes.SessionController.redirect("member-name",false)">@Messages("back")</a>
+    <a href="javascript:history.back()">@Messages("back")</a>
    </div>
 
    <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header", name.capitalize)</h1>
@@ -55,7 +55,7 @@
 
 
   </div>
-
+ </div>
  </div>
 
 }

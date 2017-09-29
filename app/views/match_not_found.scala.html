@@ -21,12 +21,12 @@
 
 @ras_main(title = Messages("match.not.found.page.title")) {
 
-<div class="grid-row">
-
-  <div class="column-full">
+<div class="grid-layout--no-gutter">
+  <div class="grid-layout__column">
+    <div class="grid-layout__column--3-4">
 
     <div>
-      <a href="@routes.SessionController.redirect("member-dob",false)">@Messages("back")</a>
+      <a href="javascript:history.back()">@Messages("back")</a>
     </div>
 
       <br>
@@ -67,6 +67,6 @@
 
 
   </div>
-
+  </div>
 </div>
 }

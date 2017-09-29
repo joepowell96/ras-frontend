@@ -24,38 +24,37 @@
 
 @views.html.helpers.errorSummary(memberDobForm)
 
-<div class="grid-row">
+<div class="grid-layout--no-gutter">
+  <div class="grid-layout__column">
+    <div class="grid-layout__column--3-4">
 
- <div class="column-full">
+        <div>
+         <a href="javascript:history.back()">@Messages("back")</a>
+        </div>
 
-   <div>
-     <a href="@routes.SessionController.redirect("member-nino",false)">@Messages("back")</a>
-   </div>
+        <h1 id="header" class="heading-xlarge">@Messages("member.dob.page.header",name.capitalize)</h1>
 
-  <h1 id="header" class="heading-xlarge">@Messages("member.dob.page.header",name.capitalize)</h1>
+        @form(action = routes.MemberDOBController.post) {
 
-  @form(action = routes.MemberDOBController.post) {
+          @if(memberDobForm.errors.toString.contains("dateOfBirth")){
+             <div id="dob-error" class="form-group form-field--error">
+          } else {
+             <div class="form-group">
+          }
 
-       @if(memberDobForm.errors.toString.contains("dateOfBirth")){
-           <div id="dob-error" class="form-group form-field--error">
-       } else {
-           <div class="form-group">
-       }
+          <fieldset id="dateOfBirth_label">
 
-       <fieldset id="dateOfBirth_label">
+          <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
 
+          <div class="form-date">
 
-       <p class="form-hint" id="dob_hint">@Messages("dob.hint")</p>
+          @views.html.helpers.groupError(memberDobForm("dateOfBirth"))
 
-       <div class="form-date">
-
-       @views.html.helpers.groupError(memberDobForm("dateOfBirth"))
-
-       @if(!memberDobForm.data.isEmpty &&
-       !memberDobForm.data.exists(_ == ("nino","")) &&
-       memberDobForm.data("dateOfBirth.day") == "" &&
-       memberDobForm.data("dateOfBirth.month") == "" &&
-       memberDobForm.data("dateOfBirth.year") == ""){
+           @if(!memberDobForm.data.isEmpty &&
+           !memberDobForm.data.exists(_ == ("nino","")) &&
+           memberDobForm.data("dateOfBirth.day") == "" &&
+           memberDobForm.data("dateOfBirth.month") == "" &&
+           memberDobForm.data("dateOfBirth.year") == ""){
 
             <div class="dob-field">
              @rasInput(memberDobForm("dateOfBirth.day"),
@@ -79,74 +78,73 @@
              '_maxLength ->4)
             </div>
 
-       } else {
+         } else {
 
-            @if(memberDobForm.errors.toString.contains("day")){
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.day"),
-                 '_label -> Html(Messages("day").capitalize),
-                 '_id -> "dob-day",
-                 '_inputClass -> "form-control form-control-error",
-                 '_maxLength -> 2)
-                </div>
-            } else {
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.day"),
-                 '_label -> Html(Messages("day").capitalize),
-                 '_id -> "dob-day",
-                 '_maxLength -> 2)
-                </div>
-            }
+              @if(memberDobForm.errors.toString.contains("day")){
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.day"),
+                   '_label -> Html(Messages("day").capitalize),
+                   '_id -> "dob-day",
+                   '_inputClass -> "form-control form-control-error",
+                   '_maxLength -> 2)
+                  </div>
+              } else {
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.day"),
+                   '_label -> Html(Messages("day").capitalize),
+                   '_id -> "dob-day",
+                   '_maxLength -> 2)
+                  </div>
+              }
 
-            @if(memberDobForm.errors.toString.contains("month")){
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.month"),
-                 '_label -> Html(Messages("month").capitalize),
-                 '_id -> "dob-month",
-                 '_inputClass -> "form-control form-control-error",
-                 '_maxLength -> 2)
-                </div>
-            } else {
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.month"),
-                 '_label -> Html(Messages("month").capitalize),
-                 '_id -> "dob-month",
-                 '_maxLength -> 2)
-                </div>
-            }
+              @if(memberDobForm.errors.toString.contains("month")){
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.month"),
+                   '_label -> Html(Messages("month").capitalize),
+                   '_id -> "dob-month",
+                   '_inputClass -> "form-control form-control-error",
+                   '_maxLength -> 2)
+                  </div>
+              } else {
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.month"),
+                   '_label -> Html(Messages("month").capitalize),
+                   '_id -> "dob-month",
+                   '_maxLength -> 2)
+                  </div>
+              }
 
-            @if(memberDobForm.errors.toString.contains("year")){
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.year"),
-                 '_label -> Html(Messages("year").capitalize),
-                 '_id -> "dob-year",
-                 '_inputClass -> "form-control form-control-error",
-                 '_maxLength ->4)
-                </div>
-            } else {
-                <div class="dob-field">
-                 @rasInput(memberDobForm("dateOfBirth.year"),
-                 '_label -> Html(Messages("year").capitalize),
-                 '_id -> "dob-year",
-                 '_maxLength ->4,
-                 '_inputClass -> " form-control year-input")
-                </div>
-            }
-         }
-
-
-   
-            </fieldset>
-
-           </div>
-       <div>
-        <button class="button" type="submit" id="continue">@Messages("continue")</button>
-       </div>
-   }
+              @if(memberDobForm.errors.toString.contains("year")){
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.year"),
+                   '_label -> Html(Messages("year").capitalize),
+                   '_id -> "dob-year",
+                   '_inputClass -> "form-control form-control-error",
+                   '_maxLength ->4)
+                  </div>
+              } else {
+                  <div class="dob-field">
+                   @rasInput(memberDobForm("dateOfBirth.year"),
+                   '_label -> Html(Messages("year").capitalize),
+                   '_id -> "dob-year",
+                   '_maxLength ->4,
+                   '_inputClass -> " form-control year-input")
+                  </div>
+              }
+           }
 
 
-  </div>
+              </fieldset>
 
+             </div>
+         <div>
+          <button class="button" type="submit" id="continue">@Messages("continue")</button>
+         </div>
+       }
+
+
+      </div>
+    </div>
  </div>
 
  }
