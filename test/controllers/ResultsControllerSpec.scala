@@ -163,9 +163,13 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
     doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found","Jim McGill")
     doc(result).getElementById("change-name").text shouldBe "Change"
     doc(result).getElementById("name").text shouldBe "Jim McGill"
+    doc(result).getElementById("change-nino").text shouldBe "Change"
     doc(result).getElementById("nino").text shouldBe nino.nino
+    doc(result).getElementById("change-dob").text shouldBe "Change"
     doc(result).getElementById("dob").text shouldBe  memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-
+    doc(result).getElementById("what-to-do").text shouldBe Messages("match.not.found.what.to.do") + " " +  Messages("contact.hmrc") + "."
+    doc(result).getElementById("contact-hmrc-link").text shouldBe Messages("contact.hmrc")
+    doc(result).getElementById("check-another-person").text shouldBe Messages("check.another.person")
   }
 
   "redirect to global error page when no session data is returned on match found" in {
