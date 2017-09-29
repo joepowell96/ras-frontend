@@ -52,11 +52,13 @@ trait ResultsController extends RasController {
                 val currentTaxYear = TaxYearResolver.currentTaxYear
                 val nextTaxYear = TaxYearResolver.currentTaxYear + 1
                 val currentYearResidencyStatus = session.residencyStatusResult.currentYearResidencyStatus
+                val nextYearResidencyStatus = session.residencyStatusResult.nextYearResidencyStatus
 
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
                 Ok(views.html.match_found(
                   name, dateOfBirth, nino,
                   currentYearResidencyStatus,
+                  nextYearResidencyStatus,
                   currentTaxYear,nextTaxYear))
 
               case _ =>

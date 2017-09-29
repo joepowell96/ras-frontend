@@ -18,6 +18,7 @@
   dateOfBirth:String,
   nino:String,
   currentYearResidencyStatus: String,
+  nextYearResidencyStatus: String,
   currentTaxYear:Int,
   nextTaxYear:Int)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
@@ -51,6 +52,15 @@
         <tr>
           <td id="cy-tax-year-period">@Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)</td>
           <td id="cy-residency-status">@currentYearResidencyStatus</td>
+        </tr>
+
+        <tr>
+          <td id="ny-tax-year-period">@Messages("tax.year.period", (currentTaxYear + 1).toString, (currentTaxYear + 2).toString)</td>
+          @if(nextYearResidencyStatus == Messages("non.scottish.taxpayer")){
+            <td id="ny-residency-status-scotland">@Messages("expected", "scotland")</td>
+          }else{
+            <td id="ny-residency-status-uk">@Messages("expected", "uk")</td>
+          }
         </tr>
 
         </tbody>
