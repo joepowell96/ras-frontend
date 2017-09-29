@@ -88,7 +88,7 @@ error.dob.invalid.future = Enter a date of birth that is not in the future
 generic.errors_heading = There is a problem with the form
 
 scottish.taxpayer = Scotland
-non.scottish.taxpayer = not Scotland
+non.scottish.taxpayer = Rest of UK
 
 this.tax.year = This tax year
 status.for.next.tax.year = Status for next tax year, {0} to {1}
@@ -120,4 +120,3 @@ change = Change
 match.not.found.what.to.do = Check with the member to make sure they have given you the correct details. If you have think the details you have entered are correct, the member must
 contact.hmrc = contact HMRC to confirm their National Insurance number
 
-expected = Expected to be outside of {0}
