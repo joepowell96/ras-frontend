@@ -100,7 +100,7 @@ finish = Finish
 
 technical.error = There was a technical problem retrieving the results. Please try again later.
 
-member.details.not.found = Member details not found
+member.details.not.found = {0} has not been found
 
 match.not.found.subheader = The details you''ve entered don'"t match HM Revenue and Customs'' records. Check you''ve entered the correct information.
 
@@ -115,3 +115,4 @@ location = Location
 tax.year.period = {0} to {1}
 
 sign.out = Sign out
+change = Change

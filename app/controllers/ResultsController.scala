@@ -76,7 +76,7 @@ trait ResultsController extends RasController {
             session match {
               case Some(session) =>
 
-                val name = session.name.firstName.capitalize
+                val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
 

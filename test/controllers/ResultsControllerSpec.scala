@@ -120,7 +120,6 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       val result = TestResultsController.noMatchFound(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
       doc.title shouldBe Messages("match.not.found.page.title")
-      doc.getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
     }
 
     "contain customer details and residency status when match found" in {
@@ -161,15 +160,12 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
             "")))
     ))
     val result = TestResultsController.noMatchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-    doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found")
-    doc(result).getElementById("subheader").text shouldBe Messages("match.not.found.subheader")
-    doc(result).getElementById("name-label").text() shouldBe Messages("name").capitalize
-    doc(result).getElementById("name").text() shouldBe (name.firstName)
-    doc(result).getElementById("dob-label").text() shouldBe Messages("dob").capitalize
-    doc(result).getElementById("dob").text() shouldBe memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-    doc(result).getElementById("nino-label").text() shouldBe Messages("nino")
-    doc(result).getElementById("nino").text() shouldBe nino.nino
-    doc(result).getElementById("try-again").text() shouldBe Messages("try.again")
+    doc(result).getElementById("match-not-found").text shouldBe Messages("member.details.not.found","Jim McGill")
+    doc(result).getElementById("change-name").text shouldBe "Change"
+    doc(result).getElementById("name").text shouldBe "Jim McGill"
+    doc(result).getElementById("nino").text shouldBe nino.nino
+    doc(result).getElementById("dob").text shouldBe  memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+
   }
 
   "redirect to global error page when no session data is returned on match found" in {

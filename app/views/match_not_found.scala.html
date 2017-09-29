@@ -30,7 +30,7 @@
     </div>
 
       <br>
-      <h1 id="match-not-found">@Messages("member.details.not.found")</h1>
+      <h1 id="match-not-found">@Messages("member.details.not.found",name)</h1>
 
       <p id="subheader">@Messages("match.not.found.subheader")</p>
 
@@ -39,19 +39,21 @@
         <tbody>
 
         <tr>
-          <th id="name-label">@Messages("name").capitalize</th>
           <td id="name">@name</td>
+          <td id="change-name"><a href="@routes.SessionController.redirect("member-name",false)">@Messages("change")</a></td>
         </tr>
 
         <tr>
-          <th id="dob-label">@Messages("dob").capitalize</th>
-          <td id="dob">@dateOfBirth</td>
-        </tr>
-
-        <tr>
-          <th id="nino-label">@Messages("nino")</th>
           <td id="nino">@nino</td>
+          <td id="change-nino"><a href="@routes.SessionController.redirect("member-nino",false)">@Messages("change")</a></td>
         </tr>
+
+        <tr>
+          <td id="dob">@dateOfBirth</td>
+          <td id="change-dob"><a href="@routes.SessionController.redirect("member-dob",false)">@Messages("change")</a></td>
+        </tr>
+
+
 
         </tbody>
       </table>
