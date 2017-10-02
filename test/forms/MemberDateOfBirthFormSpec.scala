@@ -19,6 +19,7 @@ package forms
 import forms.MemberDateOfBirthForm._
 import helpers.helpers.I18nHelper
 import models.RasDate
+import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.data.FormError
 import play.api.libs.json.Json
@@ -76,10 +77,65 @@ class MemberDateOfBirthFormSpec extends UnitSpec with I18nHelper with OneAppPerS
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("year"))))))
     }
 
-    "return error when non existing date is entered" in {
-      val formData = Json.obj("dateOfBirth" -> RasDate(Some("29"),Some("2"),Some("1999")))
+    "return error when non existing date is entered in month 2" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("30"),Some("2"),Some("1999")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb")))))
+    }
+
+    "return error when non existing date is entered in month 4" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("31"),Some("4"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when non existing date is entered in month 6" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("31"),Some("6"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when non existing date is entered in month 9" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("31"),Some("9"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when non existing date is entered in month 11" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("31"),Some("11"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.thirty")))))
+    }
+
+    "return error when day over 31 is entered" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("32"),Some("3"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
+    }
+
+    "return error when day under one is entered is entered" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("0"),Some("3"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid")))))
+    }
+
+    "return error when 0 is entered for month" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("2"),Some("0"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.month.invalid")))))
+    }
+
+    "return error when 0 is entered for year" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("2"),Some("3"),Some("0")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.year.invalid.format")))))
+    }
+
+    "return error when date is in future" in {
+      val year = (LocalDate.now.getYear + 1).toString
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("2"),Some("3"),Some(year)))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.dob.invalid.future")))))
     }
   }
 }
