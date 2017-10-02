@@ -70,7 +70,6 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     override val customerMatchingAPIConnector: CustomerMatchingAPIConnector = mockMatchingConnector
 
     when(mockSessionService.cacheDob(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-    when(mockSessionService.fetchDob()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDob)))
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
@@ -111,7 +110,6 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
 
     "fill in form" when {
       "details returned from session cache" in {
-        when(mockSessionService.fetchDob()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberDob)))
         val result = TestMemberDobController.get(fakeRequest)
         doc(result).getElementById("dob-year").value.toString should include(memberDob.dateOfBirth.year.getOrElse("0"))
         doc(result).getElementById("dob-month").value.toString should include(memberDob.dateOfBirth.month.getOrElse("0"))

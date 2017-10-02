@@ -41,8 +41,8 @@ trait MemberNameController extends RasController {
       isAuthorised.flatMap {
         case Right(_) =>
           Logger.debug("[NameController][get] user authorised")
-          sessionService.fetchName() map {
-            case Some(name) => Ok(views.html.member_name(form.fill(name)))
+          sessionService.fetchRasSession() map {
+            case Some(session) => Ok(views.html.member_name(form.fill(session.name)))
             case _ => Ok(views.html.member_name(form))
           }
         case Left(resp) =>

@@ -64,7 +64,6 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
 
     when(mockSessionService.cacheName(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-    when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(memberName)))
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
   }
 
@@ -127,7 +126,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
 
     "present empty form when no cached data exists" in {
-      when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val result = await(TestMemberNameController.get(fakeRequest))
       assert(doc(result).getElementById("firstName").attr("value").equals(""))
       assert(doc(result).getElementById("lastName").attr("value").equals(""))

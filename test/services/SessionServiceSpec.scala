@@ -48,30 +48,6 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
 
   "Session service" should {
 
-    "fetch Name" when {
-      "member name page is loaded" in{
-        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = Await.result(TestSessionService.fetchName()(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(name)
-      }
-    }
-
-    "fetch nino" when {
-      "member nino page is loaded" in{
-        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = Await.result(TestSessionService.fetchNino()(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(nino)
-      }
-    }
-
-    "fetch dob" when {
-      "member dob page is loaded" in{
-        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = Await.result(TestSessionService.fetchDob()(FakeRequest(), HeaderCarrier()), 10 seconds)
-        result shouldBe Some(memberDob)
-      }
-    }
-
     "cache Name" when {
       "no session is retrieved" in {
         when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any())).thenReturn(Future.successful(None))
