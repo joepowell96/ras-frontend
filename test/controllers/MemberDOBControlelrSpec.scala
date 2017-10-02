@@ -33,11 +33,14 @@ import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
 
 class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
+
+  implicit val headerCarrier = HeaderCarrier()
 
   val fakeRequest = FakeRequest()
   val mockAuthConnector = mock[AuthConnector]
@@ -76,7 +79,9 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
+
   "MemberDobController get" should {
+
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
       thenReturn(successfulRetrieval)
 

@@ -125,6 +125,13 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       doc(result).getElementById("firstName").value.toString should include(memberName.firstName)
       doc(result).getElementById("lastName").value.toString should include(memberName.lastName)
     }
+
+    "present empty form when no cached data exists" in {
+      when(mockSessionService.fetchName()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      val result = await(TestMemberNameController.get(fakeRequest))
+      assert(doc(result).getElementById("firstName").attr("value").equals(""))
+      assert(doc(result).getElementById("lastName").attr("value").equals(""))
+    }
   }
 
   "Member details controller form submission" should {

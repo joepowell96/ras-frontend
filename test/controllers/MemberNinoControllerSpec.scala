@@ -63,7 +63,6 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.cacheNino(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-
   }
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
@@ -75,7 +74,6 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
-
 
     "return ok" when {
       "called" in {
@@ -93,7 +91,20 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
         assert(doc(result).getElementById("nino").attr("input") != null)
         doc(result).getElementById("continue").text shouldBe Messages("continue")
       }
+
+      "rendered but no cached data exists" in {
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val result = TestMemberNinoController.get(fakeRequest)
+        doc(result).title shouldBe Messages("member.nino.page.title")
+        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header",Messages("member"))
+      }
     }
+
+    "handle unautherised access" in {
+
+    }
+
+
   }
 
   "MemberNinoController post" should {
