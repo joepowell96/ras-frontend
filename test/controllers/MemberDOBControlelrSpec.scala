@@ -118,6 +118,16 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
         doc(result).getElementById("dob-day").value.toString should include(memberDob.dateOfBirth.day.getOrElse("0"))
       }
     }
+
+    "present empty form" when {
+      "no details returned from session cache" in {
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val result = TestMemberDobController.get(fakeRequest)
+        assert(doc(result).getElementById("dob-year").attr("value").isEmpty)
+        assert(doc(result).getElementById("dob-month").attr("value").isEmpty)
+        assert(doc(result).getElementById("dob-day").attr("value").isEmpty)
+      }
+    }
   }
 
   "Member details controller form submission" should {
@@ -126,6 +136,13 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
       val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-details"))
       status(result.get) should not equal (NOT_FOUND)
     }
+
+    "return bad request when form error present" in {
+      val postData = Json.obj("dateOfBirth" -> RasDate(Some("0"),Some("1"),Some("1111")))
+      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(BAD_REQUEST)
+    }
+
 
     "redirect" in {
       val postData = Json.obj("dateOfBirth" -> RasDate(Some("1"), Some("1"), Some("1999")))
@@ -155,13 +172,21 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
 
     "redirect to technical error page if customer matching fails to return a response" in {
       when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.failed(new Exception()))
-      val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      val result = await(TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData))))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
     }
 
     "redirect to technical error page if ras fails to return a response" in {
       when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
+      when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
+      val result = await(TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData))))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("global-error")
+    }
+
+    "redirect to technical error page if no uuid" in {
+      when(mockMatchingConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(None))
       when(mockRasConnector.getResidencyStatus(any())(any())).thenReturn(Future.failed(new Exception()))
       val result = TestMemberDobController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
