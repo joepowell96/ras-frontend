@@ -75,5 +75,11 @@ class MemberDateOfBirthFormSpec extends UnitSpec with I18nHelper with OneAppPerS
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.date.non.number",Messages("year"))))))
     }
+
+    "return error when non existing date is entered" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("29"),Some("2"),Some("1999")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb")))))
+    }
   }
 }
