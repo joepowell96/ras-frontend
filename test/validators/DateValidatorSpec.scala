@@ -34,6 +34,7 @@ class DateValidatorSpec extends UnitSpec with Matchers {
     "return false when year is non digit" in {
       DateValidator.checkYearLength("a") shouldBe false
     }
+
   }
 
 }

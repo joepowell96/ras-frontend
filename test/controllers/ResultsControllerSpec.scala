@@ -134,7 +134,6 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
 
-      doc(result).getElementById("back").attr("href") should include("/relief-at-source/redirect/member-dob")
       doc(result).getElementById("header").text shouldBe Messages("match.found.header", name.firstName.capitalize)
       doc(result).getElementById("sub-header").text shouldBe Messages("match.found.sub-header", name.firstName.capitalize,
         currentTaxYear.toString, (currentTaxYear + 1).toString, (currentTaxYear + 2).toString)
