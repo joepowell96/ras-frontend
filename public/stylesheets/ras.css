@@ -58,3 +58,13 @@
   text-decoration: underline;
 }
 
+.back-arrow{
+  background-image: url('../images/icon-arrow-left.png');
+  background-repeat: no-repeat;
+  background-position:left center;
+  padding-left: 10px;
+  display: block; 
+}
+
+
+
