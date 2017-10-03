@@ -42,7 +42,9 @@ trait MemberNameController extends RasController {
         case Right(_) =>
           Logger.debug("[NameController][get] user authorised")
           sessionService.fetchRasSession() map {
-            case Some(session) => Ok(views.html.member_name(form.fill(session.name)))
+            case Some(session) =>
+              session.journeyStack.push("member-name")
+              Ok(views.html.member_name(form.fill(session.name)))
             case _ => Ok(views.html.member_name(form))
           }
         case Left(resp) =>
@@ -70,5 +72,18 @@ trait MemberNameController extends RasController {
       case Left(res) => res
     }
   }
-}
+
+  def back = Action.async { implicit request =>
+    isAuthorised.flatMap{
+      case Right(_) =>
+        sessionService.fetchRasSession() map {
+          case Some(session) =>
+            val a = session.journeyStack.pop()
+            Redirect(routes.SessionController.redirect(a,false))
+          case _ =>
+            Redirect(routes.GlobalErrorController.get())
+        }
+      case Left(res) => res
+    }
+  }}
 

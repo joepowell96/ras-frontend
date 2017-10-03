@@ -16,10 +16,14 @@
 
 package services
 
+import java.util
+
 import config.SessionCacheWiring
 import models._
 import play.api.mvc.Request
 import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -32,7 +36,8 @@ trait SessionService extends SessionCacheWiring {
   val cleanSession = RasSession(MemberName("",""),
                                 MemberNino(""),
                                 MemberDateOfBirth(RasDate(None,None,None)),
-                                ResidencyStatusResult("","","","","","",""))
+                                ResidencyStatusResult("","","","","","",""),
+                                mutable.Stack[String](""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -105,6 +110,8 @@ trait SessionService extends SessionCacheWiring {
       cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
     })
   }
+
+
 
 }
 

@@ -57,6 +57,7 @@ trait MemberDOBController extends RasController {
           Logger.debug("[DobController][get] user authorised")
           sessionService.fetchRasSession() map {
             case Some(session) =>
+              session.journeyStack.push("member-dob")
               firstName = session.name.firstName
               Ok(views.html.member_dob(form.fill(session.dateOfBirth),firstName))
             case _ => Ok(views.html.member_dob(form, firstName))

@@ -46,7 +46,8 @@ trait MemberNinoController extends RasController{
           Logger.debug("[NinoController][get] user authorised")
           sessionService.fetchRasSession() map {
             case Some(session) =>
-                firstName = session.name.firstName
+              session.journeyStack.push("member-nino")
+              firstName = session.name.firstName
               Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
             case _ =>
               Ok(views.html.member_nino(form, Messages("member")))

@@ -29,6 +29,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
@@ -40,7 +41,7 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
   val nino = MemberNino(RandomNino.generate)
   val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"), Some("2012")))
   val memberDetails = MemberDetails(name,RandomNino.generate,RasDate(Some("1"),Some("1"),Some("1999")))
-  val rasSession = RasSession(name,nino,memberDob,ResidencyStatusResult("","","","","","",""))
+  val rasSession = RasSession(name,nino,memberDob,ResidencyStatusResult("","","","","","",""),mutable.Stack[String](""))
 
   object TestSessionService extends SessionService {
     override def sessionCache: SessionCache = mockSessionCache

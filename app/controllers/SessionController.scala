@@ -73,6 +73,4 @@ trait SessionController extends RasController {
       }
 
   }
-
-
 }

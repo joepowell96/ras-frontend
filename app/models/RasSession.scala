@@ -18,11 +18,14 @@ package models
 
 import play.api.libs.json.Json
 
+import scala.collection.mutable
+
 
 case class RasSession(name:MemberName,
                       nino:MemberNino,
                       dateOfBirth:MemberDateOfBirth,
-                      residencyStatusResult: ResidencyStatusResult)
+                      residencyStatusResult: ResidencyStatusResult,
+                      journeyStack: mutable.Stack[String])
 
 object RasSession{
   implicit val format = Json.format[RasSession]
