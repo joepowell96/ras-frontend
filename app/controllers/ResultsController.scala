@@ -18,9 +18,11 @@ package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
+import models.JourneyHistory
 import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
+import repositories.JourneyHistoryRepository
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -32,11 +34,14 @@ object ResultsController extends ResultsController
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 
+  override val repository:JourneyHistoryRepository = JourneyHistoryRepository()
 }
 
 trait ResultsController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
+
+  val repository: JourneyHistoryRepository
 
   def matchFound = Action.async {
     implicit request =>
@@ -45,6 +50,8 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
+
+                repository.insertDocument(JourneyHistory(List("testing the mongo repo", "in style")))
 
                 val name = session.name.firstName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
