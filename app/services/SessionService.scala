@@ -111,7 +111,48 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
+  def cacheJourney(page: String)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) =>
+            println(Console.YELLOW + "journey stack before pushing: " + returnedSession.journeyStack + Console.WHITE)
+            val stack = returnedSession.journeyStack.push(page)
+            println(Console.YELLOW + "journey stack after pushing: " + returnedSession.journeyStack + Console.WHITE)
+            returnedSession.copy(journeyStack = stack)
+          case None =>
+            println(Console.YELLOW + "no session found " + Console.WHITE)
+            val stack = mutable.Stack("")
+            cleanSession.copy(journeyStack = stack)
+        }
+      )
+    }
 
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def cacheBack()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) =>
+            println(Console.YELLOW + "journey stack before popping: " + returnedSession.journeyStack + Console.WHITE)
+            returnedSession.journeyStack.pop()
+            println(Console.YELLOW + "journey stack after popping: " + returnedSession.journeyStack + Console.WHITE)
+            returnedSession
+          case None =>
+            val stack = mutable.Stack("")
+            cleanSession.copy(journeyStack = stack)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
 
 }
 

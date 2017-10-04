@@ -46,11 +46,9 @@ trait MemberNinoController extends RasController{
           Logger.debug("[NinoController][get] user authorised")
           sessionService.fetchRasSession() map {
             case Some(session) =>
-              session.journeyStack.push("member-nino")
               firstName = session.name.firstName
               Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
-            case _ =>
-              Ok(views.html.member_nino(form, Messages("member")))
+            case _ => Ok(views.html.member_nino(form, Messages("member")))
           }
         case Left(resp) =>
           Logger.debug("[NinoController][get] user Not authorised")
@@ -70,7 +68,9 @@ trait MemberNinoController extends RasController{
             nino => {
               Logger.debug("[NinoController][post] valid form")
               sessionService.cacheNino(nino) flatMap {
-                case Some(nino) => Future.successful(Redirect(routes.MemberDOBController.get()))
+                case Some(nino) =>
+                  sessionService.cacheJourney("member-nino")
+                  Future.successful(Redirect(routes.MemberDOBController.get()))
                 case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
               }
             }

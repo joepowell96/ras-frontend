@@ -57,7 +57,6 @@ trait MemberDOBController extends RasController {
           Logger.debug("[DobController][get] user authorised")
           sessionService.fetchRasSession() map {
             case Some(session) =>
-              session.journeyStack.push("member-dob")
               firstName = session.name.firstName
               Ok(views.html.member_dob(form.fill(session.dateOfBirth),firstName))
             case _ => Ok(views.html.member_dob(form, firstName))
@@ -80,10 +79,9 @@ trait MemberDOBController extends RasController {
         },
         dateOfBirth => {
           Logger.debug("[DobController][post] valid form")
-
           sessionService.cacheDob(dateOfBirth) flatMap {
             case Some(session) => {
-
+              sessionService.cacheJourney("member-dob")
               val name = session.name
               val nino = session.nino.nino
               val memberDetails = MemberDetails(name,nino,dateOfBirth.dateOfBirth)

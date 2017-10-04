@@ -45,7 +45,7 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
-
+                sessionService.cacheJourney("match-found")
                 val name = session.name.firstName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
@@ -54,7 +54,6 @@ trait ResultsController extends RasController {
                 val currentYearResidencyStatus = session.residencyStatusResult.currentYearResidencyStatus
                 val nextYearResidencyStatus = session.residencyStatusResult.nextYearResidencyStatus
 
-                session.journeyStack.push("match-found")
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
                 Ok(views.html.match_found(
                   name, dateOfBirth, nino,
@@ -78,12 +77,11 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
-
+                sessionService.cacheJourney("no-match-found")
                 val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
 
-                session.journeyStack.push("no-match-found")
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
                 Ok(views.html.match_not_found(name,dateOfBirth,nino))
               case _ =>

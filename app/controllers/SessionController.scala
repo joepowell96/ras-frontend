@@ -41,6 +41,8 @@ trait SessionController extends RasController {
   val MEMBER_NAME = "member-name"
   val MEMBER_NINO = "member-nino"
   val MEMBER_DOB = "member-dob"
+  val MATCH_FOUND = "match-found"
+  val NO_MATCH_FOUND = "no-match-found"
 
   def redirect(target:String, cleanSession:Boolean) = Action.async {
     implicit request =>
@@ -52,6 +54,8 @@ trait SessionController extends RasController {
               case MEMBER_NAME => Redirect(routes.MemberNameController.get())
               case MEMBER_NINO => Redirect(routes.MemberNinoController.get())
               case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
+              case MATCH_FOUND => Redirect(routes.ResultsController.matchFound())
+              case NO_MATCH_FOUND => Redirect(routes.ResultsController.noMatchFound())
               case _ =>
                 Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
                 Redirect(routes.GlobalErrorController.get())
@@ -66,11 +70,27 @@ trait SessionController extends RasController {
           case MEMBER_NAME => Future.successful(Redirect(routes.MemberNameController.get()))
           case MEMBER_NINO => Future.successful(Redirect(routes.MemberNinoController.get()))
           case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
+          case MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.matchFound()))
+          case NO_MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.noMatchFound()))
           case _ =>
             Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
             Future.successful(Redirect(routes.GlobalErrorController.get()))
         }
       }
+  }
 
+  def back = Action.async { implicit request =>
+    isAuthorised.flatMap{
+      case Right(_) =>
+        sessionService.fetchRasSession() map {
+          case Some(session) =>
+            sessionService.cacheBack()
+            val target = session.journeyStack.pop
+            Redirect(routes.SessionController.redirect(target,false))
+          case _ =>
+            Redirect(routes.GlobalErrorController.get())
+        }
+      case Left(res) => res
+    }
   }
 }

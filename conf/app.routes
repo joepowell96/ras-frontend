@@ -22,3 +22,4 @@ GET         /global-error                 controllers.GlobalErrorController.get
 GET         /notauthorised                controllers.GlobalErrorController.notAuthorised
 
 GET         /redirect/:target             controllers.SessionController.redirect(target:String, cleanSession:Boolean)
+GET         /back                         controllers.SessionController.back
