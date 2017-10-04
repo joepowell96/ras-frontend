@@ -66,12 +66,21 @@ trait SessionController extends RasController {
         }
       } else {
         target match {
-          case START => Future.successful(Redirect(routes.StartPageController.get()))
-          case MEMBER_NAME => Future.successful(Redirect(routes.MemberNameController.get()))
-          case MEMBER_NINO => Future.successful(Redirect(routes.MemberNinoController.get()))
-          case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
-          case MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.matchFound()))
-          case NO_MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.noMatchFound()))
+          case START =>
+            Future.successful(Redirect(routes.StartPageController.get()))
+          case MEMBER_NAME =>
+            sessionService.cacheJourney("no-match-found")
+            Future.successful(Redirect(routes.MemberNameController.get()))
+          case MEMBER_NINO =>
+            sessionService.cacheJourney("no-match-found")
+            Future.successful(Redirect(routes.MemberNinoController.get()))
+          case MEMBER_DOB =>
+            sessionService.cacheJourney("no-match-found")
+            Future.successful(Redirect(routes.MemberDOBController.get()))
+          case MATCH_FOUND =>
+            Future.successful(Redirect(routes.ResultsController.matchFound()))
+          case NO_MATCH_FOUND =>
+            Future.successful(Redirect(routes.ResultsController.noMatchFound()))
           case _ =>
             Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
             Future.successful(Redirect(routes.GlobalErrorController.get()))
@@ -84,8 +93,11 @@ trait SessionController extends RasController {
       case Right(_) =>
         sessionService.fetchRasSession() map {
           case Some(session) =>
+            println(Console.YELLOW + "journey stack before popping: " + session.journeyStack + Console.WHITE)
             sessionService.cacheBack()
             val target = session.journeyStack.pop
+            println(Console.YELLOW + "journey stack after popping: " + session.journeyStack + Console.WHITE)
+            println(Console.YELLOW + "I should now be on  " + target + Console.WHITE)
             Redirect(routes.SessionController.redirect(target,false))
           case _ =>
             Redirect(routes.GlobalErrorController.get())

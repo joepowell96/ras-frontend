@@ -116,12 +116,9 @@ trait SessionService extends SessionCacheWiring {
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
           case Some(returnedSession) =>
-            println(Console.YELLOW + "journey stack before pushing: " + returnedSession.journeyStack + Console.WHITE)
             val stack = returnedSession.journeyStack.push(page)
-            println(Console.YELLOW + "journey stack after pushing: " + returnedSession.journeyStack + Console.WHITE)
             returnedSession.copy(journeyStack = stack)
           case None =>
-            println(Console.YELLOW + "no session found " + Console.WHITE)
             val stack = mutable.Stack("")
             cleanSession.copy(journeyStack = stack)
         }
@@ -138,9 +135,7 @@ trait SessionService extends SessionCacheWiring {
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
           case Some(returnedSession) =>
-            println(Console.YELLOW + "journey stack before popping: " + returnedSession.journeyStack + Console.WHITE)
             returnedSession.journeyStack.pop()
-            println(Console.YELLOW + "journey stack after popping: " + returnedSession.journeyStack + Console.WHITE)
             returnedSession
           case None =>
             val stack = mutable.Stack("")
