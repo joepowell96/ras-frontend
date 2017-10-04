@@ -44,51 +44,44 @@ trait SessionController extends RasController {
   val MATCH_FOUND = "match-found"
   val NO_MATCH_FOUND = "no-match-found"
 
-  def redirect(target:String, cleanSession:Boolean) = Action.async {
+  def redirect(source: String, target:String, cleanSession:Boolean) = Action.async {
     implicit request =>
-      if(cleanSession){
-        sessionService.resetRasSession() map {
-          case Some(session) =>
-            target match {
-              case START => Redirect(routes.StartPageController.get())
-              case MEMBER_NAME => Redirect(routes.MemberNameController.get())
-              case MEMBER_NINO => Redirect(routes.MemberNinoController.get())
-              case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
-              case MATCH_FOUND => Redirect(routes.ResultsController.matchFound())
-              case NO_MATCH_FOUND => Redirect(routes.ResultsController.noMatchFound())
-              case _ =>
-                Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
-                Redirect(routes.GlobalErrorController.get())
-            }
-          case _ =>
-            Logger.error("[SessionController][cleanAndRedirect] No session found")
-            Redirect(routes.GlobalErrorController.get())
-        }
-      } else {
-        target match {
-          case START =>
-            Future.successful(Redirect(routes.StartPageController.get()))
-          case MEMBER_NAME =>
-            sessionService.cacheJourney("no-match-found")
-            Future.successful(Redirect(routes.MemberNameController.get()))
-          case MEMBER_NINO =>
-            sessionService.cacheJourney("no-match-found")
-            Future.successful(Redirect(routes.MemberNinoController.get()))
-          case MEMBER_DOB =>
-            sessionService.cacheJourney("no-match-found")
-            Future.successful(Redirect(routes.MemberDOBController.get()))
-          case MATCH_FOUND =>
-            Future.successful(Redirect(routes.ResultsController.matchFound()))
-          case NO_MATCH_FOUND =>
-            Future.successful(Redirect(routes.ResultsController.noMatchFound()))
-          case _ =>
-            Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
-            Future.successful(Redirect(routes.GlobalErrorController.get()))
+      sessionService.cacheJourney(source) flatMap { currentSession =>
+        if (cleanSession) {
+          sessionService.resetRasSession() map {
+            case Some(session) =>
+              target match {
+                case START => Redirect(routes.StartPageController.get())
+                case MEMBER_NAME => Redirect(routes.MemberNameController.get())
+                case MEMBER_NINO => Redirect(routes.MemberNinoController.get())
+                case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
+                case MATCH_FOUND => Redirect(routes.ResultsController.matchFound())
+                case NO_MATCH_FOUND => Redirect(routes.ResultsController.noMatchFound())
+                case _ =>
+                  Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
+                  Redirect(routes.GlobalErrorController.get())
+              }
+            case _ =>
+              Logger.error("[SessionController][cleanAndRedirect] No session found")
+              Redirect(routes.GlobalErrorController.get())
+          }
+        } else {
+          target match {
+            case START => Future.successful(Redirect(routes.StartPageController.get()))
+            case MEMBER_NAME => Future.successful(Redirect(routes.MemberNameController.get()))
+            case MEMBER_NINO => Future.successful(Redirect(routes.MemberNinoController.get()))
+            case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
+            case MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.matchFound()))
+            case NO_MATCH_FOUND => Future.successful(Redirect(routes.ResultsController.noMatchFound()))
+            case _ =>
+              Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
+              Future.successful(Redirect(routes.GlobalErrorController.get()))
+          }
         }
       }
   }
 
-  def back = Action.async { implicit request =>
+  def back(source:String) = Action.async { implicit request =>
     isAuthorised.flatMap{
       case Right(_) =>
         sessionService.fetchRasSession() map {
@@ -98,7 +91,7 @@ trait SessionController extends RasController {
             val target = session.journeyStack.pop
             println(Console.YELLOW + "journey stack after popping: " + session.journeyStack + Console.WHITE)
             println(Console.YELLOW + "I should now be on  " + target + Console.WHITE)
-            Redirect(routes.SessionController.redirect(target,false))
+            Redirect(routes.SessionController.redirect(source,target,false))
           case _ =>
             Redirect(routes.GlobalErrorController.get())
         }

@@ -32,7 +32,7 @@
     <div class="grid-layout__column--3-4">
 
       <div class="back-arrow">
-        <a class="link-back" href="@routes.SessionController.back()">@Messages("back")</a>
+        <a class="link-back" href="@routes.SessionController.back("match-found")">@Messages("back")</a>
       </div>
       <br>
 
@@ -62,7 +62,7 @@
       </table>
 
       <div>
-        <a id="check-another-person" href="@routes.SessionController.redirect("member-name",true)">@Messages("check.another.person")</a>
+        <a id="check-another-person" href="@routes.SessionController.redirect("match-found","member-name",true)">@Messages("check.another.person")</a>
       </div>
 
       <br>

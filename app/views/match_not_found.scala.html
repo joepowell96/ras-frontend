@@ -26,7 +26,7 @@
     <div class="grid-layout__column--3-4">
 
       <div class="back-arrow">
-        <a class="link-back" href="@routes.SessionController.back()">@Messages("back")</a>
+        <a class="link-back" href="@routes.SessionController.back("no-match-found")">@Messages("back")</a>
       </div>
 
       <br>
@@ -40,17 +40,17 @@
 
           <tr>
             <td id="name">@name</td>
-            <td id="change-name"><a href="@routes.SessionController.redirect("member-name",false)">@Messages("change")</a></td>
+            <td id="change-name"><a href="@routes.SessionController.redirect("no-match-found","member-name",false)">@Messages("change")</a></td>
           </tr>
 
           <tr>
             <td id="nino">@nino</td>
-            <td id="change-nino"><a href="@routes.SessionController.redirect("member-nino",false)">@Messages("change")</a></td>
+            <td id="change-nino"><a href="@routes.SessionController.redirect("no-match-found","member-nino",false)">@Messages("change")</a></td>
           </tr>
 
           <tr>
             <td id="dob">@dateOfBirth</td>
-            <td id="change-dob"><a href="@routes.SessionController.redirect("member-dob",false)">@Messages("change")</a></td>
+            <td id="change-dob"><a href="@routes.SessionController.redirect("no-match-found","member-dob",false)">@Messages("change")</a></td>
           </tr>
 
         </tbody>
@@ -61,7 +61,7 @@
       </p>
 
       <div>
-        <a id="check-another-person" href="@routes.SessionController.redirect("member-name",true)">@Messages("check.another.person")</a>
+        <a id="check-another-person" href="@routes.SessionController.redirect("no-match-found","member-name",true)">@Messages("check.another.person")</a>
       </div>
 
 
