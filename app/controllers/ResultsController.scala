@@ -45,7 +45,6 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
-                sessionService.cacheJourney("match-found")
                 val name = session.name.firstName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
@@ -77,7 +76,6 @@ trait ResultsController extends RasController {
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
-                sessionService.cacheJourney("no-match-found")
                 val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
                 val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                 val nino = session.nino.nino
