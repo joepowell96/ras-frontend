@@ -22,7 +22,7 @@ import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import forms.MemberDateOfBirthForm.form
-import models.{MemberDetails, ResidencyStatusResult}
+import models.{MemberDetails, RasSession, ResidencyStatusResult}
 import uk.gov.hmrc.play.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
@@ -79,13 +79,10 @@ trait MemberDOBController extends RasController with PageFlowController {
         },
         dateOfBirth => {
           Logger.debug("[DobController][post] valid form")
-
           sessionService.cacheDob(dateOfBirth) flatMap {
             case Some(session) => {
 
-              val name = session.name
-              val nino = session.nino.nino
-              val memberDetails = MemberDetails(name,nino,dateOfBirth.dateOfBirth)
+              val memberDetails = MemberDetails(session.name, session.nino.nino, session.dateOfBirth.dateOfBirth)
 
               customerMatchingAPIConnector.findMemberDetails(memberDetails).flatMap { uuid =>
 
@@ -96,7 +93,7 @@ trait MemberDOBController extends RasController with PageFlowController {
 
                 residencyStatusAPIConnector.getResidencyStatus(uuid.get).map { rasResponse =>
 
-                  val formattedName = name.firstName + " " + name.lastName
+                  val formattedName = session.name.firstName + " " + session.name.lastName
                   val formattedDob = dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
                   val cyResidencyStatus = extractResidencyStatus(rasResponse.currentYearResidencyStatus)
                   val nyResidencyStatus = extractResidencyStatus(rasResponse.nextYearForecastResidencyStatus)
@@ -118,7 +115,7 @@ trait MemberDOBController extends RasController with PageFlowController {
 
                     sessionService.cacheResidencyStatusResult(residencyStatusResult)
 
-                    nextPage("ResultsController",session)
+                    Redirect(routes.ResultsController.matchFound())
                   }
                 }.recover {
                   case e: Throwable =>
@@ -128,7 +125,7 @@ trait MemberDOBController extends RasController with PageFlowController {
               }.recover {
                 case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
                   Logger.info("[DobController][getResult] No match found from customer matching")
-                  nextPage("ResultsController",session)
+                  Redirect(routes.ResultsController.noMatchFound())
                 case e: Throwable =>
                   Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
                   Redirect(routes.GlobalErrorController.get)
@@ -149,6 +146,10 @@ trait MemberDOBController extends RasController with PageFlowController {
       Messages("non.scottish.taxpayer")
     else
       ""
+  }
+
+  private def createMemberDetails(session: RasSession): Unit = {
+
   }
 
 }
