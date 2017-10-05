@@ -39,7 +39,7 @@ object MemberDOBController extends MemberDOBController {
 
 }
 
-trait MemberDOBController extends RasController {
+trait MemberDOBController extends RasController with PageFlowController {
 
   implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
@@ -118,7 +118,7 @@ trait MemberDOBController extends RasController {
 
                     sessionService.cacheResidencyStatusResult(residencyStatusResult)
 
-                    Redirect(routes.ResultsController.matchFound())
+                    nextPage("ResultsController",session)
                   }
                 }.recover {
                   case e: Throwable =>
@@ -128,7 +128,7 @@ trait MemberDOBController extends RasController {
               }.recover {
                 case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
                   Logger.info("[DobController][getResult] No match found from customer matching")
-                  Redirect(routes.ResultsController.noMatchFound())
+                  nextPage("ResultsController",session)
                 case e: Throwable =>
                   Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
                   Redirect(routes.GlobalErrorController.get)

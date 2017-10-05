@@ -33,7 +33,7 @@ object MemberNinoController extends MemberNinoController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }
 
-trait MemberNinoController extends RasController{
+trait MemberNinoController extends RasController with PageFlowController{
 
   implicit val context: RasContext = RasContextImpl
 
@@ -69,7 +69,7 @@ trait MemberNinoController extends RasController{
             nino => {
               Logger.debug("[NinoController][post] valid form")
               sessionService.cacheNino(nino) flatMap {
-                case Some(nino) => Future.successful(Redirect(routes.MemberDOBController.get()))
+                case Some(session) => Future.successful(nextPage("MemberDOBController",session))
                 case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
               }
             }
