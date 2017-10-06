@@ -34,7 +34,7 @@ object ResultsController extends ResultsController
 
 }
 
-trait ResultsController extends RasController {
+trait ResultsController extends RasController with PageFlowController{
 
   implicit val context: RasContext = RasContextImpl
 
@@ -92,6 +92,18 @@ trait ResultsController extends RasController {
           }
 
       case Left(res) => res
+      }
+  }
+
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map {
+            case Some(session) => previousPage("ResultsController",session)
+            case _ => Redirect(routes.GlobalErrorController.get())
+          }
+        case Left(res) => res
       }
   }
 

@@ -139,6 +139,18 @@ trait MemberDOBController extends RasController with PageFlowController {
     }
   }
 
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map {
+            case Some(session) => previousPage("MemberDOBController",session)
+            case _ => Redirect(routes.GlobalErrorController.get())
+          }
+        case Left(res) => res
+      }
+  }
+
   private def extractResidencyStatus(residencyStatus: String) : String = {
     if(residencyStatus == SCOTTISH)
       Messages("scottish.taxpayer")

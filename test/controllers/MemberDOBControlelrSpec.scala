@@ -128,7 +128,7 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     }
   }
 
-  "Member details controller form submission" should {
+  "Member dob controller form submission" should {
 
     "respond to POST /relief-at-source/member-details" in {
       val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-details"))
@@ -192,6 +192,15 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     }
 
   }
+
+  "return to member nino page when back link is clicked" in {
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+    val result = TestMemberDobController.back.apply(FakeRequest())
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("/member-nino")
+  }
+
+
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 

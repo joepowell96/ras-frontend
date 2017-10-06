@@ -35,7 +35,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{contentAsString, _}
+import play.api.test.Helpers.{contentAsString, status, _}
 import services.SessionService
 import uk.gov.hmrc.auth.core.{AuthConnector, ~}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
@@ -201,5 +201,22 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).get should include("global-error")
     }
+
+    "return to member dob page when back link is clicked" in {
+      when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(
+        Some(
+          RasSession(name, nino, memberDob,
+            ResidencyStatusResult(
+              NON_SCOTTISH, NON_SCOTTISH,
+              currentTaxYear.toString, (currentTaxYear + 1).toString,
+              name.firstName + " " + name.lastName,
+              memberDob.dateOfBirth.asLocalDate.toString("d MMMM yyyy"),
+              "")))
+      ))
+      val result = TestResultsController.back.apply(FakeRequest())
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).get should include("/member-date-of-birth")
+    }
+
   }
 }
