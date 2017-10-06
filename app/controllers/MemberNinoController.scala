@@ -80,4 +80,16 @@ trait MemberNinoController extends RasController with PageFlowController{
       }
   }
 
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map {
+            case Some(session) => previousPage("MemberNinoController",session)
+            case _ => Redirect(routes.GlobalErrorController.get())
+          }
+        case Left(res) => res
+      }
+  }
+
 }

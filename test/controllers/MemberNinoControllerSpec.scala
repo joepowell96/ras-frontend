@@ -131,6 +131,13 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   }
 
+  "return to member name page when back link is clicked" in {
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+    val result = TestMemberNinoController.back.apply(FakeRequest())
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("/member-name")
+  }
+
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
 }
