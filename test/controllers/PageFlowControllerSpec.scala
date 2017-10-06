@@ -26,11 +26,6 @@ import helpers.helpers.I18nHelper
 import models._
 import org.scalatest.mockito.MockitoSugar
 
-
-
-
-
-
 class PageFlowControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
 
   object TestPageFlowController extends PageFlowController{
@@ -46,10 +41,45 @@ class PageFlowControllerSpec extends UnitSpec with WithFakeApplication with I18n
   "PageFlowController" should {
 
     "redirect to member name page" when {
-      "member nino is passed in as previous page" in {
+      "on member nino page" in {
         val result = TestPageFlowController.previousPage("MemberNinoController",emptySession)
         status(result) shouldBe 303
         redirectLocation(result).get should include("/member-name")
+      }
+    }
+
+    "redirect to member nino page" when {
+      "on member dob page" in {
+        val result = TestPageFlowController.previousPage("MemberDOBController",emptySession)
+        status(result) shouldBe 303
+        redirectLocation(result).get should include("/member-nino")
+      }
+    }
+
+    "redirect to member dob page" when {
+      "when on results page" in {
+        val result = TestPageFlowController.previousPage("ResultsController",emptySession)
+        status(result) shouldBe 303
+        redirectLocation(result).get should include("/member-date-of-birth")
+      }
+    }
+
+    "redirect to match found" when {
+      "when on member name page after match has been found" in {
+        val session = RasSession(MemberName("",""),MemberNino(""),
+          MemberDateOfBirth(RasDate(None,None,None)),ResidencyStatusResult("uk","","","","","",""))
+
+        val result = TestPageFlowController.previousPage("MemberNameController",session)
+        status(result) shouldBe 303
+        redirectLocation(result).get should include("/match-found")
+      }
+    }
+
+    "redirect to no match found" when {
+      "when on member name page after match has not been found" in {
+        val result = TestPageFlowController.previousPage("MemberNameController",emptySession)
+        status(result) shouldBe 303
+        redirectLocation(result).get should include("/match-not-found")
       }
     }
 
