@@ -47,7 +47,7 @@ trait PageFlowController extends RasController {
   val backNavigation: Map[String, RasSession => Result] = Map(
     MEMBER_NAME    -> {
       (session: RasSession) =>
-        if(session.residencyStatusResult.currentYearResidencyStatus.isEmpty)
+        if(session.name.firstName.isEmpty)
           Redirect(routes.ResultsController.noMatchFound())
         else
           Redirect(routes.ResultsController.matchFound())
