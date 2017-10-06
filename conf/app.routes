@@ -7,15 +7,21 @@ GET         /start                        controllers.StartPageController.get
 
 GET         /member-name                  controllers.MemberNameController.get
 POST        /member-name                  controllers.MemberNameController.post
+GET         /member-name/back             controllers.MemberNameController.back
 
 GET         /member-nino                  controllers.MemberNinoController.get
 POST        /member-nino                  controllers.MemberNinoController.post
+GET         /member-nino/back             controllers.MemberNinoController.back
 
 GET         /member-date-of-birth         controllers.MemberDOBController.get
 POST        /member-date-of-birth         controllers.MemberDOBController.post
+GET         /member-date-of-birth/back    controllers.MemberDOBController.back
 
 GET         /match-found                  controllers.ResultsController.matchFound
+GET         /match-found/back             controllers.ResultsController.back
+
 GET         /match-not-found              controllers.ResultsController.noMatchFound
+GET         /match-not-found/back         controllers.ResultsController.back
 
 GET         /global-error                 controllers.GlobalErrorController.get
 
