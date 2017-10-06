@@ -16,28 +16,26 @@
 
 package controllers
 
+import config.FrontendAuthConnector
+import connectors.UserDetailsConnector
 import models.RasSession
+import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Result
+import uk.gov.hmrc.auth.core.AuthConnector
 
-trait PageFlowController extends RasController{
+object PageFlowController extends PageFlowController {
+  val authConnector: AuthConnector = FrontendAuthConnector
+  override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
+  val config: Configuration = Play.current.configuration
+  val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+}
+
+trait PageFlowController extends RasController {
 
   val MEMBER_NAME = "MemberNameController"
   val MEMBER_NINO = "MemberNinoController"
   val MEMBER_DOB = "MemberDOBController"
   val RESULTS = "ResultsController"
-
-
-  def nextPage(from: String, session: RasSession): Result = {
-    forwardNavigation.get(from) match {
-      case Some(redirect) => redirect(session)
-      case None => NotFound
-    }
-  }
-
-  val forwardNavigation: Map[String, RasSession => Result] = Map(
-    MEMBER_NAME    -> { (session: RasSession) => Redirect(routes.MemberNinoController.get) },
-    MEMBER_NINO    -> { (session: RasSession) => Redirect(routes.MemberDOBController.get) }
-  )
 
   def previousPage(from: String, session: RasSession): Result = {
     backNavigation.get(from) match {
@@ -60,3 +58,4 @@ trait PageFlowController extends RasController{
   )
 
 }
+

@@ -69,7 +69,7 @@ trait MemberNinoController extends RasController with PageFlowController{
             nino => {
               Logger.debug("[NinoController][post] valid form")
               sessionService.cacheNino(nino) flatMap {
-                case Some(session) => Future.successful(nextPage("MemberNinoController",session))
+                case Some(session) => Future.successful(Redirect(routes.MemberDOBController.get()))
                 case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
               }
             }

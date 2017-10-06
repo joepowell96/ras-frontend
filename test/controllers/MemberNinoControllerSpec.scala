@@ -100,11 +100,6 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
     }
 
-    "handle unautherised access" in {
-
-    }
-
-
   }
 
   "MemberNinoController post" should {
