@@ -22,16 +22,17 @@ import helpers.helpers.I18nHelper
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import services.SessionService
-import uk.gov.hmrc.auth.frontend.Redirects
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
-import uk.gov.hmrc.auth.core.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core._
 
 
 import scala.concurrent.Future
+import uk.gov.hmrc.play.frontend.config.AuthRedirects
 
-trait RasController extends FrontendController with I18nHelper with AuthorisedFunctions with Redirects {
+trait RasController extends FrontendController with I18nHelper with AuthorisedFunctions with AuthRedirects {
 
   val userDetailsConnector:UserDetailsConnector
   val sessionService: SessionService = SessionService
