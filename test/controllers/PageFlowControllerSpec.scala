@@ -64,25 +64,6 @@ class PageFlowControllerSpec extends UnitSpec with WithFakeApplication with I18n
       }
     }
 
-    "redirect to match found" when {
-      "when on member name page after match has been found" in {
-        val session = RasSession(MemberName("John",""),MemberNino(""),
-          MemberDateOfBirth(RasDate(None,None,None)),ResidencyStatusResult("uk","","","","","",""))
-
-        val result = TestPageFlowController.previousPage("MemberNameController",session)
-        status(result) shouldBe 303
-        redirectLocation(result).get should include("/match-found")
-      }
-    }
-
-    "redirect to no match found" when {
-      "when on member name page after match has not been found" in {
-        val result = TestPageFlowController.previousPage("MemberNameController",emptySession)
-        status(result) shouldBe 303
-        redirectLocation(result).get should include("/match-not-found")
-      }
-    }
-
   }
 
 }

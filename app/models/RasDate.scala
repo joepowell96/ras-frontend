@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 case class RasDate(day: Option[String], month: Option[String], year: Option[String]){
 
   def asLocalDate: LocalDate = {
-    new LocalDate(year.getOrElse("0").toInt, month.getOrElse("0").toInt, day.getOrElse("0").toInt)
+    new LocalDate(year.getOrElse("1").toInt, month.getOrElse("1").toInt, day.getOrElse("1").toInt)
   }
 
   def isInFuture: Boolean = {

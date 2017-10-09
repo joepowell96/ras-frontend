@@ -32,7 +32,6 @@ object PageFlowController extends PageFlowController {
 
 trait PageFlowController extends RasController {
 
-  val MEMBER_NAME = "MemberNameController"
   val MEMBER_NINO = "MemberNinoController"
   val MEMBER_DOB = "MemberDOBController"
   val RESULTS = "ResultsController"
@@ -45,13 +44,6 @@ trait PageFlowController extends RasController {
   }
 
   val backNavigation: Map[String, RasSession => Result] = Map(
-    MEMBER_NAME    -> {
-      (session: RasSession) =>
-        if(session.name.firstName.isEmpty)
-          Redirect(routes.ResultsController.noMatchFound())
-        else
-          Redirect(routes.ResultsController.matchFound())
-    },
     MEMBER_NINO    -> { (session: RasSession) => Redirect(routes.MemberNameController.get) },
     MEMBER_DOB     -> { (session: RasSession) => Redirect(routes.MemberNinoController.get) },
     RESULTS        -> { (session: RasSession) => Redirect(routes.MemberDOBController.get) }

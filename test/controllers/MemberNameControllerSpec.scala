@@ -167,21 +167,4 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
 
   }
-
-  "return to match found page when back link is clicked" in {
-    val session = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("uk","","","","","",""))
-    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(session)))
-    val result = TestMemberNameController.back.apply(FakeRequest())
-    status(result) shouldBe SEE_OTHER
-    redirectLocation(result).get should include("/match-found")
-  }
-
-
-  "return to match not found page when back link is clicked" in {
-    val session = RasSession(memberName.copy(firstName = ""), memberNino, memberDob, ResidencyStatusResult("","","","","","",""))
-    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(session)))
-    val result = TestMemberNameController.back.apply(FakeRequest())
-    status(result) shouldBe SEE_OTHER
-    redirectLocation(result).get should include("/match-not-found")
-  }
 }
