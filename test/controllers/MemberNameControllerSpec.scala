@@ -154,6 +154,8 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
 
     "redirect to nino page when name cached" in {
+      val session = RasSession(memberName, MemberNino(""), MemberDateOfBirth(RasDate(None,None,None)), ResidencyStatusResult("","","","","","",""))
+      when(mockSessionService.cacheName(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(session)))
       val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("member-nino")
@@ -164,6 +166,13 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
+    }
+
+    "redirect to no macth found controller page when name changed" in {
+      when(mockSessionService.cacheName(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) shouldBe 303
+      redirectLocation(result).get should include("match-not-found")
     }
 
   }
