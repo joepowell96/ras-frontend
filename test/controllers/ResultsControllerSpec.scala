@@ -218,5 +218,12 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
       redirectLocation(result).get should include("/member-date-of-birth")
     }
 
+    "redirect to global error when no sessino and back link is clicked" in {
+      when(mockSessionService.fetchRasSession()(any(), any())).thenReturn(Future.successful(None))
+      val result = TestResultsController.back.apply(FakeRequest())
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).get should include("/global-error")
+    }
+
   }
 }

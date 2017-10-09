@@ -116,6 +116,13 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       status(result) should equal(BAD_REQUEST)
     }
 
+    "return bad request when form error present with special characters" in {
+      val postData = Json.obj(
+        "nino" -> "AB123%56C")
+      val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      status(result) should equal(BAD_REQUEST)
+    }
+
     "redirect to dob page when nino cached" in {
       val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe SEE_OTHER

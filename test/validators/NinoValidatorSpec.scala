@@ -53,9 +53,6 @@ class NinoValidatorSpec extends UnitSpec with Matchers {
     "fail with more than 6 middle digits" in {
       validateNino("AB1234567C") should equal(false)
     }
-    "fail with special characters" in {
-      validateNino("AB123%567C") should equal(false)
-    }
 
     "fail if we start with invalid characters" in {
       val invalidPrefixes = List("BG", "GB", "NK", "KN", "TN", "NT", "ZZ")

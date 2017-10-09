@@ -77,13 +77,11 @@ trait ResultsController extends RasController with PageFlowController{
           sessionService.fetchRasSession() map { session =>
             session match {
               case Some(session) =>
+
                 val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
                 val nino = session.nino.nino
-                val dateOfBirth =
-                  if(!session.dateOfBirth.dateOfBirth.year.isEmpty)
-                    session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
-                  else
-                    ""
+                val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
                 Ok(views.html.match_not_found(name,dateOfBirth,nino))
               case _ =>
