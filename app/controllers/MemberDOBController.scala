@@ -22,8 +22,8 @@ import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import forms.MemberDateOfBirthForm.form
-import models.{MemberDetails, RasSession, ResidencyStatusResult}
-import uk.gov.hmrc.play.http.Upstream4xxResponse
+import models.{MemberDetails, ResidencyStatusResult}
+import uk.gov.hmrc.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
 
 import scala.concurrent.Future

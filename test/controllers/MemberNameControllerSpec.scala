@@ -32,8 +32,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, contentType, _}
 import play.api.{Configuration, Environment}
 import services.SessionService
-import uk.gov.hmrc.auth.core.{AuthConnector, ~}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.retrieve._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
@@ -74,7 +75,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
 
   "MemberDetailsController" should {
 
-    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any())).
+    when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
       thenReturn(successfulRetrieval)
 
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
