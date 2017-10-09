@@ -118,14 +118,14 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     "redirect to dob page when nino cached" in {
       val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) shouldBe 303
+      status(result) shouldBe SEE_OTHER
       redirectLocation(result).get should include("member-date-of-birth")
     }
 
     "redirect to technical error page if nino is not cached" in {
       when(mockSessionService.cacheNino(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
       val result = TestMemberNinoController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-      status(result) shouldBe 303
+      status(result) shouldBe SEE_OTHER
       redirectLocation(result).get should include("global-error")
     }
 
@@ -136,6 +136,13 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
     val result = TestMemberNinoController.back.apply(FakeRequest())
     status(result) shouldBe SEE_OTHER
     redirectLocation(result).get should include("/member-name")
+  }
+
+  "redirect to global error page navigating back with no session" in {
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+    val result = TestMemberNinoController.back.apply(FakeRequest())
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("global-error")
   }
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))

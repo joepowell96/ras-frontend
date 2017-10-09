@@ -85,7 +85,7 @@ trait MemberNinoController extends RasController with PageFlowController{
       isAuthorised.flatMap {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map {
-            case Some(session) => previousPage("MemberNinoController",session)
+            case Some(session) => previousPage("MemberNinoController")
             case _ => Redirect(routes.GlobalErrorController.get())
           }
         case Left(res) => res

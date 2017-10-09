@@ -71,16 +71,5 @@ trait MemberNameController extends RasController with PageFlowController {
     }
   }
 
-  def back = Action.async {
-    implicit request =>
-      isAuthorised.flatMap {
-        case Right(userInfo) =>
-          sessionService.fetchRasSession() map {
-            case Some(session) => previousPage("MemberNameController",session)
-            case _ => Redirect(routes.GlobalErrorController.get())
-          }
-        case Left(res) => res
-      }
-  }
 }
 

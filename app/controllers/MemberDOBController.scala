@@ -29,14 +29,14 @@ import uk.gov.hmrc.time.TaxYearResolver
 import scala.concurrent.Future
 
 object MemberDOBController extends MemberDOBController {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-
+  // $COVERAGE-ON$
 }
 
 trait MemberDOBController extends RasController with PageFlowController {
@@ -144,7 +144,7 @@ trait MemberDOBController extends RasController with PageFlowController {
       isAuthorised.flatMap {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map {
-            case Some(session) => previousPage("MemberDOBController",session)
+            case Some(session) => previousPage("MemberDOBController")
             case _ => Redirect(routes.GlobalErrorController.get())
           }
         case Left(res) => res
@@ -160,8 +160,5 @@ trait MemberDOBController extends RasController with PageFlowController {
       ""
   }
 
-  private def createMemberDetails(session: RasSession): Unit = {
-
-  }
 
 }

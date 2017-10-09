@@ -24,10 +24,12 @@ import play.api.mvc.Result
 import uk.gov.hmrc.auth.core.AuthConnector
 
 object PageFlowController extends PageFlowController {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+  // $COVERAGE-ON$
 }
 
 trait PageFlowController extends RasController {
@@ -36,18 +38,16 @@ trait PageFlowController extends RasController {
   val MEMBER_DOB = "MemberDOBController"
   val RESULTS = "ResultsController"
 
-  def previousPage(from: String, session: RasSession): Result = {
-    backNavigation.get(from) match {
-      case Some(redirect) => redirect(session)
-      case None => NotFound
+  def previousPage(from: String): Result = {
+    from match {
+      case MEMBER_NINO => Redirect(routes.MemberNameController.get)
+      case MEMBER_DOB  => Redirect(routes.MemberNinoController.get)
+      case RESULTS     => Redirect(routes.MemberDOBController.get)
+      case _ => Redirect(routes.GlobalErrorController.get)
     }
   }
 
-  val backNavigation: Map[String, RasSession => Result] = Map(
-    MEMBER_NINO    -> { (session: RasSession) => Redirect(routes.MemberNameController.get) },
-    MEMBER_DOB     -> { (session: RasSession) => Redirect(routes.MemberNinoController.get) },
-    RESULTS        -> { (session: RasSession) => Redirect(routes.MemberDOBController.get) }
-  )
+
 
 }
 

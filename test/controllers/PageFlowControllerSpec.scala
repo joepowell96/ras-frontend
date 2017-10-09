@@ -42,25 +42,33 @@ class PageFlowControllerSpec extends UnitSpec with WithFakeApplication with I18n
 
     "redirect to member name page" when {
       "on member nino page" in {
-        val result = TestPageFlowController.previousPage("MemberNinoController",emptySession)
-        status(result) shouldBe 303
+        val result = TestPageFlowController.previousPage("MemberNinoController")
+        status(result) shouldBe SEE_OTHER
         redirectLocation(result).get should include("/member-name")
       }
     }
 
     "redirect to member nino page" when {
       "on member dob page" in {
-        val result = TestPageFlowController.previousPage("MemberDOBController",emptySession)
-        status(result) shouldBe 303
+        val result = TestPageFlowController.previousPage("MemberDOBController")
+        status(result) shouldBe SEE_OTHER
         redirectLocation(result).get should include("/member-nino")
       }
     }
 
     "redirect to member dob page" when {
-      "when on results page" in {
-        val result = TestPageFlowController.previousPage("ResultsController",emptySession)
-        status(result) shouldBe 303
+      "on results page" in {
+        val result = TestPageFlowController.previousPage("ResultsController")
+        status(result) shouldBe SEE_OTHER
         redirectLocation(result).get should include("/member-date-of-birth")
+      }
+    }
+
+    "redirect to global error page" when {
+      "not found" in {
+        val result = TestPageFlowController.previousPage("blahblah")
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
       }
     }
 

@@ -25,13 +25,13 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.time.TaxYearResolver
 
 
-object ResultsController extends ResultsController
-{
+object ResultsController extends ResultsController {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-
+  // $COVERAGE-ON$
 }
 
 trait ResultsController extends RasController with PageFlowController{
@@ -102,7 +102,7 @@ trait ResultsController extends RasController with PageFlowController{
       isAuthorised.flatMap {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map {
-            case Some(session) => previousPage("ResultsController",session)
+            case Some(session) => previousPage("ResultsController")
             case _ => Redirect(routes.GlobalErrorController.get())
           }
         case Left(res) => res

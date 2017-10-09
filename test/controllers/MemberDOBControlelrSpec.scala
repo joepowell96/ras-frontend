@@ -200,7 +200,12 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     redirectLocation(result).get should include("/member-nino")
   }
 
-
+  "redirect to global error page navigating back with no session" in {
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+    val result = TestMemberDobController.back.apply(FakeRequest())
+    status(result) shouldBe SEE_OTHER
+    redirectLocation(result).get should include("global-error")
+  }
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
