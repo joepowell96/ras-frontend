@@ -100,7 +100,7 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
       "rendered" in {
         val result = TestMemberDobController.get(fakeRequest)
         doc(result).title shouldBe Messages("member.dob.page.title")
-        doc(result).getElementById("header").text shouldBe Messages("member.dob.page.header","Jackie")
+        doc(result).getElementById("header").text shouldBe Messages("member.dob.page.header","Jackie Chan")
         doc(result).getElementById("dob_hint").text shouldBe Messages("dob.hint")
         doc(result).getElementById("continue").text shouldBe Messages("continue")
         doc(result).getElementById("dob-day_label").text shouldBe Messages("Day")

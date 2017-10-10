@@ -32,11 +32,7 @@
     <a class="link-back" href="@routes.MemberNinoController.back">@Messages("back")</a>
    </div>
 
-   @if(name == "member"){
      <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header", name)</h1>
-   }else{
-     <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header", name.capitalize)</h1>
-   }
      @form(action = routes.MemberNinoController.post) {
 
        <div class="form-group">

@@ -87,7 +87,7 @@ class MemberNinoControllerSpec extends UnitSpec with WithFakeApplication with I1
       "rendered" in {
         val result = TestMemberNinoController.get(fakeRequest)
         doc(result).title shouldBe Messages("member.nino.page.title")
-        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header","Jackie")
+        doc(result).getElementById("header").text shouldBe Messages("member.nino.page.header","Jackie Chan")
         doc(result).getElementById("nino_hint").text shouldBe Messages("nino.hint")
         assert(doc(result).getElementById("nino").attr("input") != null)
         doc(result).getElementById("continue").text shouldBe Messages("continue")

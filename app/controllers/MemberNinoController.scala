@@ -46,8 +46,8 @@ trait MemberNinoController extends RasController with PageFlowController{
           Logger.debug("[NinoController][get] user authorised")
           sessionService.fetchRasSession() map {
             case Some(session) =>
-                firstName = session.name.firstName
-              Ok(views.html.member_nino(form.fill(session.nino),session.name.firstName))
+              val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
+              Ok(views.html.member_nino(form.fill(session.nino),name))
             case _ =>
               Ok(views.html.member_nino(form, Messages("member")))
           }

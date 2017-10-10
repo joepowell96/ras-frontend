@@ -134,9 +134,9 @@ class ResultsControllerSpec extends UnitSpec with WithFakeApplication with I18nH
               "")))
       ))
       val result = TestResultsController.matchFound.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
-
-      doc(result).getElementById("header").text shouldBe Messages("match.found.header", name.firstName.capitalize)
-      doc(result).getElementById("sub-header").text shouldBe Messages("match.found.sub-header", name.firstName.capitalize, SCOTTISH,
+      val formattedName = name.firstName.capitalize + " " + name.lastName.capitalize
+      doc(result).getElementById("header").text shouldBe Messages("match.found.header", formattedName)
+      doc(result).getElementById("sub-header").text shouldBe Messages("match.found.sub-header", formattedName, SCOTTISH,
         currentTaxYear.toString, (currentTaxYear + 1).toString, (currentTaxYear + 2).toString,NON_SCOTTISH)
       doc(result).getElementById("tax-year-header").text shouldBe Messages("tax.year")
       doc(result).getElementById("location-header").text shouldBe Messages("location")
