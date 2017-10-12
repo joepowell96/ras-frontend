@@ -31,7 +31,7 @@ object FrontendAuditConnector extends Auditing with AppName {
   override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }
 
-object WSHttp extends WSGet with HttpGet
+trait WSHttp extends WSGet with HttpGet
   with WSPut with HttpPut
   with WSPost with HttpPost
   with WSDelete with HttpDelete
@@ -43,7 +43,9 @@ object WSHttp extends WSGet with HttpGet
   }
 }
 
-object FrontendAuthConnector extends PlayAuthConnector with ServicesConfig {
+object WSHttp extends WSHttp
+
+object FrontendAuthConnector extends PlayAuthConnector with ServicesConfig with WSHttp {
   val serviceUrl = baseUrl("auth")
   lazy val http = WSHttp
 }
