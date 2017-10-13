@@ -98,7 +98,8 @@ print.this.page = Print this page
 check.another.person = Check another person
 finish = Finish
 
-technical.error = There was a technical problem retrieving the results. Please try again later.
+service.unavailable = Service unavailable
+technical.difficulty = Sorry, there is a technical problem and you cannot use the service at the moment. Please try again later.
 
 member.details.not.found = {0} has not been found
 
