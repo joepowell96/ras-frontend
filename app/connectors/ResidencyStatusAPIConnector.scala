@@ -20,9 +20,10 @@ import config.WSHttp
 import models.ResidencyStatus
 import play.api.Logger
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, HttpReads}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpReads}
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 trait ResidencyStatusAPIConnector extends ServicesConfig {
 
@@ -39,7 +40,7 @@ trait ResidencyStatusAPIConnector extends ServicesConfig {
 
     Logger.debug(s"[ResidencyStatusAPIConnector][getResidencyStatus] Calling Residency Status api")
 
-    http.GET[ResidencyStatus](rasUri)(implicitly[HttpReads[ResidencyStatus]],hc = headerCarrier)
+    http.GET[ResidencyStatus](rasUri)(implicitly[HttpReads[ResidencyStatus]],hc = headerCarrier, MdcLoggingExecutionContext.fromLoggingDetails(headerCarrier))
   }
 
 }

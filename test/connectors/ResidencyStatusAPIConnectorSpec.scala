@@ -23,9 +23,9 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet }
 
 class ResidencyStatusAPIConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
@@ -43,7 +43,7 @@ class ResidencyStatusAPIConnectorSpec extends PlaySpec with OneAppPerSuite with 
 
       val expectedResponse = ResidencyStatus("scotResident","otherUKResident")
 
-      when(TestConnector.http.GET[ResidencyStatus](any())(any(),any())).thenReturn(Future.successful(expectedResponse))
+      when(TestConnector.http.GET[ResidencyStatus](any())(any(),any(), any())).thenReturn(Future.successful(expectedResponse))
 
       val result = TestConnector.getResidencyStatus(uuid)
 

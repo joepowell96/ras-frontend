@@ -21,9 +21,11 @@ import models._
 import play.api.Logger
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http._
+import uk.gov.hmrc.http._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 trait CustomerMatchingAPIConnector extends ServicesConfig{
 
@@ -45,7 +47,7 @@ trait CustomerMatchingAPIConnector extends ServicesConfig{
 
     Logger.debug(s"[CustomerMatchingAPIConnector][findMemberDetails] Calling Customer Matching api at ${matchingUri}")
 
-    http.POST[JsValue, Option[String]](matchingUri, memberDetails.asCustomerDetailsPayload, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc)
+    http.POST[JsValue, Option[String]](matchingUri, memberDetails.asCustomerDetailsPayload, Seq("Accept" -> "application/vnd.hmrc.1.0+json", "Content-Type" -> "application/json" ))(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
   private val responseHandler = new HttpReads[Option[String]] {

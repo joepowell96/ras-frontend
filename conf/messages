@@ -26,10 +26,19 @@ continue = Continue
 
 #----------------------------------------------
 
+member = member
+
 find.member.details = Find member details
 
-member.details.page.title = Find member details - GOV.UK
-member.details.page.header = Find member details
+member.name.page.title = Member name - GOV.UK
+member.name.page.header = What is the member''s name?
+member.name.page.sub-header = As shown on their birth certificate or passport.
+
+member.nino.page.title = Member nino - GOV.UK
+member.nino.page.header = What is {0}''s National Insurance number?
+
+member.dob.page.title = Member date of birth - GOV.UK
+member.dob.page.header = What is {0}''s date of birth?
 
 match.found.page.title = Match found - GOV.UK
 match.not.found.page.title = Match not found - GOV.UK
@@ -48,6 +57,8 @@ year = year
 dob.hint = For example, 21 2 1983
 nino.hint = For example, 'QQ 12 34 56 C'
 
+back = Back
+
 error.mandatory = Enter a {0}
 
 error.nino.invalid = The National Insurance number you have entered does not have the correct number of letters and numbers
@@ -63,9 +74,12 @@ tried.confirm.details = Confirm with your scheme member the details you hold are
 tried.guidance = If you have already done this and still can''t find them, your scheme member will need to contact HMRC themselves to
 confirm.nino.link = confirm their National Insurance number
 
+match.found.header = {0}''s details
+match.found.sub-header = {0} pays their tax in {1} for the current tax year of {2} to {3}. They are expected to pay tax in {5} in the next tax year of {3} to {4}.
 
 error.day.invalid = Enter a day between 1 and 31
 error.day.invalid.feb = Enter a day between 1 and 29
+error.day.invalid.feb.leap = Enter a day between 1 and 30
 error.day.invalid.thirty = Enter a day between 1 and 30
 
 error.month.invalid = Enter a month between 1 and 12
@@ -74,20 +88,20 @@ error.dob.invalid.future = Enter a date of birth that is not in the future
 
 generic.errors_heading = There is a problem with the form
 
-scottish.taxpayer = Scottish taxpayer
-non.scottish.taxpayer = Non-Scottish taxpayer
+scottish.taxpayer = Scotland
+non.scottish.taxpayer = Rest of UK
 
 this.tax.year = This tax year
 status.for.next.tax.year = Status for next tax year, {0} to {1}
 tax.year.period = 6 April {0} to 5 April {1}
 
 print.this.page = Print this page
-find.another.member = Find another member
+check.another.person = Check another person
 finish = Finish
 
 technical.error = There was a technical problem retrieving the results. Please try again later.
 
-member.details.not.found = Member details not found
+member.details.not.found = {0} has not been found
 
 match.not.found.subheader = The details you''ve entered don'"t match HM Revenue and Customs'' records. Check you''ve entered the correct information.
 
@@ -95,3 +109,16 @@ try.again = Try again
 
 unauthorised.error.page.title = Un-Authorised - GOV.UK
 unauthorised.error = you are not authorised to access this service , you need Pension scheme administrator or pension scheme provider enrolments.
+
+tax.year = Tax year
+location = Location
+
+tax.year.period = {0} to {1}
+
+sign.out = Sign out
+change = Change
+
+match.not.found.what.to.do = Check with the member to make sure they have given you the correct details. If you have think the details you have entered are correct, the member must
+contact.hmrc = contact HMRC to confirm their National Insurance number
+
+signout = Sign out

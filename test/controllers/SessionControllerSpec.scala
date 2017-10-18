@@ -30,11 +30,12 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{redirectLocation, _}
 import play.api.{Configuration, Environment, Mode}
 import services.SessionService
-import uk.gov.hmrc.auth.core.{AuthConnector, ~}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar {
 
@@ -46,11 +47,11 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
   val mockUserDetailsConnector = mock[UserDetailsConnector]
   val mockSessionService = mock[SessionService]
 
-  val nino = RandomNino.generate
+  val nino = MemberNino(RandomNino.generate)
   val dob = RasDate(Some("1"), Some("1"), Some("1999"))
-  val memberDetails = MemberDetails("Jim", "McGill", nino, dob)
+  val memberDob = MemberDateOfBirth(dob)
   val residencyStatusResult = ResidencyStatusResult("","","","","","","")
-  val rasSession = RasSession(memberDetails,residencyStatusResult)
+  val rasSession = RasSession(MemberName("Jim", "McGill"),nino, memberDob,residencyStatusResult)
 
   object TestSessionController extends SessionController{
     val authConnector: AuthConnector = mockAuthConnector
@@ -62,25 +63,82 @@ class SessionControllerSpec extends UnitSpec with WithFakeApplication with I18nH
 
   "SessionController" should {
     "redirect to target" when {
-      "cleanAndRedirect is called with member-details" in {
+
+      "redirect is called with member-name and clean" in {
         when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
-        redirectLocation(result).get should include("member-details")
+        val result = await(TestSessionController.redirect("member-name",true)(FakeRequest()))
+        redirectLocation(result).get should include("member-name")
       }
+
+      "redirect is called with member-nino and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-nino",true)(FakeRequest()))
+        redirectLocation(result).get should include("member-nino")
+      }
+
+      "redirect is called with member-dob and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-dob",true)(FakeRequest()))
+        redirectLocation(result).get should include("member-date-of-birth")
+      }
+
+      "redirect is called with start and clean" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("start",true)(FakeRequest()))
+        redirectLocation(result).get should include("relief-at-source")
+      }
+
+      "redirect is called with member-name" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-name",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-name")
+      }
+
+      "redirect is called with member-nino" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-nino",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-nino")
+      }
+
+      "redirect is called with member-dob" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("member-dob",false)(FakeRequest()))
+        redirectLocation(result).get should include("member-date-of-birth")
+      }
+
+      "redirect is called with start" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("start",false)(FakeRequest()))
+        redirectLocation(result).get should include("relief-at-source")
+      }
+
     }
 
     "redirect to global error page" when {
       "no ras session is returned (target is irrelevant here)" in {
         when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-        val result = await(TestSessionController.cleanAndRedirect("member-details")(FakeRequest()))
+        val result = await(TestSessionController.redirect("member-details", false)(FakeRequest()))
+        redirectLocation(result).get should include("global-error")
+      }
+
+      "no ras session is returned (target is irrelevant here) and clean is true" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val result = await(TestSessionController.redirect("member-details", true)(FakeRequest()))
         redirectLocation(result).get should include("global-error")
       }
 
       "ras session is returned but target is not recognised" in {
         when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-        val result = await(TestSessionController.cleanAndRedirect("blah blah")(FakeRequest()))
+        val result = await(TestSessionController.redirect("blah blah", false)(FakeRequest()))
         redirectLocation(result).get should include("global-error")
       }
+
+      "ras session is returned but target is not recognised and clean is true" in {
+        when(mockSessionService.resetRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestSessionController.redirect("blah blah", true)(FakeRequest()))
+        redirectLocation(result).get should include("global-error")
+      }
+
     }
   }
 

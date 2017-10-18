@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package validators
+package forms
 
-import org.scalatest.Matchers
-import uk.gov.hmrc.play.test.UnitSpec
+import helpers.helpers.I18nHelper
+import models.{MemberDateOfBirth, MemberName, RasDate}
+import play.api.data.Form
+import play.api.data.Forms._
+import validators.DateValidator
 
-class DateValidatorSpec extends UnitSpec with Matchers {
+object MemberDateOfBirthForm extends I18nHelper{
 
-  "date validator" should{
-
-    "return false when day is non digit" in {
-      DateValidator.checkDayRange("a","b") shouldBe false
-    }
-
-    "return false when month is non digit" in {
-      DateValidator.checkMonthRange("a") shouldBe false
-    }
-
-    "return false when year is non digit" in {
-      DateValidator.checkYearLength("a") shouldBe false
-    }
-
-  }
-
+  val form = Form(
+    mapping(
+      "dateOfBirth" -> mapping(
+        "day" -> optional(text),
+        "month" -> optional(text),
+        "year" -> optional(text)
+      )(RasDate.apply)(RasDate.unapply).verifying(DateValidator.rasDateConstraint))
+    (MemberDateOfBirth.apply)(MemberDateOfBirth.unapply)
+  )
 }
+
+
+

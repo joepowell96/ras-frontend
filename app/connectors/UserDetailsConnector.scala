@@ -22,13 +22,15 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http._
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
 trait UserDetailsConnector extends ServicesConfig with UserDetailsJsonFormats {
 
   val httpGet: HttpGet = WSHttp
 
   def getUserDetails(url: String)(implicit hc: HeaderCarrier): Future[UserDetails] = {
-    httpGet.GET[UserDetails](url)(implicitly, hc)
+    httpGet.GET[UserDetails](url)(implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
 }

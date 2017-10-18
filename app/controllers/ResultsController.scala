@@ -22,18 +22,19 @@ import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.time.TaxYearResolver
 
 
-object ResultsController extends ResultsController
-{
+object ResultsController extends ResultsController {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-
+  // $COVERAGE-ON$
 }
 
-trait ResultsController extends RasController {
+trait ResultsController extends RasController with PageFlowController{
 
   implicit val context: RasContext = RasContextImpl
 
@@ -43,9 +44,23 @@ trait ResultsController extends RasController {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map { session =>
             session match {
-              case Some(s) =>
+              case Some(session) =>
+
+                val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
+                val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+                val nino = session.nino.nino
+                val currentTaxYear = TaxYearResolver.currentTaxYear
+                val nextTaxYear = TaxYearResolver.currentTaxYear + 1
+                val currentYearResidencyStatus = session.residencyStatusResult.currentYearResidencyStatus
+                val nextYearResidencyStatus = session.residencyStatusResult.nextYearResidencyStatus
+
                 Logger.debug("[ResultsController][matchFound] Successfully retrieved ras session")
-                Ok(views.html.match_found(s.residencyStatusResult))
+                Ok(views.html.match_found(
+                  name, dateOfBirth, nino,
+                  currentYearResidencyStatus,
+                  nextYearResidencyStatus,
+                  currentTaxYear,nextTaxYear))
+
               case _ =>
                 Logger.error("[ResultsController][matchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())
@@ -61,11 +76,14 @@ trait ResultsController extends RasController {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map { session =>
             session match {
-              case Some(rasSess) =>
-                val name = rasSess.memberDetails.firstName + " " + rasSess.memberDetails.lastName
-                val dateOfBirth = rasSess.memberDetails.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+              case Some(session) =>
+
+                val name = session.name.firstName.capitalize + " " + session.name.lastName.capitalize
+                val nino = session.nino.nino
+                val dateOfBirth = session.dateOfBirth.dateOfBirth.asLocalDate.toString("d MMMM yyyy")
+
                 Logger.debug("[ResultsController][noMatchFound] Successfully retrieved ras session")
-                Ok(views.html.match_not_found(name,dateOfBirth,rasSess.memberDetails.nino))
+                Ok(views.html.match_not_found(name,dateOfBirth,nino))
               case _ =>
                 Logger.error("[ResultsController][noMatchFound] failed to retrieve ras session")
                 Redirect(routes.GlobalErrorController.get())
@@ -74,6 +92,18 @@ trait ResultsController extends RasController {
           }
 
       case Left(res) => res
+      }
+  }
+
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) =>
+          sessionService.fetchRasSession() map {
+            case Some(session) => previousPage("ResultsController")
+            case _ => Redirect(routes.GlobalErrorController.get())
+          }
+        case Left(res) => res
       }
   }
 

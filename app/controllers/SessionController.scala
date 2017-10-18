@@ -22,6 +22,8 @@ import play.api.{Configuration, Environment, Logger, Play}
 import play.api.mvc.Action
 import uk.gov.hmrc.auth.core.AuthConnector
 
+import scala.concurrent.Future
+
 object SessionController extends SessionController {
   // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
@@ -34,23 +36,43 @@ object SessionController extends SessionController {
 trait SessionController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
-  val MEMBER_DETAILS = "member-details"
 
-  def cleanAndRedirect(target: String) = Action.async {
+  val START = "start"
+  val MEMBER_NAME = "member-name"
+  val MEMBER_NINO = "member-nino"
+  val MEMBER_DOB = "member-dob"
+
+  def redirect(target:String, cleanSession:Boolean) = Action.async {
     implicit request =>
-      sessionService.resetRasSession() map {
-        case Some(session) =>
-          target match {
-            case MEMBER_DETAILS => Redirect(routes.MemberDetailsController.get())
-            case _ =>
-              Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
-              Redirect(routes.GlobalErrorController.get())
-          }
-
-        case _ =>
-          Logger.error("[SessionController][cleanAndRedirect] No session found")
-          Redirect(routes.GlobalErrorController.get())
+      if(cleanSession){
+        sessionService.resetRasSession() map {
+          case Some(session) =>
+            target match {
+              case START => Redirect(routes.StartPageController.get())
+              case MEMBER_NAME => Redirect(routes.MemberNameController.get())
+              case MEMBER_NINO => Redirect(routes.MemberNinoController.get())
+              case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
+              case _ =>
+                Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
+                Redirect(routes.GlobalErrorController.get())
+            }
+          case _ =>
+            Logger.error("[SessionController][cleanAndRedirect] No session found")
+            Redirect(routes.GlobalErrorController.get())
         }
+      } else {
+        target match {
+          case START => Future.successful(Redirect(routes.StartPageController.get()))
+          case MEMBER_NAME => Future.successful(Redirect(routes.MemberNameController.get()))
+          case MEMBER_NINO => Future.successful(Redirect(routes.MemberNinoController.get()))
+          case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
+          case _ =>
+            Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
+            Future.successful(Redirect(routes.GlobalErrorController.get()))
+        }
+      }
+
   }
+
 
 }

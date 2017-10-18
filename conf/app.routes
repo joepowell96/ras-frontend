@@ -5,14 +5,25 @@ GET         /assets/*file                 @controllers.AssetsController.at(path=
 GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
 
-GET         /member-details               controllers.MemberDetailsController.get
-POST        /member-details               controllers.MemberDetailsController.post
+GET         /member-name                  controllers.MemberNameController.get
+POST        /member-name                  controllers.MemberNameController.post
+
+GET         /member-nino                  controllers.MemberNinoController.get
+POST        /member-nino                  controllers.MemberNinoController.post
+GET         /member-nino/back             controllers.MemberNinoController.back
+
+GET         /member-date-of-birth         controllers.MemberDOBController.get
+POST        /member-date-of-birth         controllers.MemberDOBController.post
+GET         /member-date-of-birth/back    controllers.MemberDOBController.back
 
 GET         /match-found                  controllers.ResultsController.matchFound
+GET         /match-found/back             controllers.ResultsController.back
+
 GET         /match-not-found              controllers.ResultsController.noMatchFound
+GET         /match-not-found/back         controllers.ResultsController.back
 
 GET         /global-error                 controllers.GlobalErrorController.get
 
 GET         /notauthorised                controllers.GlobalErrorController.notAuthorised
 
-GET         /clean-and-redirect/:target   controllers.SessionController.cleanAndRedirect(target:String)
+GET         /check-another-member/:target controllers.SessionController.redirect(target:String, cleanSession:Boolean)

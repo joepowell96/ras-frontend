@@ -21,10 +21,9 @@ import models._
 import org.joda.time.LocalDate
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.Request
-import uk.gov.hmrc.play.http.HeaderCarrier
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 object SessionService extends SessionService
 
@@ -32,7 +31,10 @@ object SessionService extends SessionService
 trait SessionService extends SessionCacheWiring {
 
   val RAS_SESSION_KEY = "ras_session"
-  val cleanSession = RasSession(MemberDetails("","","",RasDate(Some(""),Some(""),Some(""))),ResidencyStatusResult("","","","","","",""))
+  val cleanSession = RasSession(MemberName("",""),
+                                MemberNino(""),
+                                MemberDateOfBirth(RasDate(None,None,None)),
+                                ResidencyStatusResult("","","","","","",""))
 
   def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
@@ -42,13 +44,13 @@ trait SessionService extends SessionCacheWiring {
     sessionCache.cache[RasSession](RAS_SESSION_KEY, cleanSession) map (cacheMap => Some(cleanSession))
   }
 
-  def cacheMemberDetails(memberDetails: MemberDetails)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def cacheName(name: MemberName)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
 
     val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
       sessionCache.cache[RasSession](RAS_SESSION_KEY,
         currentSession match {
-          case Some(returnedSession) => returnedSession.copy(memberDetails = memberDetails)
-          case None => cleanSession.copy(memberDetails = memberDetails)
+          case Some(returnedSession) => returnedSession.copy(name = name)
+          case None => cleanSession.copy(name = name)
         }
       )
     }
@@ -58,12 +60,36 @@ trait SessionService extends SessionCacheWiring {
     })
   }
 
-  def fetchMemberDetails()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[MemberDetails]] = {
-    sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY).map { currentSession =>
-      currentSession.map {
-        _.memberDetails
-      }
+  def cacheNino(nino: MemberNino)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(nino = nino)
+          case None => cleanSession.copy(nino = nino)
+        }
+      )
     }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def cacheDob(dob: MemberDateOfBirth)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(dateOfBirth = dob)
+          case None => cleanSession.copy(dateOfBirth = dob)
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
   }
 
   def cacheResidencyStatusResult(residencyStatusResult: ResidencyStatusResult)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {

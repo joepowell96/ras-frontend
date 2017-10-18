@@ -25,9 +25,9 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpPost}
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost }
 
 class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
@@ -43,11 +43,11 @@ class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with
 
     "send a post request to customer matching service" in {
 
-      val memberDetails = MemberDetails(RandomNino.generate, "Ramin", "Esfandiari", RasDate(Some("1"),Some("1"),Some("1999")))
+      val memberDetails = MemberDetails(MemberName("Ramin", "Esfandiari"),RandomNino.generate, RasDate(Some("1"),Some("1"),Some("1999")))
 
       val expectedResponse = Some("633e0ee7-315b-49e6-baed-d79c3dffe467")
 
-      when(TestConnector.http.POST[MemberDetails, Option[String]](any(),any(),any())(any(),any(),any())).thenReturn(Future.successful(expectedResponse))
+      when(TestConnector.http.POST[MemberDetails, Option[String]](any(),any(),any())(any(),any(),any(), any())).thenReturn(Future.successful(expectedResponse))
 
       val result = await(TestConnector.findMemberDetails(memberDetails))
 

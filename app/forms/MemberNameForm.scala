@@ -17,18 +17,14 @@
 package forms
 
 import helpers.helpers.I18nHelper
-import models.{MemberDetails, RasDate}
-import org.joda.time.LocalDate
+import models.MemberName
 import play.api.data.Form
 import play.api.data.Forms._
-import validators.{DateValidator, NinoValidator}
 
-object MemberDetailsForm extends I18nHelper{
+object MemberNameForm extends I18nHelper{
 
   val MAX_LENGTH = 35
   val NAME_REGEX = """^[a-zA-Z &`\-\'^]{1,35}$"""
-  val NINO_SUFFIX_REGEX = "[A-D]"
-  val TEMP_NINO = "TN"
 
   val form = Form(
     mapping(
@@ -39,17 +35,8 @@ object MemberDetailsForm extends I18nHelper{
       "lastName" -> text
         .verifying(Messages("error.mandatory", Messages("last.name")), _.length > 0)
         .verifying(Messages("error.length", Messages("last.name"), MAX_LENGTH), _.length <= MAX_LENGTH)
-        .verifying(Messages("error.name.invalid", Messages("last.name")), x => x.length == 0 || x.matches(NAME_REGEX)),
-      "nino" -> text
-        .verifying(NinoValidator.ninoConstraint),
-      "dateOfBirth" -> mapping(
-        "day" -> optional(text),
-        "month" -> optional(text),
-        "year" -> optional(text)
-      )(RasDate.apply)(RasDate.unapply)
-        .verifying(DateValidator.rasDateConstraint)
-    )
-    (MemberDetails.apply)(MemberDetails.unapply)
+        .verifying(Messages("error.name.invalid", Messages("last.name")), x => x.length == 0 || x.matches(NAME_REGEX))
+    )(MemberName.apply)(MemberName.unapply)
   )
 }
 

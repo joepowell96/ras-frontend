@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.play.http.HeaderCarrier
-@import scala.concurrent.ExecutionContext
 @import uk.gov.hmrc.play.views.html.layouts
 
 @(appConfig: config.ApplicationConfig = config.ApplicationConfig,
@@ -25,8 +23,8 @@
   bodyClasses: Option[String] = None,
   mainClass: Option[String] = None,
   scriptElem: Option[Html] = None,
-  supportLinkEnabled: Boolean = true,
-  linkElement : Option[Html] = None)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
+  signOutEnabled: Boolean = true,
+  supportLinkEnabled: Boolean = true)(mainContent: Html)(implicit request : Request[_], context: config.RasContext, messages: Messages)
 
 
 @getHelpForm = {
@@ -55,5 +53,6 @@
                mainContent = layouts.article(mainContent),
                serviceInfoContent = serviceInfoContent,
                scriptElem = scriptElem,
+               signOutEnabled = signOutEnabled,
                linkElement = Some(linkElement)
 )

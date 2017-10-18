@@ -16,7 +16,9 @@
 
 package validators
 
-import forms.MemberDetailsForm.Messages
+import java.time.LocalDate
+
+import forms.MemberNameForm.Messages
 import models.RasDate
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
@@ -49,7 +51,9 @@ trait DateValidator {
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
 
       else if (!DateValidator.checkDayRange(x.day.getOrElse("0"), x.month.getOrElse("0"))) {
-        if(x.month.getOrElse("0").toInt == 2)
+        if(x.month.getOrElse("0").toInt == 2 && LocalDate.now.isLeapYear)
+          Invalid(Seq(ValidationError(Messages("error.day.invalid.feb.leap"))))
+        else if(x.month.getOrElse("0").toInt == 2 && !LocalDate.now.isLeapYear)
           Invalid(Seq(ValidationError(Messages("error.day.invalid.feb"))))
         else if(List(4,6,9,11).contains(x.month.getOrElse("0").toInt))
           Invalid(Seq(ValidationError(Messages("error.day.invalid.thirty"))))
@@ -86,8 +90,10 @@ trait DateValidator {
 
   def checkDayRange(day: String, month: String): Boolean = {
     if (day forall Character.isDigit){
-      if(month.toInt == 2)
+      if(month.toInt == 2 && LocalDate.now().isLeapYear)
         day.toInt > 0 && day.toInt < 30
+      else if(month.toInt == 2 && !LocalDate.now().isLeapYear)
+          day.toInt > 0 && day.toInt < 29
       else if(List(4,6,9,11).contains(month.toInt))
         day.toInt > 0 && day.toInt < 31
       else
