@@ -21,10 +21,15 @@
 
 @ras_main(title = Messages("global.error.page.title")) {
 
-  <div>
-   <a href="javascript:history.back()">@Messages("back")</a>
-  </div>
+<div class="grid-layout--no-gutter">
+ <div class="grid-layout__column">
+  <div class="grid-layout__column--3-4">
 
-  <h1 id="header">@Messages("technical.error")</h1>
+    <h1 id="header">@Messages("service.unavailable")</h1>
+    <p id="description">@Messages("technical.difficulty")</p>
+
+  </div>
+ </div>
+</div>
 
 }

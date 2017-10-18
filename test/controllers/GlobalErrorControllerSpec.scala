@@ -58,7 +58,8 @@ class GlobalErrorControllerSpec extends UnitSpec with WithFakeApplication with I
       val result = TestGlobalErrorController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
       doc.title shouldBe Messages("global.error.page.title")
-      doc.getElementById("header").text shouldBe Messages("technical.error")
+      doc.getElementById("header").text shouldBe Messages("service.unavailable")
+      doc.getElementById("description").text shouldBe Messages("technical.difficulty")
     }
   }
 
