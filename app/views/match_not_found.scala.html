@@ -40,17 +40,17 @@
 
           <tr>
             <td id="name">@name</td>
-            <td id="change-name"><a href="@routes.SessionController.redirect("member-name",false)">@Messages("change")</a></td>
+            <td id="change-name"><a id="change-name-link" href="@routes.SessionController.redirect("member-name",false)">@Messages("change")</a></td>
           </tr>
 
           <tr>
             <td id="nino">@nino</td>
-            <td id="change-nino"><a href="@routes.SessionController.redirect("member-nino",false)">@Messages("change")</a></td>
+            <td id="change-nino"><a id="change-nino-link" href="@routes.SessionController.redirect("member-nino",false)">@Messages("change")</a></td>
           </tr>
 
           <tr>
             <td id="dob">@dateOfBirth</td>
-            <td id="change-dob"><a href="@routes.SessionController.redirect("member-dob",false)">@Messages("change")</a></td>
+            <td id="change-dob"><a id="change-dob-link" href="@routes.SessionController.redirect("member-dob",false)">@Messages("change")</a></td>
           </tr>
 
         </tbody>
