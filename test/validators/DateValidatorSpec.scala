@@ -16,6 +16,7 @@
 
 package validators
 
+import models.RasDate
 import org.scalatest.Matchers
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -24,7 +25,7 @@ class DateValidatorSpec extends UnitSpec with Matchers {
   "date validator" should{
 
     "return false when day is non digit" in {
-      DateValidator.checkDayRange("a","b") shouldBe false
+      DateValidator.checkDayRange(RasDate(Some("a"),Some("b"),Some("c"))) shouldBe false
     }
 
     "return false when month is non digit" in {

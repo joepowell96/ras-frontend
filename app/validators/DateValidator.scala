@@ -16,10 +16,11 @@
 
 package validators
 
-import java.time.LocalDate
+
 
 import forms.MemberNameForm.Messages
 import models.RasDate
+import org.joda.time.DateTime
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 
 trait DateValidator {
@@ -27,49 +28,56 @@ trait DateValidator {
   val YEAR_FIELD_LENGTH: Int = 4
 
   val rasDateConstraint : Constraint[RasDate] = Constraint("dateOfBirth") ({
-    x => {
+    date => {
 
-      if (x.day.isEmpty && x.month.isEmpty && x.year.isEmpty)
+      val leapYear =
+        try{
+          new DateTime().withYear(date.year.getOrElse("0").toInt).year.isLeap
+        } catch {
+          case e:NumberFormatException => false
+        }
+
+      if (date.day.isEmpty && date.month.isEmpty && date.year.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("dob")))))
 
-      else if (x.day.isEmpty)
+      else if (date.day.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("day")))))
 
-      else if (x.month.isEmpty)
+      else if (date.month.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("month")))))
 
-      else if (x.year.isEmpty)
+      else if (date.year.isEmpty)
         Invalid(Seq(ValidationError(Messages("error.mandatory", Messages("year")))))
 
-      else if (!DateValidator.checkForNumber(x.day.getOrElse("0")))
+      else if (!DateValidator.checkForNumber(date.day.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("day")))))
 
-      else if (!DateValidator.checkForNumber(x.month.getOrElse("0")))
+      else if (!DateValidator.checkForNumber(date.month.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("month")))))
 
-      else if (!DateValidator.checkForNumber(x.year.getOrElse("0")))
+      else if (!DateValidator.checkForNumber(date.year.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.date.non.number",Messages("year")))))
 
-      else if (!DateValidator.checkDayRange(x.day.getOrElse("0"), x.month.getOrElse("0"))) {
-        if(x.month.getOrElse("0").toInt == 2 && LocalDate.now.isLeapYear)
+      else if (!DateValidator.checkDayRange(date)) {
+        if(date.month.getOrElse("0").toInt == 2 && leapYear)
           Invalid(Seq(ValidationError(Messages("error.day.invalid.feb.leap"))))
-        else if(x.month.getOrElse("0").toInt == 2 && !LocalDate.now.isLeapYear)
+        else if(date.month.getOrElse("0").toInt == 2)
           Invalid(Seq(ValidationError(Messages("error.day.invalid.feb"))))
-        else if(List(4,6,9,11).contains(x.month.getOrElse("0").toInt))
+        else if(List(4,6,9,11).contains(date.month.getOrElse("0").toInt))
           Invalid(Seq(ValidationError(Messages("error.day.invalid.thirty"))))
         else
           Invalid(Seq(ValidationError(Messages("error.day.invalid"))))
       }
 
-      else if (!DateValidator.checkMonthRange(x.month.getOrElse("0")))
+      else if (!DateValidator.checkMonthRange(date.month.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.month.invalid"))))
 
-      else if (!DateValidator.checkYearLength(x.year.getOrElse("0")))
+      else if (!DateValidator.checkYearLength(date.year.getOrElse("0")))
         Invalid(Seq(ValidationError(Messages("error.year.invalid.format"))))
 
       else {
         try {
-          if (x.isInFuture)
+          if (date.isInFuture)
             Invalid(Seq(ValidationError(Messages("error.dob.invalid.future"))))
           else
             Valid
@@ -88,19 +96,31 @@ trait DateValidator {
     value forall Character.isDigit
   }
 
-  def checkDayRange(day: String, month: String): Boolean = {
-    if (day forall Character.isDigit){
-      if(month.toInt == 2 && LocalDate.now().isLeapYear)
-        day.toInt > 0 && day.toInt < 30
-      else if(month.toInt == 2 && !LocalDate.now().isLeapYear)
+  def checkDayRange(date:RasDate): Boolean = {
+
+    try{
+
+      val day = date.day.getOrElse("0")
+      val month = date.month.getOrElse("0")
+      val year = date.year.getOrElse("0").toInt
+      val leapYear = new DateTime().withYear(year).year.isLeap
+
+      if (day forall Character.isDigit){
+        if(month.toInt == 2 && leapYear)
+          day.toInt > 0 && day.toInt < 30
+        else if(month.toInt == 2)
           day.toInt > 0 && day.toInt < 29
-      else if(List(4,6,9,11).contains(month.toInt))
-        day.toInt > 0 && day.toInt < 31
+        else if(List(4,6,9,11).contains(month.toInt))
+          day.toInt > 0 && day.toInt < 31
+        else
+          day.toInt > 0 && day.toInt < 32
+      }
       else
-        day.toInt > 0 && day.toInt < 32
+        false
+    }catch {
+      case e: NumberFormatException => false
     }
-    else
-      false
+
   }
 
   def checkMonthRange(month: String): Boolean = {

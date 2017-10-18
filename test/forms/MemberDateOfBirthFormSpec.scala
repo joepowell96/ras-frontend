@@ -78,9 +78,15 @@ class MemberDateOfBirthFormSpec extends UnitSpec with I18nHelper with OneAppPerS
     }
 
     "return error when non existing date is entered in month 2" in {
-      val formData = Json.obj("dateOfBirth" -> RasDate(Some("30"),Some("2"),Some("1999")))
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("29"),Some("2"),Some("1999")))
       val validatedForm = form.bind(formData)
       assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb")))))
+    }
+
+    "return error when non existing date is entered in month 2 and leap year" in {
+      val formData = Json.obj("dateOfBirth" -> RasDate(Some("30"),Some("2"),Some("2056")))
+      val validatedForm = form.bind(formData)
+      assert(validatedForm.errors.contains(FormError("dateOfBirth", List(Messages("error.day.invalid.feb.leap")))))
     }
 
     "return error when non existing date is entered in month 4" in {
