@@ -23,5 +23,5 @@ trait Metrics {val responseTimer : Timer}
 
 object Metrics extends Metrics with MicroserviceMetrics {
   val registry: MetricRegistry = metrics.defaultRegistry
-  override val responseTimer = registry.timer("ras-response-timer")
+  override val responseTimer = registry.timer("ras-frontend-status-retrieval-timer")
 }
