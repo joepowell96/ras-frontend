@@ -123,3 +123,6 @@ match.not.found.what.to.do = Check with the member to make sure they have given 
 contact.hmrc = contact HMRC to confirm their National Insurance number
 
 signout = Sign out
+
+file.upload.page.title = Upload your file - GOV.UK
+file.upload.page.header = Upload your file

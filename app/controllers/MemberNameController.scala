@@ -32,7 +32,7 @@ object MemberNameController extends MemberNameController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }
 
-trait MemberNameController extends RasController with PageFlowController {
+trait MemberNameController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
 
