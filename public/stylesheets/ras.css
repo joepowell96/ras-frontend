@@ -66,5 +66,7 @@
   display: block;
 }
 
-
-
+#choose-file {
+  display: block;
+  margin-bottom: 20px;
+}

@@ -71,10 +71,15 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       status(result) shouldBe OK
     }
 
-    "contain 'upload file' header" in {
+    "contain 'upload file' title and header" in {
       val result = TestFileUploadController.get().apply(fakeRequest)
       doc(result).title() shouldBe Messages("file.upload.page.title")
       doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
+    }
+
+    "contain 'choose file' button" in {
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("choose-file") shouldNot be(null)
     }
 
   }
