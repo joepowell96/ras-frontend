@@ -25,7 +25,7 @@ class DateValidatorSpec extends UnitSpec with Matchers {
   "date validator" should{
 
     "return false when day is non digit" in {
-      DateValidator.checkDayRange(RasDate(Some("a"),Some("b"),Some("c"))) shouldBe false
+      DateValidator.checkDayRange(RasDate(Some("a"),Some("1"),Some("1999"))) shouldBe false
     }
 
     "return false when month is non digit" in {
@@ -34,6 +34,10 @@ class DateValidatorSpec extends UnitSpec with Matchers {
 
     "return false when year is non digit" in {
       DateValidator.checkYearLength("a") shouldBe false
+    }
+
+    "return false when year is a non digit" in {
+      DateValidator.checkDayRange(RasDate(Some("1"),Some("1"),Some("C"))) shouldBe false
     }
 
   }
