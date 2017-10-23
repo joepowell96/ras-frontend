@@ -129,6 +129,7 @@ trait MemberDOBController extends RasController with PageFlowController {
               }.recover {
                 case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
                   Logger.info("[DobController][getResult] No match found from customer matching")
+                  timer.stop()
                   Redirect(routes.ResultsController.noMatchFound())
                 case e: Throwable =>
                   Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
