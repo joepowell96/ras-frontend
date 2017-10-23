@@ -22,6 +22,7 @@ import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import forms.MemberDateOfBirthForm.form
+import metrics.Metrics
 import models.{MemberDetails, ResidencyStatusResult}
 import uk.gov.hmrc.http.Upstream4xxResponse
 import uk.gov.hmrc.time.TaxYearResolver
@@ -36,11 +37,13 @@ object MemberDOBController extends MemberDOBController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
+  override def metrics = Metrics
   // $COVERAGE-ON$
 }
 
 trait MemberDOBController extends RasController with PageFlowController {
 
+  def metrics: Metrics
   implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
@@ -78,6 +81,7 @@ trait MemberDOBController extends RasController with PageFlowController {
           Future.successful(BadRequest(views.html.member_dob(formWithErrors, firstName)))
         },
         dateOfBirth => {
+          val timer = metrics.responseTimer.time()
           Logger.debug("[DobController][post] valid form")
           sessionService.cacheDob(dateOfBirth) flatMap {
             case Some(session) => {
@@ -103,8 +107,8 @@ trait MemberDOBController extends RasController with PageFlowController {
                     Redirect(routes.GlobalErrorController.get)
                   }
                   else {
-
                     Logger.info("[DobController][post] Match found")
+                    timer.stop()
 
                     val residencyStatusResult =
                       ResidencyStatusResult(
@@ -159,6 +163,5 @@ trait MemberDOBController extends RasController with PageFlowController {
     else
       ""
   }
-
 
 }

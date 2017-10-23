@@ -18,6 +18,7 @@ package controllers
 
 import connectors.{CustomerMatchingAPIConnector, ResidencyStatusAPIConnector, UserDetailsConnector}
 import helpers.helpers.I18nHelper
+import metrics.Metrics
 import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -75,6 +76,8 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
 
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
+
+    override def metrics = Metrics
   }
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
