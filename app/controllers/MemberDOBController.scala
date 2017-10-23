@@ -37,13 +37,11 @@ object MemberDOBController extends MemberDOBController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-  override val metrics = Metrics
   // $COVERAGE-ON$
 }
 
 trait MemberDOBController extends RasController with PageFlowController {
 
-  val metrics: Metrics
   implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
@@ -81,7 +79,7 @@ trait MemberDOBController extends RasController with PageFlowController {
           Future.successful(BadRequest(views.html.member_dob(formWithErrors, firstName)))
         },
         dateOfBirth => {
-          val timer = metrics.responseTimer.time()
+          val timer = Metrics.responseTimer.time()
           Logger.debug("[DobController][post] valid form")
           sessionService.cacheDob(dateOfBirth) flatMap {
             case Some(session) => {
