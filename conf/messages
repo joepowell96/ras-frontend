@@ -78,8 +78,8 @@ match.found.header = {0}''s details
 match.found.sub-header = {0} pays their tax in {1} for the current tax year of {2} to {3}. They are expected to pay tax in {5} in the next tax year of {3} to {4}.
 
 error.day.invalid = Enter a day between 1 and 31
-error.day.invalid.feb = Enter a day between 1 and 29
-error.day.invalid.feb.leap = Enter a day between 1 and 30
+error.day.invalid.feb = Enter a day between 1 and 28
+error.day.invalid.feb.leap = Enter a day between 1 and 29
 error.day.invalid.thirty = Enter a day between 1 and 30
 
 error.month.invalid = Enter a month between 1 and 12
