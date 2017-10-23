@@ -39,7 +39,7 @@ class GlobalErrorControllerSpec extends UnitSpec with WithFakeApplication with I
   "GlobalErrorController" should {
 
     "respond to GET /relief-at-source/global-error" in {
-      val result = route(fakeApplication, FakeRequest(GET, "/relief-at-source/global-error"))
+      val result = await(route(fakeApplication, FakeRequest(GET, "/relief-at-source/global-error")))
       status(result.get) should not equal (NOT_FOUND)
     }
 
