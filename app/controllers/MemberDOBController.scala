@@ -37,13 +37,11 @@ object MemberDOBController extends MemberDOBController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-  override def metrics = Metrics
   // $COVERAGE-ON$
 }
 
 trait MemberDOBController extends RasController with PageFlowController {
 
-  def metrics: Metrics
   implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
@@ -81,7 +79,7 @@ trait MemberDOBController extends RasController with PageFlowController {
           Future.successful(BadRequest(views.html.member_dob(formWithErrors, firstName)))
         },
         dateOfBirth => {
-          val timer = metrics.responseTimer.time()
+          val timer = Metrics.responseTimer.time()
           Logger.debug("[DobController][post] valid form")
           sessionService.cacheDob(dateOfBirth) flatMap {
             case Some(session) => {
@@ -129,6 +127,7 @@ trait MemberDOBController extends RasController with PageFlowController {
               }.recover {
                 case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
                   Logger.info("[DobController][getResult] No match found from customer matching")
+                  timer.stop()
                   Redirect(routes.ResultsController.noMatchFound())
                 case e: Throwable =>
                   Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
