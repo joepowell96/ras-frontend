@@ -77,7 +77,7 @@ class MemberDOBControllerSpec extends UnitSpec with WithFakeApplication with I18
     when(customerMatchingAPIConnector.findMemberDetails(any())(any())).thenReturn(Future.successful(Some(uuid)))
     when(residencyStatusAPIConnector.getResidencyStatus(any())(any())).thenReturn(Future.successful(ResidencyStatus(SCOTTISH, NON_SCOTTISH)))
 
-    override def metrics = Metrics
+    override val metrics = Metrics
   }
 
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))

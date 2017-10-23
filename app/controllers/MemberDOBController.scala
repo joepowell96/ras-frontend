@@ -37,13 +37,13 @@ object MemberDOBController extends MemberDOBController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
   override val customerMatchingAPIConnector = CustomerMatchingAPIConnector
   override val residencyStatusAPIConnector = ResidencyStatusAPIConnector
-  override def metrics = Metrics
+  override val metrics = Metrics
   // $COVERAGE-ON$
 }
 
 trait MemberDOBController extends RasController with PageFlowController {
 
-  def metrics: Metrics
+  val metrics: Metrics
   implicit val context: RasContext = RasContextImpl
   val customerMatchingAPIConnector: CustomerMatchingAPIConnector
   val residencyStatusAPIConnector : ResidencyStatusAPIConnector
