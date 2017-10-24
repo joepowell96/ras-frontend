@@ -32,28 +32,9 @@ trait FileUploadConnector extends ServicesConfig {
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
   def getEnvelope()(implicit hc: HeaderCarrier): Future[Option[String]] = {
-
     val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix"
-
-    val requestBody = Json.parse(
-       """
-         {
-             "callbackUrl": "string representing absolute url",
-             "metadata": { "any": "valid json object" },
-             "constraints": 	{
-                   "maxItems": 5,
-                   "maxSize": "25MB",
-                   "maxSizePerItem": "10KB",
-                   "contentTypes": ["application/pdf","image/jpeg","application/xml"],
-                   "allowZeroLengthFiles": false
-                 }
-         }
-       """.stripMargin
-    )
-
+    val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
     http.POST[JsValue, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
-
-
   }
 
   private val responseHandler = new HttpReads[Option[String]] {

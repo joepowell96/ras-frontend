@@ -44,7 +44,16 @@ trait FileUploadController extends RasController {
 
   def post () = Action.async { implicit request =>
     isAuthorised.flatMap{
-      case Right(_) => fileUploadConnector.getEnvelope().map{ _ => Redirect(routes.FileUploadController.get())}
+      case Right(_) =>
+        fileUploadConnector.getEnvelope().map{ envelope =>
+          envelope match {
+            case Some(envelope) =>
+              //extract envelope id here or redirect to link
+              Redirect(routes.FileUploadController.get())
+            case _ =>
+              Redirect(routes.FileUploadController.get())
+          }
+        }
       case Left(res) => res
     }
   }
