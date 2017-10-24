@@ -16,12 +16,13 @@
 
 package controllers
 
-import connectors.UserDetailsConnector
+import connectors.{FileUploadConnector, UserDetailsConnector}
 import helpers.helpers.I18nHelper
 import models.UserDetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
+import org.mockito.Mock
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
@@ -47,6 +48,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
   val mockSessionService = mock[SessionService]
   val mockConfig = mock[Configuration]
   val mockEnvironment = mock[Environment]
+  val mockFileUploadConnector = mock[FileUploadConnector]
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
@@ -56,6 +58,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val sessionService = mockSessionService
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
+    override val fileUploadConnector = mockFileUploadConnector
 
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
       thenReturn(successfulRetrieval)
@@ -63,13 +66,17 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
+    when(mockFileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(Some("201")))
+
   }
 
   "FileUploadController" should {
 
-    "return 200 when called" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      status(result) shouldBe OK
+    "return 200" when {
+      "called" in {
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe OK
+      }
     }
 
     "contain 'upload file' title and header" in {
@@ -98,6 +105,13 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
     }
 
+    "redirect" when {
+      "file is uploaded successfully" in {
+        val result = await(TestFileUploadController.post.apply(fakeRequest))
+        status(result) shouldBe 303
+        redirectLocation(result).get should include("/bulk/bulk-upload")
+      }
+    }
   }
 
 

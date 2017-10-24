@@ -17,7 +17,7 @@
 package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
-import connectors.UserDetailsConnector
+import connectors.{FileUploadConnector, UserDetailsConnector}
 import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
@@ -28,6 +28,8 @@ import scala.concurrent.Future
 trait FileUploadController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
+
+  val fileUploadConnector: FileUploadConnector
 
   def get = Action.async {
     implicit request =>
@@ -40,6 +42,13 @@ trait FileUploadController extends RasController {
       }
   }
 
+  def post () = Action.async { implicit request =>
+    isAuthorised.flatMap{
+      case Right(_) => fileUploadConnector.getEnvelope().map{ _ => Redirect(routes.FileUploadController.get())}
+      case Left(res) => res
+    }
+  }
+
 }
 
 object FileUploadController extends FileUploadController {
@@ -47,4 +56,5 @@ object FileUploadController extends FileUploadController {
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+  val fileUploadConnector = FileUploadConnector
 }

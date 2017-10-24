@@ -65,7 +65,7 @@ trait FileUploadConnector extends ServicesConfig {
         case _ => None
       }
     }
-    
+
   }
 
 }
