@@ -29,6 +29,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
+import play.twirl.api.Html
 import services.SessionService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -77,9 +78,24 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
     }
 
+    "contain sub-header" in {
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("sub-header").html shouldBe Messages("file.upload.page.sub-header",Messages("templates.link"))
+    }
+
     "contain 'choose file' button" in {
       val result = TestFileUploadController.get().apply(fakeRequest)
       doc(result).getElementById("choose-file") shouldNot be(null)
+    }
+
+    "contain an upload button" in {
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("upload-button").attr("value") shouldBe Messages("upload")
+    }
+
+    "contain a back link" in {
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
     }
 
   }

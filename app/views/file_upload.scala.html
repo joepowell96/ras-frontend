@@ -27,14 +27,18 @@
   <div class="grid-layout__column">
     <div class="grid-layout__column--3-4">
 
+      <div class="back-arrow">
+        <a class="link-back" href="@routes.ResultsController.back">@Messages("back")</a>
+      </div>
 
-        <h1 id="header" class="heading-xlarge">@Messages("file.upload.page.header")</h1>
+      <h1 id="header" class="heading-xlarge">@Messages("file.upload.page.header")</h1>
 
-        <form action="">
-          <input id="choose-file" type="file" name="upload-file">
-          <input class="button" type="submit">
-        </form>
+      <p id="sub-header">@Html(Messages("file.upload.page.sub-header",Messages("templates.link")))</p>
 
+      <form action="">
+        <input id="choose-file" type="file" name="upload-file">
+        <input class="button" type="submit" value="Upload" id="upload-button">
+      </form>
 
     </div>
   </div>

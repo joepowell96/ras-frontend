@@ -150,7 +150,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
 
     "save details to cache" in {
-      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      val result = await(TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData))))
       verify(mockSessionService, atLeastOnce()).cacheName(Matchers.any())(Matchers.any(), Matchers.any())
     }
 

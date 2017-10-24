@@ -5,7 +5,7 @@ GET         /assets/*file                 @controllers.AssetsController.at(path=
 GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
 
-GET         /upload-file                  controllers.FileUploadController.get
+GET         /bulk/bulk-upload             controllers.FileUploadController.get
 
 GET         /member-name                  controllers.MemberNameController.get
 POST        /member-name                  controllers.MemberNameController.post
