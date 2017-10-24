@@ -57,14 +57,15 @@ trait FileUploadConnector extends ServicesConfig {
   }
 
   private val responseHandler = new HttpReads[Option[String]] {
+
     override def read(method: String, url: String, response: HttpResponse): Option[String] = {
       response.status match {
-        case 303 => response.header("Location").map{locationHeader =>
-          "[0-9A-Fa-f]{8}(-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}".r.findFirstIn(locationHeader)}.getOrElse(None)
-        case 403 => throw new Upstream4xxResponse("Member not found", 403, 500, response.allHeaders)
+        case 201 => response.header("Location").map{ locationHeader =>Some(locationHeader)}.getOrElse(None)
+        case 400 => throw new Upstream4xxResponse("Envelope not created, with some reason message", 400, 400, response.allHeaders)
         case _ => None
       }
     }
+    
   }
 
 }
