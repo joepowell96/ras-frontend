@@ -17,11 +17,12 @@
 package connectors
 
 import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
+import play.libs.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
 import uk.gov.hmrc.play.config.ServicesConfig
 
@@ -38,9 +39,9 @@ class FileUploadConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoS
   "File upload connector" should {
 
     "send a post request to file upload service" in {
-      when(TestConnector.http.POST[JsValue, Option[String]](any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
-      val result = TestConnector.getEnvelope
-      await(result) mustBe Some("")
+      when(TestConnector.http.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
+      val result = await(TestConnector.getEnvelope)
+      result mustBe Some("")
     }
 
   }
