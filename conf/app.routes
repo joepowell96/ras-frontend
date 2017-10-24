@@ -6,6 +6,7 @@ GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
 
 GET         /bulk/bulk-upload             controllers.FileUploadController.get
+POST        /bulk/bulk-upload             controllers.FileUploadController.post
 
 GET         /member-name                  controllers.MemberNameController.get
 POST        /member-name                  controllers.MemberNameController.post

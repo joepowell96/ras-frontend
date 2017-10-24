@@ -35,7 +35,7 @@
 
       <p id="sub-header">@Html(Messages("file.upload.page.sub-header",Messages("templates.link")))</p>
 
-      <form action="">
+      <form action="@routes.FileUploadController.post">
         <input id="choose-file" type="file" name="upload-file">
         <input class="button" type="submit" value="Upload" id="upload-button">
       </form>
