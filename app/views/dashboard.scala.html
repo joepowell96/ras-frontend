@@ -37,11 +37,42 @@
         <p id="bulk-lookup-description">@Messages("bulk.lookup.description")</p>
       </div>
 
-      <div class="grid-layout__column">
+    </div>
+  </div>
+
+<div class="grid-layout--no-gutter">
+  <div class="grid-layout__column">
+
+      <div class="grid-layout__column--1-2">
         <h2 id="recent-lookups">@Messages("recent.lookups")</h2>
         <p id="recent-lookups-description">@Messages("recent.lookups.description")</p>
       </div>
 
+      <table id="recent-lookups-table">
+
+        <colgroup>
+          <col width="2%">
+          <col width="2%">
+          <col width="2%">
+        </colgroup>
+
+        <thead>
+          <tr id="table-row">
+            <th id="reference-table-header"><span>@Messages("reference.table.header")</span></th>
+            <th id="upload-date-table-header" class="r-padding numeric"><span>@Messages("upload.date.table.header")</span></th>
+            <th id="time-left-table-header" class="r-padding numeric"><span>@Messages("time.left.table.header")</span></th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td class="r-padding" id="reference"><a href="">blah</a></td>
+            <td class="r-padding numeric" id="upload-date">blah</td>
+            <td class="r-padding numeric" id="days-left">blah</td>
+          </tr>
+        </tbody>
+
+      </table>
     </div>
   </div>
 

@@ -98,6 +98,14 @@ class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with Mocki
       doc(result).getElementById("recent-lookups-description").text shouldBe Messages("recent.lookups.description")
     }
 
+    "contain bulk lookup table" in {
+      val result = TestDashboardController.get(fakeRequest)
+      doc(result).getElementById("recent-lookups-table") should not be null
+      doc(result).getElementById("reference-table-header").text shouldBe Messages("reference.table.header")
+      doc(result).getElementById("upload-date-table-header").text shouldBe Messages("upload.date.table.header")
+      doc(result).getElementById("time-left-table-header").text shouldBe Messages("time.left.table.header")
+    }
+
   }
 
 }
