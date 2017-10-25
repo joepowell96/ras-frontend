@@ -18,11 +18,11 @@ package controllers
 
 import connectors.{FileUploadConnector, UserDetailsConnector}
 import helpers.helpers.I18nHelper
-import models.UserDetails
+import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
-import org.mockito.Mock
+import org.mockito.{Matchers, Mock}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
@@ -30,7 +30,6 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
-import play.twirl.api.Html
 import services.SessionService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -50,6 +49,11 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
   val mockEnvironment = mock[Environment]
   val mockFileUploadConnector = mock[FileUploadConnector]
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
+  val memberName = MemberName("Jackie","Chan")
+  val memberNino = MemberNino("AB123456C")
+  val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"),Some("2012")))
+  val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""))
+
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
 
   object TestFileUploadController extends FileUploadController {
@@ -112,6 +116,13 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         redirectLocation(result).get should include("/bulk/bulk-upload")
       }
     }
+
+    "return to dashboard page when back link is clicked" in {
+      val result = TestFileUploadController.back.apply(FakeRequest())
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).get should include("/dashboard")
+    }
+
   }
 
 

@@ -25,7 +25,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 
 import scala.concurrent.Future
 
-trait FileUploadController extends RasController {
+trait FileUploadController extends RasController with PageFlowController {
 
   implicit val context: RasContext = RasContextImpl
 
@@ -56,6 +56,14 @@ trait FileUploadController extends RasController {
         }
       case Left(res) => res
     }
+  }
+
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) => Future.successful(previousPage("FileUploadController"))
+        case Left(res) => res
+      }
   }
 
 }

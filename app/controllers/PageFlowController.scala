@@ -34,12 +34,16 @@ object PageFlowController extends PageFlowController {
 
 trait PageFlowController extends RasController {
 
+  val FILE_UPLOAD = "FileUploadController"
+  val MEMBER_NAME = "MemberNameController"
   val MEMBER_NINO = "MemberNinoController"
   val MEMBER_DOB = "MemberDOBController"
   val RESULTS = "ResultsController"
 
   def previousPage(from: String): Result = {
     from match {
+      case FILE_UPLOAD => Redirect(routes.DashboardController.get)
+      case MEMBER_NAME => Redirect(routes.DashboardController.get)
       case MEMBER_NINO => Redirect(routes.MemberNameController.get)
       case MEMBER_DOB  => Redirect(routes.MemberNinoController.get)
       case RESULTS     => Redirect(routes.MemberDOBController.get)

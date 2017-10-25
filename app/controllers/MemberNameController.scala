@@ -32,7 +32,7 @@ object MemberNameController extends MemberNameController {
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
 }
 
-trait MemberNameController extends RasController {
+trait MemberNameController extends RasController with PageFlowController {
 
   implicit val context: RasContext = RasContextImpl
 
@@ -69,6 +69,14 @@ trait MemberNameController extends RasController {
       )
       case Left(res) => res
     }
+  }
+
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) => Future.successful(previousPage("MemberNameController"))
+        case Left(res) => res
+      }
   }
 
 }
