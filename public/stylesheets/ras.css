@@ -81,3 +81,8 @@
   padding-right: 0;
 }
 
+#choose-file {
+  display: block;
+  margin-bottom: 20px;
+  border: 0px;
+}
