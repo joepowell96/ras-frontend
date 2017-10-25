@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.FrontendAuthConnector
+import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
 import play.api.mvc.Action
 import play.api.{Configuration, Environment, Logger, Play}
@@ -35,10 +35,12 @@ object DashboardController extends DashboardController {
 
 trait DashboardController extends RasController with PageFlowController {
 
+  implicit val context: RasContext = RasContextImpl
+
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
-        case Right(_) => Future.successful(Ok)
+        case Right(_) => Future.successful(Ok(views.html.dashboard()))
         case Left(resp) =>
           Logger.debug("[DashboardController][get] user Not authorised")
           resp

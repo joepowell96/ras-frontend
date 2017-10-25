@@ -17,13 +17,17 @@
 package controllers
 
 import connectors.UserDetailsConnector
+import helpers.helpers.I18nHelper
 import models.UserDetails
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneServerPerSuite
+import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.OK
+import play.api.test.Helpers.{OK, contentAsString, _}
 import play.api.{Configuration, Environment}
 import services.SessionService
 import uk.gov.hmrc.auth.core.AuthConnector
@@ -33,7 +37,9 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with MockitoSugar {
+
+
+class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with MockitoSugar with I18nHelper{
 
   implicit val headerCarrier = HeaderCarrier()
 
@@ -59,13 +65,19 @@ class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with Mocki
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
   }
 
-  "DashboardController" must {
+  private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
+
+  "DashboardController" should {
 
     "respond to GET /dashboard" in {
       val result = TestDashboardController.get(fakeRequest)
       status(result) shouldBe OK
     }
 
+    "contain a title" in {
+      val result = TestDashboardController.get(fakeRequest)
+      doc(result).title shouldBe Messages("dashboard.page.title")
+    }
   }
 
 }

@@ -28,7 +28,7 @@ continue = Continue
 
 member = member
 
-find.member.details = Find member details
+dashboard.page.title = Look up if a scheme member pays tax in Scotland - GOV.UK
 
 member.name.page.title = Member name - GOV.UK
 member.name.page.header = What is the member''s name?
