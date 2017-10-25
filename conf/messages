@@ -30,6 +30,12 @@ member = member
 
 dashboard.page.title = Look up if a scheme member pays tax in Scotland - GOV.UK
 
+single.lookup.link = Single look up
+single.lookup.description = Use the look up to check a single member''s residency status and get an instant on-screen result.
+
+bulk.lookup.link = Bulk look up
+bulk.lookup.description = Look up the details of multiple members in one file.
+
 member.name.page.title = Member name - GOV.UK
 member.name.page.header = What is the member''s name?
 member.name.page.sub-header = As shown on their birth certificate or passport.

@@ -74,10 +74,23 @@ class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with Mocki
       status(result) shouldBe OK
     }
 
-    "contain a title" in {
+    "contain the correct title" in {
       val result = TestDashboardController.get(fakeRequest)
       doc(result).title shouldBe Messages("dashboard.page.title")
     }
+
+    "contain single lookup link and description" in {
+      val result = TestDashboardController.get(fakeRequest)
+      doc(result).getElementById("single-lookup-link").text shouldBe Messages("single.lookup.link")
+      doc(result).getElementById("single-lookup-description").text shouldBe Messages("single.lookup.description")
+    }
+
+    "contain bulk lookup link and description" in {
+      val result = TestDashboardController.get(fakeRequest)
+      doc(result).getElementById("bulk-lookup-link").text shouldBe Messages("bulk.lookup.link")
+      doc(result).getElementById("bulk-lookup-description").text shouldBe Messages("bulk.lookup.description")
+    }
+
   }
 
 }
