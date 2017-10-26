@@ -106,6 +106,12 @@ class DashboardControllerSpec extends UnitSpec with OneServerPerSuite with Mocki
       doc(result).getElementById("time-left-table-header").text shouldBe Messages("time.left.table.header")
     }
 
+    "contain more results link" in {
+      val result = TestDashboardController.get(fakeRequest)
+      doc(result).getElementById("more-results-link").text shouldBe Messages("more.results")
+
+    }
+
   }
 
 }

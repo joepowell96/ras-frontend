@@ -23,54 +23,57 @@
 @ras_main(title = Messages("dashboard.page.title")) {
 
 
+<div class="row">
 
+  <h1 id="header">@Messages("dashboard.page.header")</h1>
 
-      <h1 id="header">@Messages("dashboard.page.header")</h1>
+  <div class="grid-layout__column--1-2">
+    <a id="single-lookup-link" class="large-underlined-link" href="@routes.MemberNameController.get">@Messages("single.lookup.link")</a>
+    <p id="single-lookup-description">@Messages("single.lookup.description")</p>
+  </div>
 
-      <div class="grid-layout__column--1-2">
-        <a id="single-lookup-link" class="large-underlined-link" href="@routes.MemberNameController.get">@Messages("single.lookup.link")</a>
-        <p id="single-lookup-description">@Messages("single.lookup.description")</p>
-      </div>
+  <div class="grid-layout__column--1-2">
+    <a id="bulk-lookup-link" class="large-underlined-link" href="@routes.FileUploadController.get">@Messages("bulk.lookup.link")</a>
+    <p id="bulk-lookup-description">@Messages("bulk.lookup.description")</p>
+  </div>
 
-      <div class="grid-layout__column--1-2">
-        <a id="bulk-lookup-link" class="large-underlined-link" href="@routes.FileUploadController.get">@Messages("bulk.lookup.link")</a>
-        <p id="bulk-lookup-description">@Messages("bulk.lookup.description")</p>
-      </div>
+</div>
 
+<div class="row">
+  <div class="grid-layout__column--1-2">
+    <h2 id="recent-lookups">@Messages("recent.lookups")</h2>
+    <p id="recent-lookups-description">@Messages("recent.lookups.description")</p>
+  </div>
 
+  <table id="recent-lookups-table">
 
+    <colgroup>
+      <col width="2%">
+      <col width="2%">
+      <col width="2%">
+    </colgroup>
 
+    <thead>
+      <tr id="table-row">
+        <th id="reference-table-header"><span>@Messages("reference.table.header")</span></th>
+        <th id="upload-date-table-header" class="r-padding numeric"><span>@Messages("upload.date.table.header")</span></th>
+        <th id="time-left-table-header" class="r-padding numeric"><span>@Messages("time.left.table.header")</span></th>
+      </tr>
+    </thead>
 
-      <div class="grid-layout__column--1-2">
-        <h2 id="recent-lookups">@Messages("recent.lookups")</h2>
-        <p id="recent-lookups-description">@Messages("recent.lookups.description")</p>
-      </div>
+    <tbody>
+      <tr>
+        <td class="r-padding" id="reference"><a href="">Reference 1</a></td>
+        <td class="r-padding numeric" id="upload-date">30 July 2017</td>
+        <td class="r-padding numeric" id="days-left">28 Days</td>
+      </tr>
+    </tbody>
 
-      <table id="recent-lookups-table">
+  </table>
+</div>
 
-        <colgroup>
-          <col width="2%">
-          <col width="2%">
-          <col width="2%">
-        </colgroup>
-
-        <thead>
-          <tr id="table-row">
-            <th id="reference-table-header"><span>@Messages("reference.table.header")</span></th>
-            <th id="upload-date-table-header" class="r-padding numeric"><span>@Messages("upload.date.table.header")</span></th>
-            <th id="time-left-table-header" class="r-padding numeric"><span>@Messages("time.left.table.header")</span></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td class="r-padding" id="reference"><a href="">blah</a></td>
-            <td class="r-padding numeric" id="upload-date">blah</td>
-            <td class="r-padding numeric" id="days-left">blah</td>
-          </tr>
-        </tbody>
-
-      </table>
-
+<div class="row">
+  <a id="more-results-link" href="">@Messages("more.results")</a>
+</div>
 
 }
