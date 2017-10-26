@@ -28,7 +28,7 @@ continue = Continue
 
 member = member
 
-dashboard.page.title = Look up if a scheme member pays tax in Scotland - GOV.UK
+dashboard.page.title = Choose a look up type - GOV.UK
 dashboard.page.header = Choose a look up type
 
 single.lookup.link = Single look up
