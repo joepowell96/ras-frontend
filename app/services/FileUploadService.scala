@@ -18,12 +18,15 @@ package services
 
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
 
+import scala.concurrent.Future
+
 trait FileUploadService {
 
   val fileUploadConnector: FileUploadConnector
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
-  def uploadFile(envelopeId: String) = {
+  //pass in a multipart form to this
+  def uploadFile(): Future[Boolean] = {
     ???
   }
 

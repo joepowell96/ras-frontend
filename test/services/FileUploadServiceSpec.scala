@@ -23,6 +23,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneServerPerSuite
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
@@ -41,7 +42,9 @@ class FileUploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFu
 
     "upload a file" in {
 
-      when(mockFileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(Some("123456789")))
+      val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
+
+      when(mockFileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
       when(mockFileUploadFrontendConnector.uploadFile(any(),any(),any())(any())).thenReturn(Future.successful(Some("123456789")))
 
 

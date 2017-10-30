@@ -16,13 +16,13 @@
 
 package connectors
 
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.Future
@@ -37,10 +37,12 @@ class FileUploadConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoS
 
   "File upload connector" should {
 
-    "request for an envelope to be created and return the envelope id" in {
-      when(TestConnector.http.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
-      val result = await(TestConnector.getEnvelope)
-      result mustBe Some("")
+    "should handle 201 responses returned from file upload service when create envelope is called" in {
+      val response = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
+      when(TestConnector.http.POST[JsValue,HttpResponse](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(response))
+
+      val result = await(TestConnector.getEnvelope())
+      result mustBe response
     }
 
   }

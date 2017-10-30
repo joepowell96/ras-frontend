@@ -31,23 +31,25 @@ trait FileUploadConnector extends ServicesConfig {
   lazy val serviceUrl = baseUrl("file-upload")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
-  def getEnvelope()(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def getEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+
     val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix"
     val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
-    http.POST[JsValue, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
+    http.POST[JsValue, HttpResponse](fileUploadUri, requestBody,Seq())(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
-  private val responseHandler = new HttpReads[Option[String]] {
-
-    override def read(method: String, url: String, response: HttpResponse): Option[String] = {
-      response.status match {
-        case 201 => response.header("Location").map{ locationHeader =>Some(locationHeader)}.getOrElse(None)
-        case 400 => throw new Upstream4xxResponse("Envelope not created, with some reason message", 400, 400, response.allHeaders)
-        case _ => None
-      }
-    }
-
-  }
+//  private val responseHandler = new HttpReads[Option[String]] {
+//
+//    override def read(method: String, url: String, response: HttpResponse): Option[String] = {
+//      response.status match {
+//        case 201 => response.header("Location").map{ locationHeader =>Some(locationHeader)}.getOrElse(None)
+//        case 400 => throw new Upstream4xxResponse("Envelope not created, with some reason message", 400, 400, response.allHeaders)
+//        case _ => None
+//      }
+//    }
+//
+//  }
 
 }
 
