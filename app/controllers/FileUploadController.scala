@@ -48,8 +48,7 @@ trait FileUploadController extends RasController with PageFlowController {
         fileUploadConnector.getEnvelope().map{ envelope =>
           envelope match {
             case Some(envelope) =>
-              //extract envelope id here or redirect to link
-              Redirect(routes.FileUploadController.get())
+              Redirect(routes.FileUploadController.uploadSuccessful())
             case _ =>
               Redirect(routes.FileUploadController.get())
           }
@@ -64,6 +63,14 @@ trait FileUploadController extends RasController with PageFlowController {
         case Right(userInfo) => Future.successful(previousPage("FileUploadController"))
         case Left(res) => res
       }
+  }
+
+  def uploadSuccessful = Action.async{
+    implicit request =>
+      isAuthorised.flatMap{
+        case Right(_) => Future.successful(Ok(views.html.file_upload_successful()))
+        case Left(res) => res
+    }
   }
 
 }

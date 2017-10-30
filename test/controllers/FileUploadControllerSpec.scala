@@ -113,7 +113,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       "file is uploaded successfully" in {
         val result = await(TestFileUploadController.post.apply(fakeRequest))
         status(result) shouldBe 303
-        redirectLocation(result).get should include("/bulk/bulk-upload")
+        redirectLocation(result).get should include("/bulk/upload-successful")
       }
     }
 
