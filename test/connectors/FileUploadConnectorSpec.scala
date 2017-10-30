@@ -16,44 +16,32 @@
 
 package connectors
 
-
-import helpers.RandomNino
-import models._
-import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.JsValue
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost }
 
-class CustomerMatchingAPIConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
+class FileUploadConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  object TestConnector extends CustomerMatchingAPIConnector {
+  object TestConnector extends FileUploadConnector {
     override val http: HttpPost = mock[HttpPost]
   }
 
-  "Customer Matching API connector" should {
+  "File upload connector" should {
 
-    "send a post request to customer matching service" in {
-
-      val memberDetails = MemberDetails(MemberName("Ramin", "Esfandiari"),RandomNino.generate, RasDate(Some("1"),Some("1"),Some("1999")))
-
-      val expectedResponse = Some("633e0ee7-315b-49e6-baed-d79c3dffe467")
-
-      when(TestConnector.http.POST[MemberDetails, Option[String]](any(),any(),any())(any(),any(),any(), any())).thenReturn(Future.successful(expectedResponse))
-
-      val result = await(TestConnector.findMemberDetails(memberDetails))
-
-//      verify(TestConnector.http).POST(meq(serviceBase),meq(memberDetails))(any(), any(), any())
-      result mustBe expectedResponse
-
+    "send a post request to file upload service" in {
+      when(TestConnector.http.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
+      val result = await(TestConnector.getEnvelope)
+      result mustBe Some("")
     }
-
 
   }
 

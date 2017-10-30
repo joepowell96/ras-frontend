@@ -66,5 +66,35 @@
   display: block;
 }
 
+.large-underlined-link {
+  font-size: 24px;
+  text-decoration: underline;
+  font-weight: bold;
+}
 
+.numeric {
+  text-align: right;
+  padding-right: 20px;
+}
 
+#choose-file {
+  display: block;
+  margin-bottom: 20px;
+  border: 0px;
+}
+
+.content__body{
+  width: 100%;
+}
+
+.grid-layout--no-gutter{
+  width:66.66%;
+}
+
+#recent-lookups-table{
+ padding-right:20px;
+}
+
+#more-results-link{
+  float:right;
+}

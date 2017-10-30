@@ -16,14 +16,15 @@
 
 package controllers
 
-import config.FrontendAuthConnector
+import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
-import models.RasSession
-import play.api.{Configuration, Environment, Play}
-import play.api.mvc.Result
+import play.api.mvc.Action
+import play.api.{Configuration, Environment, Logger, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 
-object PageFlowController extends PageFlowController {
+import scala.concurrent.Future
+
+object DashboardController extends DashboardController {
   // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
@@ -32,26 +33,18 @@ object PageFlowController extends PageFlowController {
   // $COVERAGE-ON$
 }
 
-trait PageFlowController extends RasController {
+trait DashboardController extends RasController with PageFlowController {
 
-  val FILE_UPLOAD = "FileUploadController"
-  val MEMBER_NAME = "MemberNameController"
-  val MEMBER_NINO = "MemberNinoController"
-  val MEMBER_DOB = "MemberDOBController"
-  val RESULTS = "ResultsController"
+  implicit val context: RasContext = RasContextImpl
 
-  def previousPage(from: String): Result = {
-    from match {
-      case FILE_UPLOAD => Redirect(routes.DashboardController.get)
-      case MEMBER_NAME => Redirect(routes.DashboardController.get)
-      case MEMBER_NINO => Redirect(routes.MemberNameController.get)
-      case MEMBER_DOB  => Redirect(routes.MemberNinoController.get)
-      case RESULTS     => Redirect(routes.MemberDOBController.get)
-      case _ => Redirect(routes.GlobalErrorController.get)
-    }
+  def get = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(_) => Future.successful(Ok(views.html.dashboard()))
+        case Left(resp) =>
+          Logger.debug("[DashboardController][get] user Not authorised")
+          resp
+      }
   }
 
-
-
 }
-

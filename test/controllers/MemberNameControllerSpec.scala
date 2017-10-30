@@ -73,7 +73,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
   // and finally the tests
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
 
-  "MemberDetailsController" should {
+  "MemberNameController" should {
 
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
       thenReturn(successfulRetrieval)
@@ -134,7 +134,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
   }
 
-  "Member details controller form submission" should {
+  "Member name controller form submission" should {
 
     "respond to POST /relief-at-source/member-name" in {
       val result = route(fakeApplication, FakeRequest(POST, "/relief-at-source/member-name"))
@@ -150,7 +150,7 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
 
     "save details to cache" in {
-      val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
+      val result = await(TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData))))
       verify(mockSessionService, atLeastOnce()).cacheName(Matchers.any())(Matchers.any(), Matchers.any())
     }
 
@@ -167,6 +167,16 @@ class MemberNameControllerSpec extends UnitSpec with WithFakeApplication with I1
       val result = TestMemberNameController.post.apply(fakeRequest.withJsonBody(Json.toJson(postData)))
       status(result) shouldBe 303
       redirectLocation(result).get should include("global-error")
+    }
+
+  }
+
+  "Member name controller back" should {
+
+    "return to dashboard page when back link is clicked" in {
+      val result = TestMemberNameController.back.apply(fakeRequest)
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).get should include("/dashboard")
     }
 
   }

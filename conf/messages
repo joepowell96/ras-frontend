@@ -28,7 +28,23 @@ continue = Continue
 
 member = member
 
-find.member.details = Find member details
+dashboard.page.title = Choose a look up type - GOV.UK
+dashboard.page.header = Choose a look up type
+
+single.lookup.link = Single look up
+single.lookup.description = Use the look up to check a single member''s residency status and get an instant on-screen result.
+
+bulk.lookup.link = Bulk look up
+bulk.lookup.description = Look up the details of multiple members in one file.
+
+recent.lookups = Recent bulk look ups
+recent.lookups.description = You have 30 days from the processing date to view the results.
+
+reference.table.header = Reference
+upload.date.table.header = Processing date
+time.left.table.header = Time left
+
+more.results = More results
 
 member.name.page.title = Member name - GOV.UK
 member.name.page.header = What is the member''s name?
@@ -123,3 +139,10 @@ match.not.found.what.to.do = Check with the member to make sure they have given 
 contact.hmrc = contact HMRC to confirm their National Insurance number
 
 signout = Sign out
+
+file.upload.page.title = Upload your file - GOV.UK
+file.upload.page.header = Upload your file
+file.upload.page.sub-header = The file must contain mandatory information and in a specific format. You can {0} on how to create your file first.
+templates.link = <a href="">download a template and instructions (2 files)</a>
+
+upload = Upload

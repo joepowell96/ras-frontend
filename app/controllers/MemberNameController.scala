@@ -71,5 +71,13 @@ trait MemberNameController extends RasController with PageFlowController {
     }
   }
 
+  def back = Action.async {
+    implicit request =>
+      isAuthorised.flatMap {
+        case Right(userInfo) => Future.successful(previousPage("MemberNameController"))
+        case Left(res) => res
+      }
+  }
+
 }
 
