@@ -16,30 +16,34 @@
 
 package connectors
 
+import java.util.UUID
+
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.Future
 
-class FileUploadConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
+class FileUploadFrontendConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  object TestConnector extends FileUploadConnector {
-    override val http: HttpPost = mock[HttpPost]
+  object TestConnector extends FileUploadFrontendConnector {
+    override val httpPost: HttpPost = mock[HttpPost]
   }
 
-  "File upload connector" should {
+  "File upload frontend connector" should {
 
-    "request for an envelope to be created and return the envelope id" in {
-      when(TestConnector.http.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
-      val result = await(TestConnector.getEnvelope)
+    "upload file" in {
+      when(TestConnector.httpPost.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
+      val envelopeId = "123456789"
+      val fileId = UUID.randomUUID().toString
+      val result = await(TestConnector.uploadFile("",envelopeId, fileId))
       result mustBe Some("")
     }
 
