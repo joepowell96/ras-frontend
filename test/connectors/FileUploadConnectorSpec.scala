@@ -18,33 +18,46 @@ package connectors
 
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class FileUploadConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
+class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
   object TestConnector extends FileUploadConnector {
     override val http: HttpPost = mock[HttpPost]
+    override val serviceUrl = ""
+    override val serviceUrlSuffix = ""
   }
 
-  "File upload connector" should {
+  "File upload connector" when {
 
-    "should handle 201 responses returned from file upload service when create envelope is called" in {
-      val response = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
-      when(TestConnector.http.POST[JsValue,HttpResponse](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(response))
+    "calling file upload service create envelope endpoint" should {
 
-      val result = await(TestConnector.getEnvelope())
-      result mustBe response
+      "handle 201 responses" in {
+        val response = HttpResponse(201, None, Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")), None)
+        when(TestConnector.http.POST[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any())).thenReturn(Future.successful(response))
+        val result = await(TestConnector.getEnvelope())
+        result shouldBe response
+      }
+
+      "handle 400 responses" in {
+        when(TestConnector.http.POST[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any())).thenReturn(Future.failed(new BadRequestException("Test Exception")))
+        val result = TestConnector.getEnvelope()
+        ScalaFutures.whenReady(result.failed){ r =>
+          r shouldBe a[BadRequestException]
+        }
+
+      }
     }
-
   }
 
 }
