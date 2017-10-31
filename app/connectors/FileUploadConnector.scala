@@ -27,12 +27,13 @@ import scala.concurrent.Future
 trait FileUploadConnector extends ServicesConfig {
 
   val http: HttpPost
-  val serviceUrl: String
-  val serviceUrlSuffix: String
+  lazy val serviceUrl = baseUrl("file-upload")
+  lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
   def getEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
     val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
+
     http.POST[JsValue, HttpResponse](
       s"$serviceUrl/$serviceUrlSuffix", requestBody, Seq()
     )(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
@@ -43,6 +44,4 @@ trait FileUploadConnector extends ServicesConfig {
 
 object FileUploadConnector extends FileUploadConnector {
   override val http = WSHttp
-  override val serviceUrl = baseUrl("file-upload")
-  override val serviceUrlSuffix = getString("file-upload-url-suffix")
 }

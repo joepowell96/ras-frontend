@@ -19,7 +19,7 @@ package connectors
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.http._
@@ -34,8 +34,6 @@ class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
 
   object TestConnector extends FileUploadConnector {
     override val http: HttpPost = mock[HttpPost]
-    override val serviceUrl = ""
-    override val serviceUrlSuffix = ""
   }
 
   "File upload connector" when {
@@ -55,7 +53,6 @@ class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
         ScalaFutures.whenReady(result.failed){ r =>
           r shouldBe a[BadRequestException]
         }
-
       }
     }
   }
