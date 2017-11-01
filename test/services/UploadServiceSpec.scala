@@ -27,26 +27,24 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class FileUploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutures with MockitoSugar {
+class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutures with MockitoSugar {
 
   val mockFileUploadConnector = mock[FileUploadConnector]
   val mockFileUploadFrontendConnector = mock[FileUploadFrontendConnector]
 
-  object TestFileUploadService extends FileUploadService {
+  object TestUploadService extends UploadService {
     override val fileUploadConnector = mockFileUploadConnector
     override val fileUploadFrontendConnector = mockFileUploadFrontendConnector
   }
 
   "File upload service" should {
 
-    "upload a file" in {
+    "obtain an envelope id from file upload service" in {
 
       val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
-      val fileUploadFrontendConnectorResponse = HttpResponse(200,None,Map(),None)
-
-      when(mockFileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-      when(mockFileUploadFrontendConnector.uploadFile(any(),any(),any())(any())).thenReturn(Future.successful(fileUploadFrontendConnectorResponse))
-
+      when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+      val result = await(TestUploadService.obtainUploadEnvelopeId())
+      result shouldBe "0b215e97-11d4-4006-91db-c067e74fc653"
 
     }
 

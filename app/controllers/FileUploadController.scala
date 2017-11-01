@@ -21,7 +21,7 @@ import connectors.{FileUploadConnector, UserDetailsConnector}
 import play.Logger
 import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
-import services.FileUploadService
+import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
 
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ trait FileUploadController extends RasController with PageFlowController {
 
   implicit val context: RasContext = RasContextImpl
 
-  val fileUploadService: FileUploadService
+  val fileUploadService: UploadService
 
   def get = Action.async {
     implicit request =>
@@ -81,5 +81,5 @@ object FileUploadController extends FileUploadController {
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  val fileUploadService = FileUploadService
+  val fileUploadService = UploadService
 }

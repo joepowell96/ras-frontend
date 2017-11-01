@@ -17,23 +17,35 @@
 package services
 
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
-
+import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait FileUploadService {
+trait UploadService {
+
+  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   val fileUploadConnector: FileUploadConnector
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
-  //pass in a multipart form to this
   def uploadFile(): Future[Boolean] = {
-    ???
+    obtainUploadEnvelopeId()
+    Future.successful(true)
+  }
+
+  def obtainUploadEnvelopeId(): Future[Option[String]] = {
+    fileUploadConnector.getEnvelope().map { response =>
+      response.header("Location") match {
+        case Some(locationHeader) => Some(locationHeader)
+        case _ => None
+      }
+    }
   }
 
 
 }
 
-object FileUploadService extends FileUploadService {
+object UploadService extends UploadService {
   override val fileUploadConnector = FileUploadConnector
   override val fileUploadFrontendConnector = FileUploadFrontendConnector
 }
