@@ -18,7 +18,6 @@ package connectors
 
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
@@ -40,20 +39,13 @@ class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
 
     "calling file upload service create envelope endpoint" should {
 
-      "handle 201 responses" in {
+      "return service response to caller" in {
         val response = HttpResponse(201, None, Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")), None)
         when(TestConnector.http.POST[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any())).thenReturn(Future.successful(response))
         val result = await(TestConnector.getEnvelope())
         result shouldBe response
       }
 
-      "handle 400 responses" in {
-        when(TestConnector.http.POST[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any())).thenReturn(Future.failed(new BadRequestException("Test Exception")))
-        val result = TestConnector.getEnvelope()
-        ScalaFutures.whenReady(result.failed){ r =>
-          r shouldBe a[BadRequestException]
-        }
-      }
     }
   }
 

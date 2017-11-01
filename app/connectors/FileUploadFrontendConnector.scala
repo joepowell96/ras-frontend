@@ -25,27 +25,22 @@ import scala.concurrent.Future
 
 trait FileUploadFrontendConnector extends ServicesConfig {
 
-  val httpPost: HttpPost = WSHttp
+  val httpPost: HttpPost
   lazy val serviceUrl = baseUrl("file-upload-frontend")
   lazy val serviceUrlSuffix = getString("file-upload-frontend-upload")
 
-  def uploadFile(file: String, envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[Option[String]] = {
+  def uploadFile(file: String, envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+
     val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix/$envelopeId/files/$fileId"
-    val requestBody = file
 
-    httpPost.POST[String, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+    httpPost.POST[String, HttpResponse](
+      fileUploadUri, file, Seq()
+    )(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
-  private val responseHandler = new HttpReads[Option[String]] {
-    override def read(method: String, url: String, response: HttpResponse): Option[String] = {
-      response.status match {
-        case 200 => Some("200")
-        case _ => None
-      }
-    }
 
-  }
 }
 
-
-object FileUploadFrontendConnector extends FileUploadFrontendConnector
+object FileUploadFrontendConnector extends FileUploadFrontendConnector {
+  override val httpPost = WSHttp
+}

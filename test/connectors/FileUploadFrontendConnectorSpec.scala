@@ -16,20 +16,18 @@
 
 package connectors
 
-import java.util.UUID
-
-import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
-class FileUploadFrontendConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
+class FileUploadFrontendConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -37,14 +35,17 @@ class FileUploadFrontendConnectorSpec extends PlaySpec with OneAppPerSuite with 
     override val httpPost: HttpPost = mock[HttpPost]
   }
 
-  "File upload frontend connector" should {
+  "File upload frontend connector" when {
 
-    "upload file" in {
-      when(TestConnector.httpPost.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
-      val envelopeId = "123456789"
-      val fileId = UUID.randomUUID().toString
-      val result = await(TestConnector.uploadFile("",envelopeId, fileId))
-      result mustBe Some("")
+    "calling upload frontend service upload endpoint" should {
+
+      "return service response to caller" in {
+        val response = HttpResponse(200, None, Map(), None)
+        when(TestConnector.httpPost.POST[JsValue, HttpResponse](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(response))
+        val result = await(TestConnector.uploadFile("","",""))
+        result shouldBe response
+      }
+
     }
 
   }
