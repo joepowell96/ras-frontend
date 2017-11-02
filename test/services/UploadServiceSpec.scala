@@ -37,14 +37,47 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
     override val fileUploadFrontendConnector = mockFileUploadFrontendConnector
   }
 
-  "File upload service" should {
+  "File upload service" when {
 
-    "obtain an envelope id from file upload service" in {
+    "calling uploadFile" should {
 
-      val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
-      when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-      val result = await(TestUploadService.obtainUploadEnvelopeId())
-      result shouldBe Some("0b215e97-11d4-4006-91db-c067e74fc653")
+      "return true if a file has been uploaded successfully" in {
+        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
+        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestUploadService.uploadFile)
+        result shouldBe true
+      }
+
+      "return false if a file fails to upload" in {
+        val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
+        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestUploadService.uploadFile)
+        result shouldBe false
+      }
+    }
+
+    "calling obtainEnvelopeId" should {
+
+      "extract envelope id from successful file upload response" in {
+        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
+        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestUploadService.obtainUploadEnvelopeId)
+        result shouldBe Some("0b215e97-11d4-4006-91db-c067e74fc653")
+      }
+
+      "handle cases where file upload responds with success but envelope id cannot be extracted from the header" in {
+        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/")),None)
+        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestUploadService.obtainUploadEnvelopeId)
+        result shouldBe None
+      }
+
+      "handle cases where a bad request has been returned from file upload controller" in {
+        val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
+        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestUploadService.obtainUploadEnvelopeId)
+        result shouldBe None
+      }
 
     }
 

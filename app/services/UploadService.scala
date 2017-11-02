@@ -25,21 +25,25 @@ trait UploadService {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
   val fileUploadConnector: FileUploadConnector
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
   def uploadFile(): Future[Boolean] = {
-    obtainUploadEnvelopeId()
-    Future.successful(true)
+    obtainUploadEnvelopeId.map { envelopeId =>
+      envelopeId match {
+        case Some(id) => true
+        case _ => false
+      }
+    }
   }
 
-  def obtainUploadEnvelopeId(): Future[Option[String]] = {
+  def obtainUploadEnvelopeId: Future[Option[String]] = {
     fileUploadConnector.getEnvelope().map { response =>
       response.header("Location") match {
         case Some(locationHeader) =>
-          val pattern = "envelopes/([\\w\\d-]+)$".r.unanchored
           locationHeader match {
-            case pattern(a) => Some(a)
+            case envelopeIdPattern(id) => Some(id)
             case _ => None
           }
         case _ => None
