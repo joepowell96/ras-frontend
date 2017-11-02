@@ -44,7 +44,7 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
       val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
       when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
       val result = await(TestUploadService.obtainUploadEnvelopeId())
-      result shouldBe "0b215e97-11d4-4006-91db-c067e74fc653"
+      result shouldBe Some("0b215e97-11d4-4006-91db-c067e74fc653")
 
     }
 

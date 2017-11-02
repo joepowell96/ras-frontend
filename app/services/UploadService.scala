@@ -36,7 +36,12 @@ trait UploadService {
   def obtainUploadEnvelopeId(): Future[Option[String]] = {
     fileUploadConnector.getEnvelope().map { response =>
       response.header("Location") match {
-        case Some(locationHeader) => Some(locationHeader)
+        case Some(locationHeader) =>
+          val pattern = "envelopes/([\\w\\d-]+)$".r.unanchored
+          locationHeader match {
+            case pattern(a) => Some(a)
+            case _ => None
+          }
         case _ => None
       }
     }
