@@ -50,8 +50,6 @@ trait UploadService {
       }
     }
   }
-
-
 }
 
 object UploadService extends UploadService {
