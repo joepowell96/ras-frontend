@@ -81,7 +81,15 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
 
     }
 
+    "calling createFileId" should {
 
+      "return a random file id" in {
+        val uuidPattern = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
+        val uuid = TestUploadService.createFileId
+        assert(uuidPattern.findFirstIn(uuid).isDefined)
+      }
+
+    }
   }
 
 }

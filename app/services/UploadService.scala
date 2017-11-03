@@ -16,8 +16,11 @@
 
 package services
 
+import java.util.UUID
+
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -49,6 +52,11 @@ trait UploadService {
         case _ => None
       }
     }
+  }
+
+  def createFileId: String = {
+    "lkasjhdl 87899e9r4 h kj"
+//    UUID.randomUUID().toString
   }
 }
 
