@@ -49,8 +49,10 @@ trait FileUploadController extends RasController with PageFlowController {
         fileUploadService.uploadFile("".getBytes).map{ uploadSuccessful =>
           uploadSuccessful match {
             case true =>
+              Logger.debug("[FileUploadController][post] File uploaded successfully")
               Redirect(routes.FileUploadController.uploadSuccessful())
             case _ =>
+              Logger.debug("[FileUploadController][post] File upload failed")
               Redirect(routes.GlobalErrorController.get())
           }
         }

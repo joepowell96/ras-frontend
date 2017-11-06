@@ -19,6 +19,7 @@ package services
 import java.util.UUID
 
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
+import play.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,8 +39,12 @@ trait UploadService {
         case Some(envelopeId) =>
           fileUploadFrontendConnector.uploadFile(data, envelopeId, createFileId).map { result =>
             result.status match {
-              case 200 => true
-              case _ => false
+              case 200 =>
+                Logger.debug("[UploadService][uploadFile] File uploaded successfully")
+                true
+              case _ =>
+                Logger.debug("[UploadService][uploadFile] File upload failed")
+                false
             }
           }
         case _ => Future.successful(false)
