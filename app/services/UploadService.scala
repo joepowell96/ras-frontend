@@ -33,10 +33,13 @@ trait UploadService {
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
   def uploadFile(): Future[Boolean] = {
-    obtainUploadEnvelopeId.map { envelopeId =>
-      envelopeId match {
-        case Some(id) => true
-        case _ => false
+    obtainUploadEnvelopeId.flatMap { envelopeIdOption =>
+      envelopeIdOption match {
+        case Some(envelopeId) =>
+          val fileId = createFileId
+          Future.successful(true)
+        case _ =>
+          Future.successful(false)
       }
     }
   }
