@@ -54,10 +54,7 @@ trait UploadService {
     }
   }
 
-  def createFileId: String = {
-    "lkasjhdl 87899e9r4 h kj"
-//    UUID.randomUUID().toString
-  }
+  def createFileId: String = { UUID.randomUUID().toString }
 }
 
 object UploadService extends UploadService {
