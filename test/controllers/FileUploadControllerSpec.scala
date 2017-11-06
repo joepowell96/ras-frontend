@@ -70,7 +70,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
-    when(mockFileUploadService.uploadFile).thenReturn(Future.successful(true))
+    when(mockFileUploadService.uploadFile(any())).thenReturn(Future.successful(true))
 
   }
 

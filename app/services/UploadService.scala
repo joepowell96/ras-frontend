@@ -19,7 +19,7 @@ package services
 import java.util.UUID
 
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,16 +32,23 @@ trait UploadService {
   val fileUploadConnector: FileUploadConnector
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
-  def uploadFile(): Future[Boolean] = {
+  def uploadFile(data: Array[Byte]): Future[Boolean] = {
+
     obtainUploadEnvelopeId.flatMap { envelopeIdOption =>
       envelopeIdOption match {
         case Some(envelopeId) =>
           val fileId = createFileId
-          Future.successful(true)
+          fileUploadFrontendConnector.uploadFile(data, envelopeId, fileId).map { result =>
+            result.status match {
+              case 200 => true
+              case _ => false
+            }
+          }
         case _ =>
           Future.successful(false)
       }
     }
+
   }
 
   def obtainUploadEnvelopeId: Future[Option[String]] = {

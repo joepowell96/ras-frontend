@@ -29,12 +29,11 @@ trait FileUploadFrontendConnector extends ServicesConfig {
   lazy val serviceUrl = baseUrl("file-upload-frontend")
   lazy val serviceUrlSuffix = getString("file-upload-frontend-upload")
 
-  def uploadFile(file: String, envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def uploadFile(file: Array[Byte], envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
     val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix/$envelopeId/files/$fileId"
 
-    httpPost.POST[String, HttpResponse](
-      fileUploadUri, file, Seq()
+    httpPost.POST[Array[Byte], HttpResponse](fileUploadUri, file, Seq()
     )(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 

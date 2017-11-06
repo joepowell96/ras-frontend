@@ -42,7 +42,7 @@ class FileUploadFrontendConnectorSpec extends UnitSpec with OneAppPerSuite with 
       "return service response to caller" in {
         val response = HttpResponse(200, None, Map(), None)
         when(TestConnector.httpPost.POST[JsValue, HttpResponse](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(response))
-        val result = await(TestConnector.uploadFile("","",""))
+        val result = await(TestConnector.uploadFile("".getBytes(),"",""))
         result shouldBe response
       }
 
