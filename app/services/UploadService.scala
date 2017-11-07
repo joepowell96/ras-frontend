@@ -20,6 +20,7 @@ import java.util.UUID
 
 import connectors.{FileUploadConnector, FileUploadFrontendConnector}
 import play.Logger
+import play.api.mvc.Request
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,7 @@ trait UploadService {
   val fileUploadConnector: FileUploadConnector
   val fileUploadFrontendConnector: FileUploadFrontendConnector
 
-  def uploadFile(data: Array[Byte]): Future[Boolean] = {
+  def uploadFile(data: Array[Byte])(implicit request: Request[_], hc: HeaderCarrier): Future[Boolean] = {
     obtainUploadEnvelopeId.flatMap { envelopeIdOption =>
       envelopeIdOption match {
         case Some(envelopeId) =>

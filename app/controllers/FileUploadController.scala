@@ -16,11 +16,13 @@
 
 package controllers
 
+import java.nio.file.{Files, Paths}
+
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
-import connectors.{FileUploadConnector, UserDetailsConnector}
+import connectors.UserDetailsConnector
 import play.Logger
-import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
+import play.api.{Configuration, Environment, Play}
 import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
 
@@ -43,21 +45,32 @@ trait FileUploadController extends RasController with PageFlowController {
       }
   }
 
-  def post () = Action.async { implicit request =>
-    isAuthorised.flatMap{
-      case Right(_) =>
-        fileUploadService.uploadFile("".getBytes).map{ uploadSuccessful =>
-          uploadSuccessful match {
-            case true =>
-              Logger.debug("[FileUploadController][post] File uploaded successfully")
-              Redirect(routes.FileUploadController.uploadSuccessful())
-            case _ =>
-              Logger.debug("[FileUploadController][post] File upload failed")
-              Redirect(routes.GlobalErrorController.get())
+  def post () = Action.async(parse.multipartFormData) {
+    implicit request =>
+      import java.io.File
+
+      request.body.file("file").map { file =>
+        val fileName = file.filename
+        val contentType = file.contentType
+        val f = file.ref.file
+        println(Console.YELLOW + fileName + Console.WHITE)
+        println(Console.YELLOW + contentType + Console.WHITE)
+        println(Console.YELLOW + f.toString + Console.WHITE)
+
+        file.ref.moveTo(new File(s"/tmp/files/$fileName"))
+        val dataAsByteArray = Files.readAllBytes(Paths.get(s"/tmp/files/$fileName"))
+      }
+          fileUploadService.uploadFile("".getBytes).map{ uploadSuccessful =>
+            uploadSuccessful match {
+              case true =>
+                Logger.debug("[FileUploadController][post] File uploaded successfully")
+                Redirect(routes.FileUploadController.uploadSuccessful())
+              case _ =>
+                Logger.debug("[FileUploadController][post] File upload failed")
+                Redirect(routes.GlobalErrorController.get())
+            }
           }
-        }
-      case Left(res) => res
-    }
+
   }
 
   def back = Action.async {

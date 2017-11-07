@@ -31,6 +31,9 @@ trait FileUploadFrontendConnector extends ServicesConfig {
 
   def uploadFile(file: Array[Byte], envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
+    println(Console.YELLOW + envelopeId + Console.WHITE)
+    println(Console.YELLOW + fileId + Console.WHITE)
+
     val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix/$envelopeId/files/$fileId"
 
     httpPost.POST[Array[Byte], HttpResponse](fileUploadUri, file, Seq()
