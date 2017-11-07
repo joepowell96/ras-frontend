@@ -28,6 +28,7 @@ import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
 
 import scala.concurrent.Future
+import scala.io.Source
 
 trait FileUploadController extends RasController with PageFlowController {
 
@@ -74,10 +75,10 @@ trait FileUploadController extends RasController with PageFlowController {
     isAuthorised.flatMap{
       case Right(_) =>
 
-        val a = request.body.asMultipartFormData.get.file("file").get.ref.file
-        val c = FileUtils.readFileToByteArray(a)
+        val file = request.body.asMultipartFormData.get.file("file").get.ref.file
+        val fileAsArrayByte = FileUtils.readFileToByteArray(file)
 
-        fileUploadService.uploadFile(c).map{ uploadSuccessful =>
+        fileUploadService.uploadFile(fileAsArrayByte).map{ uploadSuccessful =>
           uploadSuccessful match {
             case true =>
               Logger.debug("[FileUploadController][post] File uploaded successfully")
