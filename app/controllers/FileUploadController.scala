@@ -47,29 +47,29 @@ trait FileUploadController extends RasController with PageFlowController {
 
   def post () = Action.async(parse.multipartFormData) {
     implicit request =>
-      import java.io.File
 
-      request.body.file("file").map { file =>
+      val dataAsByteArray = request.body.file("file").map { file =>
+        import java.io.File
         val fileName = file.filename
         val contentType = file.contentType
         val f = file.ref.file
         println(Console.YELLOW + fileName + Console.WHITE)
         println(Console.YELLOW + contentType + Console.WHITE)
         println(Console.YELLOW + f.toString + Console.WHITE)
+        file.ref.moveTo(new File(s"tmp/files/$fileName"))
+        Files.readAllBytes(Paths.get(s"tmp/files/$fileName"))
+      }.get
 
-        file.ref.moveTo(new File(s"/tmp/files/$fileName"))
-        val dataAsByteArray = Files.readAllBytes(Paths.get(s"/tmp/files/$fileName"))
+      fileUploadService.uploadFile(dataAsByteArray).map{ uploadSuccessful =>
+        uploadSuccessful match {
+          case true =>
+            Logger.debug("[FileUploadController][post] File uploaded successfully")
+            Redirect(routes.FileUploadController.uploadSuccessful())
+          case _ =>
+            Logger.debug("[FileUploadController][post] File upload failed")
+            Redirect(routes.GlobalErrorController.get())
+        }
       }
-          fileUploadService.uploadFile("".getBytes).map{ uploadSuccessful =>
-            uploadSuccessful match {
-              case true =>
-                Logger.debug("[FileUploadController][post] File uploaded successfully")
-                Redirect(routes.FileUploadController.uploadSuccessful())
-              case _ =>
-                Logger.debug("[FileUploadController][post] File upload failed")
-                Redirect(routes.GlobalErrorController.get())
-            }
-          }
 
   }
 
