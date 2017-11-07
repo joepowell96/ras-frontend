@@ -20,6 +20,7 @@ import java.nio.file.{Files, Paths}
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
+import org.apache.commons.io.FileUtils
 import play.Logger
 import play.api.mvc.Action
 import play.api.{Configuration, Environment, Play}
@@ -52,13 +53,9 @@ trait FileUploadController extends RasController with PageFlowController {
         import java.io.File
         val fileName = file.filename
         val contentType = file.contentType
-        val f = file.ref.file
-        println(Console.YELLOW + fileName + Console.WHITE)
-        println(Console.YELLOW + contentType + Console.WHITE)
-        println(Console.YELLOW + f.toString + Console.WHITE)
         file.ref.moveTo(new File(s"tmp/files/$fileName"))
         Files.readAllBytes(Paths.get(s"tmp/files/$fileName"))
-      }.get
+      }.getOrElse("".getBytes())
 
       fileUploadService.uploadFile(dataAsByteArray).map{ uploadSuccessful =>
         uploadSuccessful match {
@@ -72,6 +69,31 @@ trait FileUploadController extends RasController with PageFlowController {
       }
 
   }
+
+  def post2 = Action.async { implicit request =>
+    isAuthorised.flatMap{
+      case Right(_) =>
+
+        val a = request.body.asMultipartFormData.get.file("file").get.ref.file
+        val c = FileUtils.readFileToByteArray(a)
+
+        fileUploadService.uploadFile(c).map{ uploadSuccessful =>
+          uploadSuccessful match {
+            case true =>
+              Logger.debug("[FileUploadController][post] File uploaded successfully")
+              Redirect(routes.FileUploadController.uploadSuccessful())
+            case _ =>
+              Logger.debug("[FileUploadController][post] File upload failed")
+              Redirect(routes.GlobalErrorController.get())
+          }
+        }
+        Future.successful(Redirect(routes.GlobalErrorController.get()))
+      case Left(res) => res
+    }
+  }
+
+
+
 
   def back = Action.async {
     implicit request =>
