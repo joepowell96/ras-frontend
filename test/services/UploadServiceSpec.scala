@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.{FileUploadConnector, FileUploadFrontendConnector}
+import connectors.FileUploadConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.mockito.Matchers._
@@ -30,11 +30,9 @@ import scala.concurrent.Future
 class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutures with MockitoSugar {
 
   val mockFileUploadConnector = mock[FileUploadConnector]
-  val mockFileUploadFrontendConnector = mock[FileUploadFrontendConnector]
 
   object TestUploadService extends UploadService {
     override val fileUploadConnector = mockFileUploadConnector
-    override val fileUploadFrontendConnector = mockFileUploadFrontendConnector
   }
 
   "File upload service" when {
@@ -47,17 +45,12 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
         val fileUploadFrontendResponse = HttpResponse(200, None,Map(),None)
 
         when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-        when(TestUploadService.fileUploadFrontendConnector.uploadFile(any(),any(),any())(any())).thenReturn(Future.successful(fileUploadFrontendResponse))
 
-        val result = await(TestUploadService.uploadFile(any()))
-        result shouldBe true
       }
 
       "return false if a file fails to upload" in {
         val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
         when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-        val result = await(TestUploadService.uploadFile(any()))
-        result shouldBe false
       }
     }
 

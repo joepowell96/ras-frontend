@@ -20,15 +20,14 @@ import java.nio.file.{Files, Paths}
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
-import org.apache.commons.io.FileUtils
 import play.Logger
-import play.api.mvc.Action
+import play.api.mvc.{Action, Request}
 import play.api.{Configuration, Environment, Play}
 import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
-import scala.io.Source
 
 trait FileUploadController extends RasController with PageFlowController {
 
@@ -40,61 +39,26 @@ trait FileUploadController extends RasController with PageFlowController {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
-          Future.successful(Ok(views.html.file_upload()))
+          getFileUploadUrl.flatMap { urlOption =>
+            urlOption match {
+              case Some(url) => Future.successful(Ok(views.html.file_upload(url)))
+              case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
+            }
+          }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user Not authorised")
           resp
       }
   }
 
-  def post () = Action.async(parse.multipartFormData) {
-    implicit request =>
-
-      val dataAsByteArray = request.body.file("file").map { file =>
-        import java.io.File
-        val fileName = file.filename
-        val contentType = file.contentType
-        file.ref.moveTo(new File(s"tmp/files/$fileName"))
-        Files.readAllBytes(Paths.get(s"tmp/files/$fileName"))
-      }.getOrElse("".getBytes())
-
-      fileUploadService.uploadFile(dataAsByteArray).map{ uploadSuccessful =>
-        uploadSuccessful match {
-          case true =>
-            Logger.debug("[FileUploadController][post] File uploaded successfully")
-            Redirect(routes.FileUploadController.uploadSuccessful())
-          case _ =>
-            Logger.debug("[FileUploadController][post] File upload failed")
-            Redirect(routes.GlobalErrorController.get())
-        }
+  private def getFileUploadUrl()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[String]] = {
+    fileUploadService.createFileUploadUrl.flatMap { urlOption =>
+      urlOption match {
+        case Some(url) => Future.successful(Some(url))
+        case _ => Future.successful(None)
       }
-
-  }
-
-  def post2 = Action.async { implicit request =>
-    isAuthorised.flatMap{
-      case Right(_) =>
-
-        val file = request.body.asMultipartFormData.get.file("file").get.ref.file
-        val fileAsArrayByte = FileUtils.readFileToByteArray(file)
-
-        fileUploadService.uploadFile(fileAsArrayByte).map{ uploadSuccessful =>
-          uploadSuccessful match {
-            case true =>
-              Logger.debug("[FileUploadController][post] File uploaded successfully")
-              Redirect(routes.FileUploadController.uploadSuccessful())
-            case _ =>
-              Logger.debug("[FileUploadController][post] File upload failed")
-              Redirect(routes.GlobalErrorController.get())
-          }
-        }
-        Future.successful(Redirect(routes.GlobalErrorController.get()))
-      case Left(res) => res
     }
   }
-
-
-
 
   def back = Action.async {
     implicit request =>

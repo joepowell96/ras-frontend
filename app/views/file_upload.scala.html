@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(fileUploadUrl: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -35,12 +35,13 @@
 
       <p id="sub-header">@Html(Messages("file.upload.page.sub-header",Messages("templates.link")))</p>
 
-      @form(action = routes.FileUploadController.post, 'enctype -> "multipart/form-data") {
-        <div class="form-group">
-          <input id="choose-file" type="file" name="file">
-          <input class="button" type="submit" value="Upload" id="upload-button">
-        </div>
-      }
+      <form>
+        action=@fileUploadUrl
+        enctype="multipart/form-data"
+        method="post" >
+        <input id="someId" name="someName" type="file" size="40"/>
+        <button type="submit" id="upload-button">Upload</button>
+      </form>
 
     </div>
   </div>

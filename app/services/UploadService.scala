@@ -18,37 +18,27 @@ package services
 
 import java.util.UUID
 
-import connectors.{FileUploadConnector, FileUploadFrontendConnector}
-import play.Logger
-import play.api.mvc.Request
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import connectors.FileUploadConnector
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait UploadService {
+trait  UploadService extends ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
+  lazy val serviceUrl = baseUrl("file-upload")
+  lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
   val fileUploadConnector: FileUploadConnector
-  val fileUploadFrontendConnector: FileUploadFrontendConnector
 
-  def uploadFile(data: Array[Byte])(implicit request: Request[_], hc: HeaderCarrier): Future[Boolean] = {
+  def createFileUploadUrl: Future[Option[String]] = {
     obtainUploadEnvelopeId.flatMap { envelopeIdOption =>
       envelopeIdOption match {
-        case Some(envelopeId) =>
-          fileUploadFrontendConnector.uploadFile(data, envelopeId, createFileId).map { result =>
-            result.status match {
-              case 200 =>
-                Logger.debug("[UploadService][uploadFile] File uploaded successfully")
-                true
-              case _ =>
-                Logger.debug("[UploadService][uploadFile] File upload failed")
-                false
-            }
-          }
-        case _ => Future.successful(false)
+        case Some(envelopeId) => Future.successful(Some(s"$serviceUrl/${envelopeId}/files/${createFileId}"))
+        case _ => Future.successful(None)
       }
     }
   }
@@ -72,5 +62,4 @@ trait UploadService {
 
 object UploadService extends UploadService {
   override val fileUploadConnector = FileUploadConnector
-  override val fileUploadFrontendConnector = FileUploadFrontendConnector
 }

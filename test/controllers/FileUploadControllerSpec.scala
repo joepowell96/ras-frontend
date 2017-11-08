@@ -107,24 +107,6 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
     }
 
-    "redirect to upload successful" when {
-      "file is uploaded successfully" in {
-        when(mockFileUploadService.uploadFile(any())).thenReturn(Future.successful(true))
-        val result = await(TestFileUploadController.post.apply(fakeRequest))
-        status(result) shouldBe 303
-        redirectLocation(result).get should include("/bulk/upload-successful")
-      }
-    }
-
-    "redirect to global error" when {
-      "file fails to upload" in {
-        when(mockFileUploadService.uploadFile(any())).thenReturn(Future.successful(false))
-        val result = await(TestFileUploadController.post.apply(fakeRequest))
-        status(result) shouldBe 303
-        redirectLocation(result).get should include("/global-error")
-      }
-    }
-
     "return to dashboard page when back link is clicked" in {
       val result = TestFileUploadController.back.apply(FakeRequest())
       status(result) shouldBe SEE_OTHER
