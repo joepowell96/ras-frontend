@@ -51,7 +51,7 @@ trait FileUploadController extends RasController with PageFlowController {
       }
   }
 
-  private def getFileUploadUrl()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[String]] = {
+  private def getFileUploadUrl()(implicit hc: HeaderCarrier): Future[Option[String]] = {
     fileUploadService.createFileUploadUrl.flatMap { urlOption =>
       urlOption match {
         case Some(url) => Future.successful(Some(url))

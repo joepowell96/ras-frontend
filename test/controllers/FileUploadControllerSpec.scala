@@ -70,12 +70,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
+
   }
 
   "FileUploadController" should {
 
     "return 200" when {
       "called" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         status(result) shouldBe OK
       }
@@ -99,7 +101,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     "contain an upload button" in {
       val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementById("upload-button").attr("value") shouldBe Messages("upload")
+      doc(result).getElementById("upload-button").text shouldBe Messages("upload")
     }
 
     "contain a back link" in {
