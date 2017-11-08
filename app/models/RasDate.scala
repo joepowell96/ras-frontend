@@ -35,4 +35,8 @@ case class RasDate(day: Option[String], month: Option[String], year: Option[Stri
 
 object RasDate {
   implicit val format = Json.format[RasDate]
+
+  def fromLocalDate(date: LocalDate): RasDate = {
+    RasDate(Some(date.getDayOfMonth.toString), Some(date.getMonthOfYear.toString), Some(date.getYear.toString))
+  }
 }

@@ -17,7 +17,9 @@
 package connectors
 
 import config.WSHttp
+import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.StreamedResponse
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
@@ -27,6 +29,7 @@ import scala.concurrent.Future
 trait FileUploadConnector extends ServicesConfig {
 
   val http: HttpPost = WSHttp
+  val httpGet: WSHttp = WSHttp
 
   lazy val serviceUrl = baseUrl("file-upload")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
@@ -36,6 +39,13 @@ trait FileUploadConnector extends ServicesConfig {
     val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
     http.POST[JsValue, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
+
+  def getFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[StreamedResponse] = {
+    Logger.debug(s"Get to file-upload with URI : /file-upload/envelopes/${envelopeId}/files/${fileId}/content")
+//    httpGet.buildRequest(s"$serviceUrl/envelopes/${envelopeId}/files/${fileId}/content").stream()
+    httpGet.buildRequestWithStream(s"$serviceUrl/$serviceUrlSuffix/${envelopeId}/files/${fileId}/content")
+  }
+
 
   private val responseHandler = new HttpReads[Option[String]] {
 
