@@ -21,9 +21,12 @@ import java.io.{BufferedReader, InputStream, InputStreamReader}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import connectors.FileUploadConnector
-import models.RawMemberDetails
+import helpers.FromListToCaseClass
+import models.{MemberDetails, MemberName, RasDate, RawMemberDetails}
+import org.joda.time.LocalDate
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -46,7 +49,7 @@ trait FileProcessingService {
   def readFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[List[String] ] = {
 
     fileUploadConnector.getFile(envelopeId, fileId).map{
-      case Some(inputStream) => Source.fromInputStream(inputStream).getLines().toList //readFromStream(inputStream)
+      case Some(inputStream) => Source.fromInputStream(inputStream).getLines().toList
       case None => Nil
     }
   }
@@ -57,5 +60,18 @@ trait FileProcessingService {
     Iterator continually bufferedReader.readLine takeWhile (_ != null) mkString
   }
 
-  def processRow(inputRow:String) = inputRow
+  def createMatchingData(inputRow:String): Option[RawMemberDetails] = {
+//    if (inputRow.isEmpty) None
+
+    fromListToCaseClass[RawMemberDetails](parseString(inputRow))
+  }
+
+  private def parseString(inputRow: String): Array[String] = {
+    val cols = inputRow.split(",")
+
+    cols ++ (for (x <- 0 until 4-cols.length ) yield "")
+  }
+
+  private def fromListToCaseClass[T] = new FromListToCaseClass[T]
 }
+

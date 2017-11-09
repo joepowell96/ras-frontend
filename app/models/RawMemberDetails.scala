@@ -16,4 +16,4 @@
 
 package models
 
-case class RawMemberDetails(firstName: String, lastName: String, nino: String, dateOfBirth: String)
+case class RawMemberDetails(firstName: String = "", lastName: String = "", nino: String = "", dateOfBirth: String = "")

@@ -54,15 +54,49 @@ class FileProcessingServiceSpec extends UnitSpec with OneServerPerSuite with Sca
         val row1 = "John,Smith,AB123456C,1990-02-21".getBytes
         val inputStream = new ByteArrayInputStream(row1)
 
-        val streamResponse:StreamedResponse = StreamedResponse(DefaultWSResponseHeaders(200, Map("CONTENT_TYPE" -> Seq("application/octet-stream"))),
+        val streamResponse: StreamedResponse = StreamedResponse(DefaultWSResponseHeaders(200, Map("CONTENT_TYPE" -> Seq("application/octet-stream"))),
           Source.apply[ByteString](Seq(ByteString("John, "), ByteString("Smith, "),
-            ByteString("AB123456C, "), ByteString("1990-02-21")).to[scala.collection.immutable.Iterable]) )
+            ByteString("AB123456C, "), ByteString("1990-02-21")).to[scala.collection.immutable.Iterable]))
 
         when(mockFileUploadConnector.getFile(any(), any())(any())).thenReturn(Future.successful(Some(inputStream)))
 
         val result = await(SUT.readFile(envelopeId, fileId))
 
         result should contain theSameElementsAs List("John,Smith,AB123456C,1990-02-21")
+      }
+    }
+
+    "createMatchingData" when {
+      "parse line as raw data and convert to RawMemberDetails object" in {
+        val inputData = "John,Smith,AB123456C,1990-02-21"
+
+        val result = SUT.createMatchingData(inputData)
+
+        result shouldBe Some(RawMemberDetails("John", "Smith", "AB123456C", "1990-02-21"))
+      }
+
+      "parse line as raw data and convert to RawMemberDetails object when there are 4 columns with at least one containing empty data" in {
+        val inputData = ",Smith,AB123456C,1990-02-21"
+
+        val result = SUT.createMatchingData(inputData)
+
+        result shouldBe Some(RawMemberDetails("", "Smith", "AB123456C", "1990-02-21"))
+      }
+
+      "parse line as raw data and convert to RawMemberDetails object when there are less than 3 columns" in {
+        val inputData = "Smith,AB123456C,1990-02-21"
+
+        val result = SUT.createMatchingData(inputData)
+
+        result shouldBe Some(RawMemberDetails("Smith", "AB123456C", "1990-02-21", ""))
+      }
+
+      "parse empty line as raw data and convert to RawMemberDetails object" in {
+        val inputData = ""
+
+        val result = SUT.createMatchingData(inputData)
+
+        result shouldBe Some(RawMemberDetails("", "", ",", ""))
       }
     }
   }
