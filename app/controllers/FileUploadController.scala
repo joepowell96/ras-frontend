@@ -17,10 +17,11 @@
 package controllers
 
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
-import connectors.{FileUploadConnector, UserDetailsConnector}
+import connectors.UserDetailsConnector
 import play.Logger
-import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Action
+import play.api.{Configuration, Environment, Play}
+import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
 
 import scala.concurrent.Future
@@ -29,33 +30,26 @@ trait FileUploadController extends RasController with PageFlowController {
 
   implicit val context: RasContext = RasContextImpl
 
-  val fileUploadConnector: FileUploadConnector
+  val fileUploadService: UploadService
 
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
-          Future.successful(Ok(views.html.file_upload()))
+          fileUploadService.createFileUploadUrl.flatMap { urlOption =>
+            urlOption match {
+              case Some(url) =>
+                Logger.debug("[FileUploadController][get] successfully obtained a form url")
+                Future.successful(Ok(views.html.file_upload(url)))
+              case _ =>
+                Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                Future.successful(Redirect(routes.GlobalErrorController.get()))
+            }
+          }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user Not authorised")
           resp
       }
-  }
-
-  def post () = Action.async { implicit request =>
-    isAuthorised.flatMap{
-      case Right(_) =>
-        fileUploadConnector.getEnvelope().map{ envelope =>
-          envelope match {
-            case Some(envelope) =>
-              //extract envelope id here or redirect to link
-              Redirect(routes.FileUploadController.get())
-            case _ =>
-              Redirect(routes.FileUploadController.get())
-          }
-        }
-      case Left(res) => res
-    }
   }
 
   def back = Action.async {
@@ -66,6 +60,11 @@ trait FileUploadController extends RasController with PageFlowController {
       }
   }
 
+  def uploadCallback = Action.async{ implicit request =>
+    val requestBody = request.body.toString
+    Future.successful(Ok(views.html.file_upload_successful(requestBody)))
+  }
+
 }
 
 object FileUploadController extends FileUploadController {
@@ -73,5 +72,5 @@ object FileUploadController extends FileUploadController {
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
-  val fileUploadConnector = FileUploadConnector
+  val fileUploadService = UploadService
 }

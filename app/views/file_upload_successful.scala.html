@@ -14,34 +14,22 @@
  * limitations under the License.
  *@
 
-@(fileUploadUrl: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(result: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.helpers._
 
-@ras_main(title = Messages("file.upload.page.title")) {
+@ras_main(title = Messages("file.upload.successful.page.title")) {
 
 
 <div class="grid-layout--no-gutter">
   <div class="grid-layout__column">
     <div class="grid-layout__column--3-4">
 
-      <div class="back-arrow">
-        <a class="link-back" href="@routes.FileUploadController.back">@Messages("back")</a>
-      </div>
+      <h1 id="header" class="heading-xlarge">File uploaded successfully</h1>
 
-      <h1 id="header" class="heading-xlarge">@Messages("file.upload.page.header")</h1>
-
-      <p id="sub-header">@Html(Messages("file.upload.page.sub-header",Messages("templates.link")))</p>
-
-      <form
-        action=@fileUploadUrl
-        enctype="multipart/form-data"
-        method="post" >
-        <input id="choose-file" name="file" type="file" size="40"/>
-        <button type="submit" id="upload-button">Upload</button>
-      </form>
+      <p>result</p>
 
     </div>
   </div>

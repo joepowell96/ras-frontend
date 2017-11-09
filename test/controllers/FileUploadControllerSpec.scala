@@ -30,7 +30,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
-import services.SessionService
+import services.{UploadService, SessionService}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
@@ -47,7 +47,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
   val mockSessionService = mock[SessionService]
   val mockConfig = mock[Configuration]
   val mockEnvironment = mock[Environment]
-  val mockFileUploadConnector = mock[FileUploadConnector]
+  val mockFileUploadService = mock[UploadService]
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
@@ -62,7 +62,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val sessionService = mockSessionService
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val fileUploadConnector = mockFileUploadConnector
+    override val fileUploadService = mockFileUploadService
 
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
       thenReturn(successfulRetrieval)
@@ -70,14 +70,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
-    when(mockFileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(Some("201")))
 
   }
 
   "FileUploadController" should {
 
     "return 200" when {
-      "called" in {
+      "get called" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         status(result) shouldBe OK
       }
@@ -101,20 +101,12 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     "contain an upload button" in {
       val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementById("upload-button").attr("value") shouldBe Messages("upload")
+      doc(result).getElementById("upload-button").text shouldBe Messages("upload")
     }
 
     "contain a back link" in {
       val result = TestFileUploadController.get().apply(fakeRequest)
       doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
-    }
-
-    "redirect" when {
-      "file is uploaded successfully" in {
-        val result = await(TestFileUploadController.post.apply(fakeRequest))
-        status(result) shouldBe 303
-        redirectLocation(result).get should include("/bulk/bulk-upload")
-      }
     }
 
     "return to dashboard page when back link is clicked" in {
