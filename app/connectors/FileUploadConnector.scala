@@ -30,7 +30,7 @@ trait FileUploadConnector extends ServicesConfig {
   lazy val serviceUrl = baseUrl("file-upload")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
-  def getEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def createEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
     val requestBody = Json.parse("""{"callbackUrl": "http://localhost:9673/relief-at-source/bulk/upload-callback"}""".stripMargin)
 

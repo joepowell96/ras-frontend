@@ -37,7 +37,7 @@ trait UploadService extends ServicesConfig {
 
   def createFileUploadUrl(): Future[Option[String]] = {
     val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
-    fileUploadConnector.getEnvelope().map { response =>
+    fileUploadConnector.createEnvelope().map { response =>
       response.header("Location") match {
         case Some(locationHeader) =>
           locationHeader match {

@@ -43,7 +43,7 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
 
         val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
 
-        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        when(TestUploadService.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
 
         val result = await(TestUploadService.createFileUploadUrl)
 
@@ -53,14 +53,14 @@ class UploadServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFuture
 
       "return none if envelope id could not be extracted from the header" in {
         val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/")),None)
-        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        when(TestUploadService.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
         val result = await(TestUploadService.createFileUploadUrl)
         result shouldBe None
       }
 
       "return none if connector fails to return a response" in {
         val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
-        when(TestUploadService.fileUploadConnector.getEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        when(TestUploadService.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
         val result = await(TestUploadService.createFileUploadUrl)
         result shouldBe None
       }
