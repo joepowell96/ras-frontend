@@ -16,16 +16,13 @@
 
 package controllers
 
-import java.nio.file.{Files, Paths}
-
 import config.{FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.UserDetailsConnector
 import play.Logger
-import play.api.mvc.{Action, Request}
+import play.api.mvc.Action
 import play.api.{Configuration, Environment, Play}
 import services.UploadService
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -39,25 +36,20 @@ trait FileUploadController extends RasController with PageFlowController {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
-          getFileUploadUrl.flatMap { urlOption =>
+          fileUploadService.createFileUploadUrl.flatMap { urlOption =>
             urlOption match {
-              case Some(url) => Future.successful(Ok(views.html.file_upload(url)))
-              case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
+              case Some(url) =>
+                Logger.debug("[FileUploadController][get] successfully obtained a form url")
+                Future.successful(Ok(views.html.file_upload(url)))
+              case _ =>
+                Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                Future.successful(Redirect(routes.GlobalErrorController.get()))
             }
           }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user Not authorised")
           resp
       }
-  }
-
-  private def getFileUploadUrl()(implicit hc: HeaderCarrier): Future[Option[String]] = {
-    fileUploadService.createFileUploadUrl.flatMap { urlOption =>
-      urlOption match {
-        case Some(url) => Future.successful(Some(url))
-        case _ => Future.successful(None)
-      }
-    }
   }
 
   def back = Action.async {
