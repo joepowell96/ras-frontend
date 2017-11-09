@@ -68,12 +68,10 @@ trait FileUploadController extends RasController with PageFlowController {
       }
   }
 
-  def uploadSuccessful = Action.async{
-    implicit request =>
-      isAuthorised.flatMap{
-        case Right(_) => Future.successful(Ok(views.html.file_upload_successful()))
-        case Left(res) => res
-    }
+  def uploadCallback = Action.async{ implicit request =>
+    val requestBody = request.body.toString
+    println(Console.YELLOW + "this is the callback response: " + requestBody + Console.WHITE)
+    Future.successful(Ok(views.html.file_upload_successful(requestBody)))
   }
 
 }

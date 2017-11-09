@@ -21,43 +21,33 @@ import java.util.UUID
 import connectors.FileUploadConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
-
 import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
-trait  UploadService extends ServicesConfig {
+trait UploadService extends ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  lazy val serviceUrl = baseUrl("file-upload")
+  lazy val serviceUrl = baseUrl("file-upload-frontend")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
   val fileUploadConnector: FileUploadConnector
 
-  def createFileUploadUrl: Future[Option[String]] = {
-    obtainUploadEnvelopeId.flatMap { envelopeIdOption =>
-      envelopeIdOption match {
-        case Some(envelopeId) => Future.successful(Some(s"$serviceUrl/${envelopeId}/files/${createFileId}"))
-        case _ => Future.successful(None)
-      }
-    }
-  }
-
-  def obtainUploadEnvelopeId: Future[Option[String]] = {
+  def createFileUploadUrl(): Future[Option[String]] = {
     val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
     fileUploadConnector.getEnvelope().map { response =>
       response.header("Location") match {
         case Some(locationHeader) =>
           locationHeader match {
-            case envelopeIdPattern(id) => Some(id)
+            case envelopeIdPattern(id) =>
+              Some(s"$serviceUrl/file-upload/upload/envelopes/${id}/files/${UUID.randomUUID().toString}")
             case _ => None
           }
         case _ => None
       }
     }
   }
-
-  def createFileId: String = { UUID.randomUUID().toString }
 }
 
 object UploadService extends UploadService {

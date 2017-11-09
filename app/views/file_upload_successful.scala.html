@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_], context: config.RasContext, messages: Messages)
+@(result: String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
@@ -28,6 +28,8 @@
     <div class="grid-layout__column--3-4">
 
       <h1 id="header" class="heading-xlarge">File uploaded successfully</h1>
+
+      <p>result</p>
 
     </div>
   </div>

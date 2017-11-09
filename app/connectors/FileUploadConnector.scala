@@ -32,7 +32,7 @@ trait FileUploadConnector extends ServicesConfig {
 
   def getEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
-    val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
+    val requestBody = Json.parse("""{"callbackUrl": "http://localhost:9673/relief-at-source/bulk/upload-callback"}""".stripMargin)
 
     http.POST[JsValue, HttpResponse](
       s"$serviceUrl/$serviceUrlSuffix", requestBody, Seq()
