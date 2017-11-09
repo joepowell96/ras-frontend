@@ -19,10 +19,11 @@ package services
 import java.util.UUID
 
 import connectors.FileUploadConnector
+import play.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait UploadService extends ServicesConfig {
@@ -42,9 +43,13 @@ trait UploadService extends ServicesConfig {
           locationHeader match {
             case envelopeIdPattern(id) =>
               Some(s"$serviceUrl/file-upload/upload/envelopes/${id}/files/${UUID.randomUUID().toString}")
-            case _ => None
+            case _ =>
+              Logger.debug("[UploadService][createFileUploadUrl] Failed to obtain an envelope id from location header")
+              None
           }
-        case _ => None
+        case _ =>
+          Logger.debug("[UploadService][createFileUploadUrl] Failed to find a location header in the response")
+          None
       }
     }
   }
