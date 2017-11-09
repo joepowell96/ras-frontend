@@ -16,10 +16,15 @@
 
 package connectors
 
+import java.io.InputStream
+
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.StreamConverters
 import config.WSHttp
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.StreamedResponse
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
@@ -40,12 +45,20 @@ trait FileUploadConnector extends ServicesConfig {
     http.POST[JsValue, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
   }
 
-  def getFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[StreamedResponse] = {
+  def getFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[Option[InputStream]] = {
+    implicit val system = ActorSystem()
+    implicit val materializer = ActorMaterializer()
     Logger.debug(s"Get to file-upload with URI : /file-upload/envelopes/${envelopeId}/files/${fileId}/content")
 //    httpGet.buildRequest(s"$serviceUrl/envelopes/${envelopeId}/files/${fileId}/content").stream()
-    httpGet.buildRequestWithStream(s"$serviceUrl/$serviceUrlSuffix/${envelopeId}/files/${fileId}/content")
+    httpGet.buildRequestWithStream(s"$serviceUrl/$serviceUrlSuffix/${envelopeId}/files/${fileId}/content").map { res =>
+      Some(res.body.runWith(StreamConverters.asInputStream()))
+    } recover {
+      case ex: Throwable => {
+        Logger.error("Exception thrown while retrieving file / converting to InputStream.", ex)
+        None
+      }
+    }
   }
-
 
   private val responseHandler = new HttpReads[Option[String]] {
 

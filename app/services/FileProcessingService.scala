@@ -16,6 +16,46 @@
 
 package services
 
-class FileProcessingService {
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import connectors.FileUploadConnector
+import models.RawMemberDetails
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.io.Source
+
+object FileProcessingService extends FileProcessingService {
+
+  override val fileUploadConnector: FileUploadConnector = FileUploadConnector
+}
+
+trait FileProcessingService {
+
+  implicit val system = ActorSystem()
+  implicit val materializer = ActorMaterializer()
+
+  val fileUploadConnector: FileUploadConnector
+
+  //val results:ListBuffer[String] = ListBuffer.empty
+
+  def readFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[List[String] ] = {
+
+    fileUploadConnector.getFile(envelopeId, fileId).map{
+      case Some(inputStream) => Source.fromInputStream(inputStream).getLines().toList //readFromStream(inputStream)
+      case None => Nil
+    }
+  }
+
+  private def inputStreamToString(is: InputStream) = {
+    val inputStreamReader = new InputStreamReader(is)
+    val bufferedReader = new BufferedReader(inputStreamReader)
+    Iterator continually bufferedReader.readLine takeWhile (_ != null) mkString
+  }
+
+  def processRow(inputRow:String) = inputRow
 }
