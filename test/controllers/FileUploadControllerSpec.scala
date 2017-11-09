@@ -76,7 +76,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
   "FileUploadController" should {
 
     "return 200" when {
-      "called" in {
+      "get called" in {
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         status(result) shouldBe OK
