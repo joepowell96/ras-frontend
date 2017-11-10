@@ -38,13 +38,37 @@ trait FileUploadConnector extends ServicesConfig {
 
   lazy val serviceUrl = baseUrl("file-upload")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
+  lazy val rasFrontendBaseUrl = baseUrl("ras-frontend")
+  lazy val rasFrontendUrlSuffix = getString("ras-frontend-url-suffix")
+  lazy val fileUploadBaseUrl = baseUrl("file-upload")
+  lazy val fileUploadUrlSuffix = getString("file-upload-url-suffix")
+
+  lazy val maxItems = getInt("file-upload-constraints.maxItems")
+  lazy val maxSize = getString("file-upload-constraints.maxSize")
+  lazy val maxSizePerItem = getString("file-upload-constraints.maxSizePerItem")
+  lazy val allowZeroLengthFiles = getBoolean("file-upload-constraints.allowZeroLengthFiles")
 
   def createEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
 
-    val requestBody = Json.parse("""{"callbackUrl": "http://localhost:9673/relief-at-source/bulk/upload-callback"}""".stripMargin)
+
+    val requestBody = Json.parse(
+      s"""
+        {
+          "callbackUrl": "$rasFrontendBaseUrl/$rasFrontendUrlSuffix/bulk/upload-callback",
+          "constraints": 	{
+              "maxItems": 1,
+              "maxSize": "$maxSize",
+              "maxSizePerItem": "$maxSizePerItem",
+              "contentTypes": ["text/xml"],
+              "allowZeroLengthFiles": $allowZeroLengthFiles
+              }
+          }
+      """.stripMargin)
+
+    Logger.debug(s"[FileUploadConnector][createEnvelope] envelope parameters: ${requestBody}")
 
     http.POST[JsValue, HttpResponse](
-      s"$serviceUrl/$serviceUrlSuffix", requestBody, Seq()
+      s"$fileUploadBaseUrl/$fileUploadUrlSuffix", requestBody, Seq()
     )(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
 
   }

@@ -18,12 +18,11 @@ package services
 
 import config.SessionCacheWiring
 import models._
-import org.joda.time.LocalDate
-import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.Request
+import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 object SessionService extends SessionService
 
@@ -36,7 +35,7 @@ trait SessionService extends SessionCacheWiring {
                                 MemberDateOfBirth(RasDate(None,None,None)),
                                 ResidencyStatusResult("","","","","","",""))
 
-  def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+    def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
   }
 

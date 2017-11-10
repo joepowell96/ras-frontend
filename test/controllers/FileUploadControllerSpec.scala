@@ -16,13 +16,12 @@
 
 package controllers
 
-import connectors.{FileUploadConnector, UserDetailsConnector}
+import connectors.UserDetailsConnector
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
-import org.mockito.{Matchers, Mock}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
@@ -30,7 +29,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
-import services.{UploadService, SessionService}
+import services.{SessionService, UploadService}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.HeaderCarrier
@@ -70,49 +69,83 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     when(mockUserDetailsConnector.getUserDetails(any())(any())).
       thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
 
-
   }
 
   "FileUploadController" should {
 
-    "return 200" when {
-      "get called" in {
+    "display file upload page" when {
+
+      "an upload url has been successfully obtained" in {
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         status(result) shouldBe OK
       }
+
     }
 
-    "contain 'upload file' title and header" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).title() shouldBe Messages("file.upload.page.title")
-      doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
+    "redirect to global error page" when {
+      "an upload url has not been obtained" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(None))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
+      }
     }
 
-    "contain sub-header" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementById("sub-header").html shouldBe Messages("file.upload.page.sub-header",Messages("templates.link"))
+    "rendered file upload page" should {
+
+      "contain 'upload file' title and header" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        doc(result).title() shouldBe Messages("file.upload.page.title")
+        doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
+      }
+
+      "contain sub-header" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        doc(result).getElementById("sub-header").html shouldBe Messages("file.upload.page.sub-header", Messages("templates.link"))
+      }
+
+      "contain 'choose file' button" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        doc(result).getElementById("choose-file") shouldNot be(null)
+      }
+
+      "contain an upload button" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        doc(result).getElementById("upload-button").text shouldBe Messages("upload")
+      }
+
+      "contain a back link" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
+      }
     }
 
-    "contain 'choose file' button" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementById("choose-file") shouldNot be(null)
-    }
-
-    "contain an upload button" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementById("upload-button").text shouldBe Messages("upload")
-    }
-
-    "contain a back link" in {
-      val result = TestFileUploadController.get().apply(fakeRequest)
-      doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
-    }
-
-    "return to dashboard page when back link is clicked" in {
+    "redirect to dashboard page when back link is clicked" in {
       val result = TestFileUploadController.back.apply(FakeRequest())
       status(result) shouldBe SEE_OTHER
       redirectLocation(result).get should include("/dashboard")
+    }
+
+    "display file upload successful page" when {
+
+      "file has been uploaded successfully" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = await(TestFileUploadController.uploadSuccess().apply(fakeRequest))
+        status(result) shouldBe OK
+      }
+
+      "file has failed upload" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        val result = await(TestFileUploadController.uploadError().apply(fakeRequest))
+        redirectLocation(result).get should include("/global-error")
+      }
+
     }
 
   }

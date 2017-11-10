@@ -16,7 +16,7 @@
 
 package services
 
-import java.io.{ByteArrayInputStream, InputStream, InputStreamReader}
+import java.io.ByteArrayInputStream
 
 import akka.stream.scaladsl.Source
 import akka.util.ByteString

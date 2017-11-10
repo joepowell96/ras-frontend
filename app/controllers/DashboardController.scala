@@ -42,7 +42,7 @@ trait DashboardController extends RasController with PageFlowController {
       isAuthorised.flatMap {
         case Right(_) => Future.successful(Ok(views.html.dashboard()))
         case Left(resp) =>
-          Logger.debug("[DashboardController][get] user Not authorised")
+          Logger.debug("[DashboardController][get] user not authorised")
           resp
       }
   }
