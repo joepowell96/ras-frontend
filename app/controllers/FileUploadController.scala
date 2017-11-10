@@ -78,6 +78,7 @@ trait FileUploadController extends RasController with PageFlowController {
       case Left(resp) =>
         Logger.debug("[FileUploadController][uploadSuccess] user not authorised")
         resp
+    }
   }
 
 }
