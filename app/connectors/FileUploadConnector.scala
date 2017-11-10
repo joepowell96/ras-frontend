@@ -33,24 +33,27 @@ import scala.concurrent.Future
 
 trait FileUploadConnector extends ServicesConfig {
 
-  val http: HttpPost = WSHttp
-  val httpGet: WSHttp = WSHttp
+  val http: HttpPost
+  val wsHttp: WSHttp
 
   lazy val serviceUrl = baseUrl("file-upload")
   lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
 
-  def getEnvelope()(implicit hc: HeaderCarrier): Future[Option[String]] = {
-    val fileUploadUri = s"$serviceUrl/$serviceUrlSuffix"
-    val requestBody = Json.parse("""{"callbackUrl": "ourCallbackUrl"}""".stripMargin)
-    http.POST[JsValue, Option[String]](fileUploadUri, requestBody,Seq())(implicitly, rds = responseHandler, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+  def createEnvelope()(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+
+    val requestBody = Json.parse("""{"callbackUrl": "http://localhost:9673/relief-at-source/bulk/upload-callback"}""".stripMargin)
+
+    http.POST[JsValue, HttpResponse](
+      s"$serviceUrl/$serviceUrlSuffix", requestBody, Seq()
+    )(implicitly, implicitly, hc, MdcLoggingExecutionContext.fromLoggingDetails(hc))
+
   }
 
   def getFile(envelopeId: String, fileId: String)(implicit hc: HeaderCarrier): Future[Option[InputStream]] = {
     implicit val system = ActorSystem()
     implicit val materializer = ActorMaterializer()
     Logger.debug(s"Get to file-upload with URI : /file-upload/envelopes/${envelopeId}/files/${fileId}/content")
-//    httpGet.buildRequest(s"$serviceUrl/envelopes/${envelopeId}/files/${fileId}/content").stream()
-    httpGet.buildRequestWithStream(s"$serviceUrl/$serviceUrlSuffix/${envelopeId}/files/${fileId}/content").map { res =>
+    wsHttp.buildRequestWithStream(s"$serviceUrl/$serviceUrlSuffix/${envelopeId}/files/${fileId}/content").map { res =>
       Some(res.body.runWith(StreamConverters.asInputStream()))
     } recover {
       case ex: Throwable => {
@@ -59,19 +62,10 @@ trait FileUploadConnector extends ServicesConfig {
       }
     }
   }
-
-  private val responseHandler = new HttpReads[Option[String]] {
-
-    override def read(method: String, url: String, response: HttpResponse): Option[String] = {
-      response.status match {
-        case 201 => response.header("Location").map{ locationHeader =>Some(locationHeader)}.getOrElse(None)
-        case 400 => throw new Upstream4xxResponse("Envelope not created, with some reason message", 400, 400, response.allHeaders)
-        case _ => None
-      }
-    }
-
-  }
-
 }
 
-object FileUploadConnector extends FileUploadConnector
+object FileUploadConnector extends FileUploadConnector {
+
+  override val http: HttpPost = WSHttp
+  override val wsHttp: WSHttp = WSHttp
+}

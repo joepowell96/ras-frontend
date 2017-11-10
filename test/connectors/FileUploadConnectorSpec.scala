@@ -20,22 +20,21 @@ import java.io.{BufferedReader, InputStreamReader}
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source, StreamConverters}
+import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import config.WSHttp
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.JsValue
 import play.api.libs.ws.{DefaultWSResponseHeaders, StreamedResponse}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpPost}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.test.UnitSpec
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoSugar with ServicesConfig with WSHttp{
 
@@ -45,17 +44,21 @@ class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
 
   object TestConnector extends FileUploadConnector {
     override val http: HttpPost = mock[HttpPost]
-    override val httpGet: WSHttp = mockWsHttp
+    override val wsHttp: WSHttp = mockWsHttp
   }
 
-  "File upload connector" should {
+  "File upload connector" when {
 
-    "send a post request to file upload service" in {
-      when(TestConnector.http.POST[JsValue, Option[String]](any(),any(),any())(any(),any(),any(),any())).thenReturn(Future.successful(Some("")))
-      val result = await(TestConnector.getEnvelope)
-      result shouldBe Some("")
+    "calling file upload service create envelope endpoint" should {
+
+      "return service response to caller" in {
+        val response = HttpResponse(201, None, Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")), None)
+        when(TestConnector.http.POST[JsValue, HttpResponse](any(), any(), any())(any(), any(), any(), any())).thenReturn(Future.successful(response))
+        val result = await(TestConnector.createEnvelope())
+        result shouldBe response
+      }
+
     }
-
   }
 
   ///file-upload/envelopes/{ENVELOPEID}/files/{FILEID}/content
@@ -83,15 +86,6 @@ class FileUploadConnectorSpec extends UnitSpec with OneAppPerSuite with MockitoS
 
       (Iterator continually reader.readLine takeWhile (_ != null) toList) should contain theSameElementsAs List("Test", "Passed")
 
-      //for(i <- 0 until 2) values += reader.readLine()
-
-//      reader.lines()
-
-//      await(result.runWith(Sink.foreach[ByteString]{(string) =>
-//        values += string.utf8String
-//      }))
-
-     // values.toList should contain theSameElementsAs List("Test", "Passed")
     }
 
 //    "return a 404 exception from File-Upload service when a file has not been found with the fileId provided" in {

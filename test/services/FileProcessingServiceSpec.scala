@@ -96,7 +96,7 @@ class FileProcessingServiceSpec extends UnitSpec with OneServerPerSuite with Sca
 
         val result = SUT.createMatchingData(inputData)
 
-        result shouldBe Some(RawMemberDetails("", "", ",", ""))
+        result shouldBe Some(RawMemberDetails("", "", "", ""))
       }
     }
   }

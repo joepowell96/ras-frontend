@@ -22,12 +22,9 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import connectors.FileUploadConnector
 import helpers.FromListToCaseClass
-import models.{MemberDetails, MemberName, RasDate, RawMemberDetails}
-import org.joda.time.LocalDate
+import models.RawMemberDetails
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.Source
