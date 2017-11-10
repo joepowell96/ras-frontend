@@ -22,9 +22,9 @@ import connectors.FileUploadConnector
 import play.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
+import uk.gov.hmrc.play.http.logging.MdcLoggingExecutionContext
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait UploadService extends ServicesConfig {
 
@@ -37,7 +37,7 @@ trait UploadService extends ServicesConfig {
 
   val fileUploadConnector: FileUploadConnector
 
-  def createFileUploadUrl(): Future[Option[String]] = {
+  def createFileUploadUrl()(implicit ec: ExecutionContext = MdcLoggingExecutionContext.fromLoggingDetails(hc)): Future[Option[String]] = {
     val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
     fileUploadConnector.createEnvelope().map { response =>
       response.header("Location") match {
