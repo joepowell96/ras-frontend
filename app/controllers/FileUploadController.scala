@@ -47,7 +47,7 @@ trait FileUploadController extends RasController with PageFlowController {
             }
           }
         case Left(resp) =>
-          Logger.debug("[FileUploadController][get] user Not authorised")
+          Logger.debug("[FileUploadController][get] user not authorised")
           resp
       }
   }
@@ -60,9 +60,24 @@ trait FileUploadController extends RasController with PageFlowController {
       }
   }
 
-  def uploadCallback = Action.async{ implicit request =>
-    val requestBody = request.body.toString
-    Future.successful(Ok(views.html.file_upload_successful(requestBody)))
+  def uploadSuccess = Action.async { implicit request =>
+    isAuthorised.flatMap {
+      case Right(_) =>
+        Logger.debug("[FileUploadController][uploadSuccess] upload has been successful")
+        Future.successful(Ok(views.html.file_upload_successful()))
+      case Left(resp) =>
+        Logger.debug("[FileUploadController][uploadSuccess] user not authorised")
+        resp
+    }
+  }
+
+  def uploadError = Action.async { implicit request =>
+    isAuthorised.flatMap {
+      case Right(_) =>
+        Future.successful(Redirect(routes.GlobalErrorController.get()))
+      case Left(resp) =>
+        Logger.debug("[FileUploadController][uploadSuccess] user not authorised")
+        resp
   }
 
 }

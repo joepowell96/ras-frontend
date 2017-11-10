@@ -30,8 +30,10 @@ trait UploadService extends ServicesConfig {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
-  lazy val serviceUrl = baseUrl("file-upload-frontend")
-  lazy val serviceUrlSuffix = getString("file-upload-url-suffix")
+  lazy val rasFrontendBaseUrl = baseUrl("ras-frontend")
+  lazy val rasFrontendUrlSuffix = getString("ras-frontend-url-suffix")
+  lazy val fileUploadFrontendBaseUrl = baseUrl("file-upload-frontend")
+  lazy val fileUploadFrontendSuffix = getString("file-upload-frontend-url-suffix")
 
   val fileUploadConnector: FileUploadConnector
 
@@ -42,7 +44,14 @@ trait UploadService extends ServicesConfig {
         case Some(locationHeader) =>
           locationHeader match {
             case envelopeIdPattern(id) =>
-              Some(s"$serviceUrl/file-upload/upload/envelopes/${id}/files/${UUID.randomUUID().toString}")
+              Logger.debug("[UploadService][createFileUploadUrl] Envelope id obtained")
+
+              val fileUploadUrl = s"$fileUploadFrontendBaseUrl/$fileUploadFrontendSuffix/$id/files/${UUID.randomUUID().toString}"
+              val successRedirectUrl = s"redirect-success-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-success"
+              val errorRedirectUrl = s"redirect-error-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-error"
+              val completeFileUploadUlr = s"${fileUploadUrl}?${successRedirectUrl}&${errorRedirectUrl}"
+
+              Some(completeFileUploadUlr)
             case _ =>
               Logger.debug("[UploadService][createFileUploadUrl] Failed to obtain an envelope id from location header")
               None
@@ -56,5 +65,7 @@ trait UploadService extends ServicesConfig {
 }
 
 object UploadService extends UploadService {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   override val fileUploadConnector = FileUploadConnector
+  // $COVERAGE-ON$
 }

@@ -16,8 +16,6 @@
 
 package controllers
 
-import javax.inject.Inject
-
 import config.RasContextImpl
 import helpers.helpers.I18nHelper
 import play.api.mvc.Action
