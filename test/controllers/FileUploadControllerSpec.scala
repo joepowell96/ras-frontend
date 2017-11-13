@@ -26,7 +26,7 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import play.api.http.Status.OK
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
@@ -143,7 +143,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
     }
 
-    "Display error" when {
+    "redirect to file upload page" when {
 
       "empty file is being uploaded" in {
         val uploadResponse = UploadResponse("400",Some("Envelope does not allow zero length files, and submitted file has length zero"))
@@ -152,7 +152,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
         val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
         val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
-        redirectLocation(result).get should include("/global-error")
+        redirectLocation(result).get should include("bulk/bulk-upload")
       }
 
     }

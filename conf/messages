@@ -146,3 +146,5 @@ file.upload.page.sub-header = The file must contain mandatory information and in
 templates.link = <a href="">download a template and instructions (2 files)</a>
 
 upload = Upload
+
+file-upload-empty-file-error=Envelope does not allow zero length files, and submitted file has length zero.
