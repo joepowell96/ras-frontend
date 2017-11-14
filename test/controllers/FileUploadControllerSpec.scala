@@ -130,8 +130,11 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
 
       "contain empty file error if present in session cache" in {
-        val reason = """{"error":{"msg":"Envelope does not allow zero length files, and submitted file has length 0"}}"""
-        when(TestFileUploadController.sessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession.copy(uploadResponse = Some(UploadResponse("403",Some(reason)))))))
+        when(TestFileUploadController.sessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(
+          Future.successful(Some(rasSession.copy(
+            uploadResponse = Some(UploadResponse("403",Some(Messages("file-upload-empty-file-error"))))))
+          )
+        )
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = await(TestFileUploadController.get().apply(fakeRequest))
         doc(result).getElementById("upload-error").text shouldBe Messages("file-upload-empty-file-error")

@@ -88,9 +88,14 @@ trait FileUploadController extends RasController with PageFlowController {
   def uploadError = Action.async { implicit request =>
     isAuthorised.flatMap {
       case Right(_) =>
+
         val errorCode = request.getQueryString("errorCode").getOrElse("")
-        val errorReason = request.getQueryString("reason")
-        val errorResponse = UploadResponse(errorCode, errorReason)
+        val errorReason = request.getQueryString("reason").getOrElse("")
+
+        // temp solution, replace with a json read
+        val msg = errorReason.substring(17)
+        val errorResponse = UploadResponse(errorCode,Some(msg))
+
         sessionService.cacheUploadResponse(errorResponse).flatMap {
           case Some(session) => Future.successful(Redirect(routes.FileUploadController.get()))
           case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
