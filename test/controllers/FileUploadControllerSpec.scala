@@ -65,7 +65,6 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
     override val fileUploadService = mockFileUploadService
 
-    //when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
@@ -131,11 +130,11 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
 
       "contain empty file error if present in session cache" in {
+        val reason = """{"error":{"msg":"Envelope does not allow zero length files, and submitted file has length 0"}}"""
+        when(TestFileUploadController.sessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession.copy(uploadResponse = Some(UploadResponse("403",Some(reason)))))))
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-        when(TestFileUploadController.sessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession.copy(uploadResponse = Some(UploadResponse("403",Some("blahblah")))))))
-
         val result = await(TestFileUploadController.get().apply(fakeRequest))
-        doc(result).getElementsByClass("upload-error").text shouldBe Messages("file-upload-empty-file-error")
+        doc(result).getElementById("upload-error").text shouldBe Messages("file-upload-empty-file-error")
       }
     }
 

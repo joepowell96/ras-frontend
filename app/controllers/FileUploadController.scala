@@ -38,22 +38,19 @@ trait FileUploadController extends RasController with PageFlowController {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
-
           fileUploadService.createFileUploadUrl.flatMap { urlOption =>
             urlOption match {
               case Some(url) =>
-
                 Logger.debug("[FileUploadController][get] successfully obtained a form url")
-
                 sessionService.fetchRasSession().map {
                   case Some(session) =>
-                    val errorReason = session.uploadResponse.getOrElse(UploadResponse("",None)).reason.getOrElse("blahblah")
+                    Logger.debug("[FileUploadController][get] session retrieved")
+                    val errorReason = session.uploadResponse.getOrElse(UploadResponse("",None)).reason.getOrElse("")
                     Ok(views.html.file_upload(url,errorReason))
                   case _ =>
+                    Logger.debug("[FileUploadController][get] no session retrieved")
                     Ok(views.html.file_upload(url,""))
                 }
-
-
               case _ =>
                 Logger.debug("[FileUploadController][get] failed to obtain a form url")
                 Future.successful(Redirect(routes.GlobalErrorController.get()))
@@ -63,7 +60,6 @@ trait FileUploadController extends RasController with PageFlowController {
               Logger.error("[FileUploadController][get] failed to obtain an envelope")
               Redirect(routes.GlobalErrorController.get)
           }
-
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user not authorised")
           resp
@@ -92,17 +88,15 @@ trait FileUploadController extends RasController with PageFlowController {
   def uploadError = Action.async { implicit request =>
     isAuthorised.flatMap {
       case Right(_) =>
-
         val errorCode = request.getQueryString("errorCode").getOrElse("")
         val errorReason = request.getQueryString("reason")
         val errorResponse = UploadResponse(errorCode, errorReason)
-
         sessionService.cacheUploadResponse(errorResponse).flatMap {
           case Some(session) => Future.successful(Redirect(routes.FileUploadController.get()))
           case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
         }
       case Left(resp) =>
-        Logger.debug("[FileUploadController][uploadSuccess] user not authorised")
+        Logger.debug("[FileUploadController][uploadError] user not authorised")
         resp
     }
   }
