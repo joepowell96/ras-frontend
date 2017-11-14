@@ -33,20 +33,37 @@ trait FileUploadController extends RasController with PageFlowController {
 
   val fileUploadService: UploadService
 
+
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
         case Right(_) =>
+
           fileUploadService.createFileUploadUrl.flatMap { urlOption =>
             urlOption match {
               case Some(url) =>
+
                 Logger.debug("[FileUploadController][get] successfully obtained a form url")
-                Future.successful(Ok(views.html.file_upload(url)))
+
+                sessionService.fetchRasSession().map {
+                  case Some(session) =>
+                    val errorReason = session.uploadResponse.getOrElse(UploadResponse("",None)).reason.getOrElse("blahblah")
+                    Ok(views.html.file_upload(url,errorReason))
+                  case _ =>
+                    Ok(views.html.file_upload(url,""))
+                }
+
+
               case _ =>
                 Logger.debug("[FileUploadController][get] failed to obtain a form url")
                 Future.successful(Redirect(routes.GlobalErrorController.get()))
             }
+          }.recover {
+            case e: Throwable =>
+              Logger.error("[FileUploadController][get] failed to obtain an envelope")
+              Redirect(routes.GlobalErrorController.get)
           }
+
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user not authorised")
           resp

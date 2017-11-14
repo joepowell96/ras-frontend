@@ -65,6 +65,9 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
     override val fileUploadService = mockFileUploadService
 
+    //when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+    when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).
       thenReturn(successfulRetrieval)
 
@@ -125,6 +128,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
+      }
+
+      "contain empty file error if present in session cache" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(TestFileUploadController.sessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession.copy(uploadResponse = Some(UploadResponse("403",Some("blahblah")))))))
+
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementsByClass("upload-error").text shouldBe Messages("file-upload-empty-file-error")
       }
     }
 
