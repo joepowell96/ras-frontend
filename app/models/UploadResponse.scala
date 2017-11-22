@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.Json
 
 case class UploadResponse(code: String, reason: Option[String])
 

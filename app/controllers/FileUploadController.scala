@@ -33,7 +33,6 @@ trait FileUploadController extends RasController with PageFlowController {
 
   val fileUploadService: UploadService
 
-
   def get = Action.async {
     implicit request =>
       isAuthorised.flatMap {
@@ -90,11 +89,11 @@ trait FileUploadController extends RasController with PageFlowController {
       case Right(_) =>
 
         val errorCode = request.getQueryString("errorCode").getOrElse("")
-        val errorReason = request.getQueryString("reason").getOrElse("")
-
-        // temp solution, replace with a json read
-        val msg = errorReason.substring(17)
-        val errorResponse = UploadResponse(errorCode,Some(msg))
+        val errorResponse = errorCode match {
+          case "400" => UploadResponse(errorCode,Some("File is empty"))
+          case "413" => UploadResponse(errorCode,Some("File size exceeds limit to upload"))
+          case _ => UploadResponse(errorCode,Some("File is corrupt"))
+        }
 
         sessionService.cacheUploadResponse(errorResponse).flatMap {
           case Some(session) => Future.successful(Redirect(routes.FileUploadController.get()))
