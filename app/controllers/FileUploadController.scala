@@ -103,7 +103,7 @@ trait FileUploadController extends RasController with PageFlowController {
     uploadResponse match {
       case Some(response) =>
         response.code match {
-          case "400" if response.reason.getOrElse("") == Messages("file.upload.empty.file.reason") =>
+          case "400" if response.reason.getOrElse("").contains(Messages("file.upload.empty.file.reason")) =>
             Logger.debug("[FileUploadController][extractErrorReason] empty file")
             Messages("file.empty.error")
           case "400" =>
