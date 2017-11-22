@@ -44,22 +44,7 @@ trait FileUploadController extends RasController with PageFlowController {
                 sessionService.fetchRasSession().map {
                   case Some(session) =>
                     Logger.debug("[FileUploadController][get] session retrieved")
-                    session.uploadResponse match {
-                      case Some(response) =>
-                        val errorReason =
-                          response.code match {
-                            case "400" =>
-                              if(response.reason.getOrElse("") == (Messages("file.upload.empty.file.reason")))
-                                Messages("file.empty.error")
-                              else
-                                Messages("upload.failed.error")
-                            case "413" => Messages("file.large.error")
-                            case _ => Messages("upload.failed.error")
-                          }
-                        Ok(views.html.file_upload(url,errorReason))
-                      case _ =>
-                        Ok(views.html.file_upload(url,""))
-                    }
+                    Ok(views.html.file_upload(url,extractErrorReason(session.uploadResponse)))
                   case _ =>
                     Logger.debug("[FileUploadController][get] no session retrieved")
                     Ok(views.html.file_upload(url,""))
@@ -101,11 +86,9 @@ trait FileUploadController extends RasController with PageFlowController {
   def uploadError = Action.async { implicit request =>
     isAuthorised.flatMap {
       case Right(_) =>
-
         val errorCode = request.getQueryString("errorCode").getOrElse("")
         val errorReason = request.getQueryString("reason").getOrElse("")
         val errorResponse = UploadResponse(errorCode, Some(errorReason))
-
         sessionService.cacheUploadResponse(errorResponse).flatMap {
           case Some(session) => Future.successful(Redirect(routes.FileUploadController.get()))
           case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
@@ -113,6 +96,19 @@ trait FileUploadController extends RasController with PageFlowController {
       case Left(resp) =>
         Logger.debug("[FileUploadController][uploadError] user not authorised")
         resp
+    }
+  }
+
+  private def extractErrorReason(uploadResponse: Option[UploadResponse]):String ={
+    uploadResponse match {
+      case Some(response) =>
+        response.code match {
+          case "400" if response.reason.getOrElse("") == Messages("file.upload.empty.file.reason") => Messages("file.empty.error")
+          case "400" => Messages("upload.failed.error")
+          case "413" => Messages("file.large.error")
+          case _ => Messages("upload.failed.error")
+        }
+      case _ => ""
     }
   }
 
