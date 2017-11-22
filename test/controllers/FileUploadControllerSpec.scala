@@ -94,6 +94,13 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         status(result) shouldBe SEE_OTHER
         redirectLocation(result).get should include("/global-error")
       }
+
+      "an there has been a problem calling the envelope creator" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.failed(new RuntimeException))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
+      }
     }
 
     "rendered file upload page" should {
@@ -158,6 +165,15 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         val result = await(TestFileUploadController.get().apply(fakeRequest))
         doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
       }
+
+      "not contain any errors if no session cache is available" in {
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe ""
+      }
+
+
     }
 
     "redirect to dashboard page when back link is clicked" in {
@@ -177,14 +193,21 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     "redirect to file upload page" when {
 
-      "empty file is being uploaded" in {
-        val uploadResponse = UploadResponse("400",Some("Envelope does not allow zero length files, and submitted file has length zero"))
-        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
-        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+      "the upload error endpoint in called by the file upload" in {
         when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
+        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}")
         val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
         redirectLocation(result).get should include("bulk/bulk-upload")
+      }
+    }
+
+    "redirect to global error page" when {
+
+      "the upload error endpoint in called by the file upload but caching fails" in {
+        when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
+        val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
+        redirectLocation(result).get should include("/global-error")
       }
 
     }
