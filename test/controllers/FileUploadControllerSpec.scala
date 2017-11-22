@@ -131,7 +131,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 
       "contain empty file error if present in session cache" in {
 
-        val uploadResponse = UploadResponse("400",Some("File is empty"))
+        val uploadResponse = UploadResponse("400",Some(""))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
 
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
