@@ -130,7 +130,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
 
       "contain empty file error if present in session cache" in {
-        val uploadResponse = UploadResponse("400",Some(""))
+        val uploadResponse = UploadResponse("400",Some(Messages("file.upload.empty.file.reason")))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
@@ -149,14 +149,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         doc(result).getElementById("upload-error").text shouldBe Messages("file.large.error")
       }
 
-      "contain file has a problem error if present in session cache" in {
+      "contain file failed to upload if present in session cache" in {
         val uploadResponse = UploadResponse("",Some(""))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
         val result = await(TestFileUploadController.get().apply(fakeRequest))
-        doc(result).getElementById("upload-error").text shouldBe Messages("file.problematic.error")
+        doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
       }
     }
 

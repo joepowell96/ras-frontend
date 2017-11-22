@@ -48,9 +48,13 @@ trait FileUploadController extends RasController with PageFlowController {
                       case Some(response) =>
                         val errorReason =
                           response.code match {
-                            case "400" => Messages("file.empty.error")
+                            case "400" =>
+                              if(response.reason.getOrElse("") == (Messages("file.upload.empty.file.reason")))
+                                Messages("file.empty.error")
+                              else
+                                Messages("upload.failed.error")
                             case "413" => Messages("file.large.error")
-                            case _ => Messages("file.problematic.error")
+                            case _ => Messages("upload.failed.error")
                           }
                         Ok(views.html.file_upload(url,errorReason))
                       case _ =>

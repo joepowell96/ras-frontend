@@ -150,4 +150,4 @@ upload = Upload
 file.upload.empty.file.reason=Envelope does not allow zero length files, and submitted file has length zero.
 file.empty.error=Cannot upload an empty file.
 file.large.error=File size exceeds limit to upload.
-file.problematic.error=There is an unknown problem with the file you are trying to upload.
+upload.failed.error=There is an unknown problem with the file you are trying to upload.
