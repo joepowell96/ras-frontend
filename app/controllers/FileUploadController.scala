@@ -103,10 +103,27 @@ trait FileUploadController extends RasController with PageFlowController {
     uploadResponse match {
       case Some(response) =>
         response.code match {
-          case "400" if response.reason.getOrElse("") == Messages("file.upload.empty.file.reason") => Messages("file.empty.error")
-          case "400" => Messages("upload.failed.error")
-          case "413" => Messages("file.large.error")
-          case _ => Messages("upload.failed.error")
+          case "400" if response.reason.getOrElse("") == Messages("file.upload.empty.file.reason") =>
+            Logger.debug("[FileUploadController][extractErrorReason] empty file")
+            Messages("file.empty.error")
+          case "400" =>
+            Logger.debug("[FileUploadController][extractErrorReason] bad request")
+            Messages("upload.failed.error")
+          case "404" =>
+            Logger.debug("[FileUploadController][extractErrorReason] enveloper not found")
+            Messages("upload.failed.error")
+          case "413" =>
+            Logger.debug("[FileUploadController][extractErrorReason] file too large")
+            Messages("file.large.error")
+          case "415" =>
+            Logger.debug("[FileUploadController][extractErrorReason] file type other than the supported type")
+            Messages("upload.failed.error")
+          case "423" =>
+            Logger.debug("[FileUploadController][extractErrorReason] routing request has been made for this Envelope. Envelope is locked")
+            Messages("upload.failed.error")
+          case _ =>
+            Logger.debug("[FileUploadController][extractErrorReason] unknown cause")
+            Messages("upload.failed.error")
         }
       case _ => ""
     }

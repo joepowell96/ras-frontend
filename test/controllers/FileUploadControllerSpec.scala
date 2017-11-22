@@ -146,6 +146,16 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         doc(result).getElementById("upload-error").text shouldBe Messages("file.empty.error")
       }
 
+      "contain upload file error if a bad request has been submitted" in {
+        val uploadResponse = UploadResponse("400",None)
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
+      }
+
       "contain file too large error if present in session cache" in {
         val uploadResponse = UploadResponse("413",Some(""))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
@@ -156,12 +166,38 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         doc(result).getElementById("upload-error").text shouldBe Messages("file.large.error")
       }
 
+      "contain upload failed error if envelope not found in session cache" in {
+        val uploadResponse = UploadResponse("404",Some(""))
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
+      }
+
+      "contain upload failed error if file type is wrong" in {
+        val uploadResponse = UploadResponse("415",Some(""))
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
+      }
+
+      "contain upload failed error if locked" in {
+        val uploadResponse = UploadResponse("423",Some(""))
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
+      }
+
       "contain file failed to upload if present in session cache" in {
         val uploadResponse = UploadResponse("",Some(""))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-
         val result = await(TestFileUploadController.get().apply(fakeRequest))
         doc(result).getElementById("upload-error").text shouldBe Messages("upload.failed.error")
       }
