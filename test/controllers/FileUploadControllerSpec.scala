@@ -130,15 +130,33 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
 
       "contain empty file error if present in session cache" in {
-
         val uploadResponse = UploadResponse("400",Some(""))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
-
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
         val result = await(TestFileUploadController.get().apply(fakeRequest))
-        doc(result).getElementById("upload-error").text shouldBe "File is empty"
+        doc(result).getElementById("upload-error").text shouldBe Messages("file.empty.error")
+      }
+
+      "contain file too large error if present in session cache" in {
+        val uploadResponse = UploadResponse("413",Some(""))
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("file.large.error")
+      }
+
+      "contain file has a problem error if present in session cache" in {
+        val uploadResponse = UploadResponse("",Some(""))
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
+        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+
+        val result = await(TestFileUploadController.get().apply(fakeRequest))
+        doc(result).getElementById("upload-error").text shouldBe Messages("file.problematic.error")
       }
     }
 
@@ -162,13 +180,10 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       "empty file is being uploaded" in {
         val uploadResponse = UploadResponse("400",Some("Envelope does not allow zero length files, and submitted file has length zero"))
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),Some(uploadResponse))
-
         when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
         when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-
         val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
         val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
-
         redirectLocation(result).get should include("bulk/bulk-upload")
       }
 

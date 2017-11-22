@@ -44,13 +44,18 @@ trait FileUploadController extends RasController with PageFlowController {
                 sessionService.fetchRasSession().map {
                   case Some(session) =>
                     Logger.debug("[FileUploadController][get] session retrieved")
-                    val errorReason =
-                      session.uploadResponse.getOrElse(UploadResponse("",None)).code match {
-                      case "400" => "File is empty"
-                      case "413" => "File size exceeds limit to upload"
-                      case _ => "File is corrupt"
+                    session.uploadResponse match {
+                      case Some(response) =>
+                        val errorReason =
+                          response.code match {
+                            case "400" => Messages("file.empty.error")
+                            case "413" => Messages("file.large.error")
+                            case _ => Messages("file.problematic.error")
+                          }
+                        Ok(views.html.file_upload(url,errorReason))
+                      case _ =>
+                        Ok(views.html.file_upload(url,""))
                     }
-                    Ok(views.html.file_upload(url,errorReason))
                   case _ =>
                     Logger.debug("[FileUploadController][get] no session retrieved")
                     Ok(views.html.file_upload(url,""))

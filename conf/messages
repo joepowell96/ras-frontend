@@ -147,4 +147,7 @@ templates.link = <a href="">download a template and instructions (2 files)</a>
 
 upload = Upload
 
-file-upload-empty-file-error=Envelope does not allow zero length files, and submitted file has length zero.
+file.upload.empty.file.reason=Envelope does not allow zero length files, and submitted file has length zero.
+file.empty.error=Cannot upload an empty file.
+file.large.error=File size exceeds limit to upload.
+file.problematic.error=There is an unknown problem with the file you are trying to upload.
