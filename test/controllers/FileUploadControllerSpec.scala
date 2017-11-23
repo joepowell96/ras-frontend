@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.UserDetailsConnector
+import connectors.{FileUploadConnector, UserDetailsConnector}
 import helpers.helpers.I18nHelper
 import models._
 import org.jsoup.Jsoup
@@ -30,10 +30,10 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import play.api.{Configuration, Environment}
-import services.{SessionService, UploadService}
+import services.SessionService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 import scala.concurrent.Future
@@ -41,18 +41,19 @@ import scala.concurrent.Future
 class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I18nHelper with MockitoSugar{
 
   implicit val headerCarrier = HeaderCarrier()
+
   val fakeRequest = FakeRequest()
   val mockAuthConnector = mock[AuthConnector]
+  val mockFileUploadConnector = mock[FileUploadConnector]
   val mockUserDetailsConnector = mock[UserDetailsConnector]
   val mockSessionService = mock[SessionService]
   val mockConfig = mock[Configuration]
   val mockEnvironment = mock[Environment]
-  val mockFileUploadService = mock[UploadService]
   val successfulRetrieval: Future[~[Option[String], Option[String]]] = Future.successful(new ~(Some("1234"), Some("/")))
   val memberName = MemberName("Jackie","Chan")
   val memberNino = MemberNino("AB123456C")
   val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"),Some("2012")))
-  val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),None)
+  val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""))
 
 
   private def doc(result: Future[Result]): Document = Jsoup.parse(contentAsString(result))
@@ -63,7 +64,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val sessionService = mockSessionService
     override val config: Configuration = mockConfig
     override val env: Environment = mockEnvironment
-    override val fileUploadService = mockFileUploadService
+    override val fileUploadConnector = mockFileUploadConnector
 
     when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
 
@@ -76,6 +77,16 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
   }
 
   "FileUploadController" should {
+
+    "render the file upload page with existing envelope id" in {
+
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("","","","","","",""),None,Some(Envelope("envelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+
+
+    }
+
 
     "display file upload page" when {
 
@@ -246,6 +257,35 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         redirectLocation(result).get should include("/global-error")
       }
 
+    }
+
+    "calling createFileUploadUrl" should {
+
+      "return a url" in {
+
+        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
+
+        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+
+        val result = await(TestFileUploadController.createFileUploadUrl)
+
+        result.getOrElse("") should include("file-upload/upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")
+
+      }
+
+      "return none if envelope id could not be extracted from the header" in {
+        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/")),None)
+        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestFileUploadController.createFileUploadUrl)
+        result shouldBe None
+      }
+
+      "return none if connector fails to return a response" in {
+        val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
+        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
+        val result = await(TestFileUploadController.createFileUploadUrl)
+        result shouldBe None
+      }
     }
 
   }
