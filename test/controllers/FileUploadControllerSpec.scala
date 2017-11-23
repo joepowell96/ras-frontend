@@ -91,7 +91,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     "display file upload page" when {
 
       "an upload url has been successfully obtained" in {
-        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
+        when(TestFileUploadController.fileUploadConnector.createEnvelope()).thenReturn(Future.successful(Some("")))
         val result = TestFileUploadController.get().apply(fakeRequest)
         status(result) shouldBe OK
       }

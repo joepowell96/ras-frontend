@@ -18,7 +18,7 @@ package controllers
 
 import java.util.UUID
 
-import config.{FrontendAuthConnector, RasContext, RasContextImpl}
+import config.{ApplicationConfig, FrontendAuthConnector, RasContext, RasContextImpl}
 import connectors.{FileUploadConnector, UserDetailsConnector}
 import models.UploadResponse
 import play.Logger
@@ -26,7 +26,6 @@ import play.api.mvc.Action
 import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -134,10 +133,10 @@ trait FileUploadController extends RasController with PageFlowController {
 
   def createFileUploadUrl(): Future[Option[String]] = {
 
-    lazy val rasFrontendBaseUrl = baseUrl("ras-frontend")
-    lazy val rasFrontendUrlSuffix = getString("ras-frontend-url-suffix")
-    lazy val fileUploadFrontendBaseUrl = baseUrl("file-upload-frontend")
-    lazy val fileUploadFrontendSuffix = getString("file-upload-frontend-url-suffix")
+    lazy val rasFrontendBaseUrl = ApplicationConfig.baseUrl("ras-frontend")
+    lazy val rasFrontendUrlSuffix = ApplicationConfig.getString("ras-frontend-url-suffix")
+    lazy val fileUploadFrontendBaseUrl = ApplicationConfig.baseUrl("file-upload-frontend")
+    lazy val fileUploadFrontendSuffix = ApplicationConfig.getString("file-upload-frontend-url-suffix")
 
     val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
     fileUploadConnector.createEnvelope()(hc = HeaderCarrier()).map { response =>
