@@ -1,0 +1,60 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(memberNinoForm: Form[models.MemberNino], name:String)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+@import views.html.helpers._
+
+@ras_main(title = Messages("member.nino.page.title")) {
+
+@views.html.helpers.errorSummary(memberNinoForm)
+
+<div class="grid-layout--no-gutter">
+ <div class="grid-layout__column">
+  <div class="grid-layout__column--3-4">
+
+   <div class="back-arrow">
+    <a class="link-back" href="@routes.MemberNinoController.back">@Messages("back")</a>
+   </div>
+
+     <h1 id="header" class="heading-xlarge">@Messages("member.nino.page.header", name)</h1>
+     @form(action = routes.MemberNinoController.post) {
+
+       <div class="form-group">
+
+        <div>
+         @rasInput(memberNinoForm("nino"),
+         '_labelClass -> "form-label-bold",
+         '_id -> "nino",
+         '_maxLength -> 15,
+         '_hintText -> Messages("nino.hint"))
+        </div>
+
+       </div>
+
+       <div>
+        <button class="button" type="submit" id="continue">@Messages("continue")</button>
+       </div>
+     }
+
+
+  </div>
+ </div>
+ </div>
+
+}

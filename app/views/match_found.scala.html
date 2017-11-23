@@ -1,0 +1,77 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(name: String,
+  dateOfBirth:String,
+  nino:String,
+  currentYearResidencyStatus: String,
+  nextYearResidencyStatus: String,
+  currentTaxYear:Int,
+  nextTaxYear:Int)(implicit request: Request[_], context: config.RasContext, messages: Messages)
+
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.play.views.html.helpers._
+
+@ras_main(title = Messages("match.found.page.title")) {
+
+<div class="grid-layout--no-gutter">
+  <div class="grid-layout__column">
+    <div class="grid-layout__column--3-4">
+
+      <div class="back-arrow">
+        <a class="link-back" href="@routes.ResultsController.back">@Messages("back")</a>
+      </div>
+      <br>
+
+      <h1 id="header">@Messages("match.found.header",name)</h1>
+
+      <p id="sub-header">@Messages("match.found.sub-header",name ,currentYearResidencyStatus ,currentTaxYear.toString,(currentTaxYear + 1).toString,(currentTaxYear + 2).toString, nextYearResidencyStatus)</p>
+
+      <table>
+        <tbody>
+
+        <tr>
+          <th id="tax-year-header">@Messages("tax.year")</th>
+          <th id="location-header">@Messages("location")</th>
+        </tr>
+
+        <tr>
+          <td id="cy-tax-year-period">@Messages("tax.year.period", currentTaxYear.toString, (currentTaxYear + 1).toString)</td>
+          <td id="cy-residency-status">@currentYearResidencyStatus</td>
+        </tr>
+
+        <tr>
+          <td id="ny-tax-year-period">@Messages("tax.year.period", (currentTaxYear + 1).toString, (currentTaxYear + 2).toString)</td>
+          <td id="ny-residency-status">@nextYearResidencyStatus</td>
+        </tr>
+
+        </tbody>
+      </table>
+
+      <div>
+        <a id="check-another-person" href="@routes.SessionController.redirect("member-name",true)">@Messages("check.another.person")</a>
+      </div>
+
+      <br>
+
+      <div>
+        <a id="sign-out" class="button" href="" role="button" >@Messages("sign.out")</a>
+      </div>
+
+  </div>
+  </div>
+</div>
+}
