@@ -100,6 +100,53 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         redirectLocation(result).get should include("/global-error")
       }
 
+      "an upload url has not been obtained because of bad request" in {
+        val connectorResponse = HttpResponse(400,None,Map(),None)
+        when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
+      }
+    }
+
+    "render the file upload page containing a back link" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
+    }
+
+    "redirect to dashboard page when back link is clicked" in {
+      val result = TestFileUploadController.back.apply(FakeRequest())
+      status(result) shouldBe SEE_OTHER
+      redirectLocation(result).get should include("/dashboard")
+    }
+
+    "display file upload successful page" when {
+      "file has been uploaded successfully" in {
+        val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val result = await(TestFileUploadController.uploadSuccess().apply(fakeRequest))
+        status(result) shouldBe OK
+      }
+    }
+
+    "redirect to file upload page" when {
+      "the upload error endpoint in called by the file upload" in {
+        when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}")
+        val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
+        redirectLocation(result).get should include("bulk/bulk-upload")
+      }
+    }
+
+    "redirect to global error page" when {
+      "the upload error endpoint in called by the file upload but caching fails" in {
+        when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
+        val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
+        redirectLocation(result).get should include("/global-error")
+      }
     }
   }
 
@@ -142,11 +189,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 //        doc(result).getElementById("upload-button").text shouldBe Messages("upload")
 //      }
 //
-//      "contain a back link" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        doc(result).getElementsByClass("link-back").text shouldBe Messages("back")
-//      }
+
 //
 //      "contain empty file error if present in session cache" in {
 //        val uploadResponse = UploadResponse("400",Some(Messages("file.upload.empty.file.reason")))
@@ -223,71 +266,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 //
 //
 //    }
-//
-//    "redirect to dashboard page when back link is clicked" in {
-//      val result = TestFileUploadController.back.apply(FakeRequest())
-//      status(result) shouldBe SEE_OTHER
-//      redirectLocation(result).get should include("/dashboard")
-//    }
-//
-//    "display file upload successful page" when {
-//
-//      "file has been uploaded successfully" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = await(TestFileUploadController.uploadSuccess().apply(fakeRequest))
-//        status(result) shouldBe OK
-//      }
-//    }
-//
-//    "redirect to file upload page" when {
-//
-//      "the upload error endpoint in called by the file upload" in {
-//        when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
-//        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}")
-//        val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
-//        redirectLocation(result).get should include("bulk/bulk-upload")
-//      }
-//    }
-//
-//    "redirect to global error page" when {
-//
-//      "the upload error endpoint in called by the file upload but caching fails" in {
-//        when(mockSessionService.cacheUploadResponse(Matchers.any())(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
-//        val uploadRequest = FakeRequest(GET, "/relief-at-source/upload-error?errorCode=400&reason={%22error%22:{%22msg%22:%22Envelope%20does%20not%20allow%20zero%20length%20files,%20and%20submitted%20file%20has%20length%200%22}}" )
-//        val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
-//        redirectLocation(result).get should include("/global-error")
-//      }
-//
-//    }
-//
-//    "calling createFileUploadUrl" should {
-//
-//      "return a url" in {
-//
-//        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")),None)
-//
-//        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-//
-//        val result = await(TestFileUploadController.createFileUploadUrl)
-//
-//        result.getOrElse("") should include("file-upload/upload/envelopes/0b215e97-11d4-4006-91db-c067e74fc653")
-//
-//      }
-//
-//      "return none if envelope id could not be extracted from the header" in {
-//        val fileUploadConnectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/")),None)
-//        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-//        val result = await(TestFileUploadController.createFileUploadUrl)
-//        result shouldBe None
-//      }
-//
-//      "return none if connector fails to return a response" in {
-//        val fileUploadConnectorResponse = HttpResponse(400,None,Map(),None)
-//        when(TestFileUploadController.fileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(fileUploadConnectorResponse))
-//        val result = await(TestFileUploadController.createFileUploadUrl)
-//        result shouldBe None
-//      }
-//    }
+
 //
 //  }
 
