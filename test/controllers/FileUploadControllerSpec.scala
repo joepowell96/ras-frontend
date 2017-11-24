@@ -89,25 +89,23 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       status(result) shouldBe OK
       doc(result).getElementById("upload-form").attr("action").contains("0b215e97-11d4-4006-91db-c067e74fc653")
     }
+
+    "redirect to global error page" when {
+
+      "an upload url has not been obtained because of empty location header" in {
+        val connectorResponse = HttpResponse(201,None,Map("Location" -> List("localhost:8898/file-upload/envelopes/")),None)
+        when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
+      }
+
+    }
   }
 
-//    "display file upload page" when {
-//
-//      "an upload url has been successfully obtained" in {
-//        when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        status(result) shouldBe OK
-//      }
-//
-//    }
-//
-//    "redirect to global error page" when {
-//      "an upload url has not been obtained" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(None))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        status(result) shouldBe SEE_OTHER
-//        redirectLocation(result).get should include("/global-error")
-//      }
+
+
+
 //
 //      "an there has been a problem calling the envelope creator" in {
 //        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.failed(new RuntimeException))
