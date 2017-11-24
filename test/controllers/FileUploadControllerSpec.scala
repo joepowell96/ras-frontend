@@ -67,19 +67,27 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     override val env: Environment = mockEnvironment
     override val fileUploadConnector = mockFileUploadConnector
 
-    when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
     when(mockAuthConnector.authorise[~[Option[String], Option[String]]](any(), any())(any(),any())).thenReturn(successfulRetrieval)
     when(mockUserDetailsConnector.getUserDetails(any())(any())).thenReturn(Future.successful(UserDetails(None, None, "", groupIdentifier = Some("group"))))
   }
 
   "FileUploadController" should {
 
-    "use existing envelope to construct a url for the upload form" in {
+    "use existing envelope id to construct a url for the upload form" in {
       val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
       when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
       val result = await(TestFileUploadController.get.apply(fakeRequest))
       status(result) shouldBe OK
       doc(result).getElementById("upload-form").attr("action").contains("existingEnvelopeId123")
+    }
+
+    "use new envelope id to construct a url for the upload form" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, None)
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
+      val result = await(TestFileUploadController.get.apply(fakeRequest))
+      status(result) shouldBe OK
+      doc(result).getElementById("upload-form").attr("action").contains("0b215e97-11d4-4006-91db-c067e74fc653")
     }
   }
 

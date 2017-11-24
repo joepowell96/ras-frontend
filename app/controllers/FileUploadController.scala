@@ -25,6 +25,7 @@ import play.Logger
 import play.api.mvc.Action
 import play.api.{Configuration, Environment, Play}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,12 +41,16 @@ trait FileUploadController extends RasController with PageFlowController {
         case Right(_) =>
           sessionService.fetchRasSession().flatMap {
             case Some(session) =>
-              createFileUploadUrl(session.envelope) match {
+              createFileUploadUrl(session.envelope)(hc).flatMap {
                 case Some(url) =>
                   Future.successful(Ok(views.html.file_upload(url,extractErrorReason(session.uploadResponse))))
                 case _ =>
                   Logger.debug("[FileUploadController][get] failed to obtain a form url")
                   Future.successful(Redirect(routes.GlobalErrorController.get()))
+              }.recover {
+                case e: Throwable =>
+                  Logger.error("[FileUploadController][get] failed to obtain an envelope")
+                  Redirect(routes.GlobalErrorController.get)
               }
             case _ =>
               Logger.error("[FileUploadController][get] failed to obtain an envelope")
@@ -80,25 +85,41 @@ trait FileUploadController extends RasController with PageFlowController {
 
 
 
-  def createFileUploadUrl(envelope: Option[Envelope]): Option[String] = {
+  def createFileUploadUrl(envelope: Option[Envelope])(implicit hc:HeaderCarrier): Future[Option[String]] = {
 
     val config = ApplicationConfig
     val rasFrontendBaseUrl = config.baseUrl("ras-frontend")
     val rasFrontendUrlSuffix = config.getString("ras-frontend-url-suffix")
     val fileUploadFrontendBaseUrl = config.baseUrl("file-upload-frontend")
     val fileUploadFrontendSuffix = config.getString("file-upload-frontend-url-suffix")
-
     val envelopeIdPattern = "envelopes/([\\w\\d-]+)$".r.unanchored
+    val successRedirectUrl = s"redirect-success-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-success"
+    val errorRedirectUrl = s"redirect-error-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-error"
 
     envelope match {
       case Some(envelope) =>
         val fileUploadUrl = s"$fileUploadFrontendBaseUrl/$fileUploadFrontendSuffix/${envelope.id}/files/${UUID.randomUUID().toString}"
-        val successRedirectUrl = s"redirect-success-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-success"
-        val errorRedirectUrl = s"redirect-error-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-error"
         val completeFileUploadUrl = s"${fileUploadUrl}?${successRedirectUrl}&${errorRedirectUrl}"
-        Some(completeFileUploadUrl)
+        Future.successful(Some(completeFileUploadUrl))
       case _ =>
-        None
+        fileUploadConnector.createEnvelope().map { response =>
+          response.header("Location") match {
+            case Some(locationHeader) =>
+              locationHeader match {
+                case envelopeIdPattern(id) =>
+                  Logger.debug("[UploadService][createFileUploadUrl] Envelope id obtained")
+                  val fileUploadUrl = s"$fileUploadFrontendBaseUrl/$fileUploadFrontendSuffix/$id/files/${UUID.randomUUID().toString}"
+                  val completeFileUploadUrl = s"${fileUploadUrl}?${successRedirectUrl}&${errorRedirectUrl}"
+                  Some(completeFileUploadUrl)
+                case _ =>
+                  Logger.debug("[UploadService][createFileUploadUrl] Failed to obtain an envelope id from location header")
+                  None
+              }
+            case _ =>
+              Logger.debug("[UploadService][createFileUploadUrl] Failed to find a location header in the response")
+              None
+          }
+        }
     }
   }
 
