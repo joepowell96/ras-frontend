@@ -41,11 +41,15 @@ trait FileUploadController extends RasController with PageFlowController {
           sessionService.fetchRasSession().flatMap {
             case Some(session) =>
               createFileUploadUrl(session.envelope) match {
-                case Some(url) => ???
-                case _ => ???
+                case Some(url) =>
+                  Future.successful(Ok(views.html.file_upload(url,extractErrorReason(session.uploadResponse))))
+                case _ =>
+                  Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                  Future.successful(Redirect(routes.GlobalErrorController.get()))
               }
-              ???
-            case _ => ???
+            case _ =>
+              Logger.error("[FileUploadController][get] failed to obtain an envelope")
+              Future.successful(Redirect(routes.GlobalErrorController.get))
           }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user not authorised")
@@ -93,7 +97,8 @@ trait FileUploadController extends RasController with PageFlowController {
         val errorRedirectUrl = s"redirect-error-url=$rasFrontendBaseUrl/$rasFrontendUrlSuffix/upload-error"
         val completeFileUploadUrl = s"${fileUploadUrl}?${successRedirectUrl}&${errorRedirectUrl}"
         Some(completeFileUploadUrl)
-      case _ => ???
+      case _ =>
+        None
     }
   }
 
