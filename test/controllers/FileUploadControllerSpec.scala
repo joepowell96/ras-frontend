@@ -150,44 +150,49 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
     }
   }
 
+  "rendered file upload page" should {
+
+    "contain 'upload file' title and header" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).title() shouldBe Messages("file.upload.page.title")
+      doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
+    }
+
+    "contain sub-header" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("sub-header").html shouldBe Messages("file.upload.page.sub-header", Messages("templates.link"))
+    }
+
+    "contain 'choose file' button" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("choose-file") shouldNot be(null)
+    }
+
+    "contain an upload button" in {
+      val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
+      when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
+      val result = TestFileUploadController.get().apply(fakeRequest)
+      doc(result).getElementById("upload-button").text shouldBe Messages("upload")
+    }
+  }
 
 
 
+//"there has been a problem calling the envelope creator" in {
+//  when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.failed(new RuntimeException))
+//  val result = TestFileUploadController.get().apply(fakeRequest)
+//  status(result) shouldBe SEE_OTHER
+//  redirectLocation(result).get should include("/global-error")
+//}
+
 //
-//      "an there has been a problem calling the envelope creator" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.failed(new RuntimeException))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        status(result) shouldBe SEE_OTHER
-//        redirectLocation(result).get should include("/global-error")
-//      }
-//    }
-//
-//    "rendered file upload page" should {
-//
-//      "contain 'upload file' title and header" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        doc(result).title() shouldBe Messages("file.upload.page.title")
-//        doc(result).getElementById("header").text shouldBe Messages("file.upload.page.header")
-//      }
-//
-//      "contain sub-header" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        doc(result).getElementById("sub-header").html shouldBe Messages("file.upload.page.sub-header", Messages("templates.link"))
-//      }
-//
-//      "contain 'choose file' button" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        doc(result).getElementById("choose-file") shouldNot be(null)
-//      }
-//
-//      "contain an upload button" in {
-//        when(TestFileUploadController.fileUploadService.createFileUploadUrl).thenReturn(Future.successful(Some("")))
-//        val result = TestFileUploadController.get().apply(fakeRequest)
-//        doc(result).getElementById("upload-button").text shouldBe Messages("upload")
-//      }
+
 //
 
 //
