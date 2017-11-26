@@ -147,6 +147,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
         val result = await(TestFileUploadController.uploadError().apply(uploadRequest))
         redirectLocation(result).get should include("/global-error")
       }
+
+      "there has been a problem calling the envelope creator" in {
+        when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+        when(mockFileUploadConnector.createEnvelope()).thenReturn(Future.failed(new RuntimeException))
+        val result = TestFileUploadController.get().apply(fakeRequest)
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get should include("/global-error")
+      }
     }
   }
 
