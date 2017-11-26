@@ -53,6 +53,7 @@ trait FileUploadController extends RasController with PageFlowController {
                   Redirect(routes.GlobalErrorController.get)
               }
             case _ =>
+              createFileUploadUrl(None)
               Logger.error("[FileUploadController][get] failed to obtain an envelope")
               Future.successful(Redirect(routes.GlobalErrorController.get))
           }
@@ -87,6 +88,7 @@ trait FileUploadController extends RasController with PageFlowController {
                   Logger.debug("[UploadService][createFileUploadUrl] Envelope id obtained")
                   val fileUploadUrl = s"$fileUploadFrontendBaseUrl/$fileUploadFrontendSuffix/$id/files/${UUID.randomUUID().toString}"
                   val completeFileUploadUrl = s"${fileUploadUrl}?${successRedirectUrl}&${errorRedirectUrl}"
+
                   Some(completeFileUploadUrl)
                 case _ =>
                   Logger.debug("[UploadService][createFileUploadUrl] Failed to obtain an envelope id from location header")

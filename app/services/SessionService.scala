@@ -36,7 +36,7 @@ trait SessionService extends SessionCacheWiring {
                                 ResidencyStatusResult("","","","","","",""),
                                 None)
 
-    def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+  def fetchRasSession()(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
     sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) map (rasSession => rasSession)
   }
 
@@ -115,6 +115,22 @@ trait SessionService extends SessionCacheWiring {
         currentSession match {
           case Some(returnedSession) => returnedSession.copy(uploadResponse = Some(uploadResponse))
           case None => cleanSession.copy(uploadResponse = Some(uploadResponse))
+        }
+      )
+    }
+
+    result.map(cacheMap => {
+      cacheMap.getEntry[RasSession](RAS_SESSION_KEY)
+    })
+  }
+
+  def cacheEnvelope(envelope: Envelope)(implicit request: Request[_], hc: HeaderCarrier): Future[Option[RasSession]] = {
+
+    val result = sessionCache.fetchAndGetEntry[RasSession](RAS_SESSION_KEY) flatMap { currentSession =>
+      sessionCache.cache[RasSession](RAS_SESSION_KEY,
+        currentSession match {
+          case Some(returnedSession) => returnedSession.copy(envelope = Some(envelope))
+          case None => cleanSession.copy(envelope = Some(envelope))
         }
       )
     }
