@@ -41,7 +41,8 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
   val memberDob = MemberDateOfBirth(RasDate(Some("12"),Some("12"), Some("2012")))
   val memberDetails = MemberDetails(name,RandomNino.generate,RasDate(Some("1"),Some("1"),Some("1999")))
   val uploadResponse = UploadResponse("111",Some("error error"))
-  val rasSession = RasSession(name,nino,memberDob,ResidencyStatusResult("","","","","","",""),None)
+  val envelope = Envelope("someEnvelopeId1234")
+  val rasSession = RasSession(name,nino,memberDob,ResidencyStatusResult("","","","","","",""))
 
   object TestSessionService extends SessionService {
     override def sessionCache: SessionCache = mockSessionCache
@@ -133,6 +134,23 @@ class SessionServiceSpec extends UnitSpec with OneServerPerSuite with ScalaFutur
         when(mockSessionCache.cache[RasSession](any(), any())(any(), any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
         val result = Await.result(TestSessionService.cacheUploadResponse(uploadResponse)(FakeRequest(), HeaderCarrier()), 10 seconds)
         result shouldBe Some(rasSession.copy(uploadResponse = Some(uploadResponse)))
+      }
+    }
+
+    "cache envelope" when {
+      "no session is available" in {
+        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any(), any())).thenReturn(Future.successful(None))
+        val json = Json.toJson[RasSession](rasSession.copy(envelope = Some(envelope)))
+        when(mockSessionCache.cache[RasSession](any(), any())(any(), any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
+        val result = Await.result(TestSessionService.cacheEnvelope(envelope)(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(rasSession.copy(envelope = Some(envelope)))
+      }
+      "a session is available" in {
+        when(mockSessionCache.fetchAndGetEntry[RasSession](any())(any(), any(), any())).thenReturn(Future.successful(Some(rasSession)))
+        val json = Json.toJson[RasSession](rasSession.copy(envelope = Some(envelope)))
+        when(mockSessionCache.cache[RasSession](any(), any())(any(), any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("ras_session" -> json))))
+        val result = Await.result(TestSessionService.cacheEnvelope(envelope)(FakeRequest(), HeaderCarrier()), 10 seconds)
+        result shouldBe Some(rasSession.copy(envelope = Some(envelope)))
       }
     }
 
