@@ -53,9 +53,17 @@ trait FileUploadController extends RasController with PageFlowController {
                   Redirect(routes.GlobalErrorController.get)
               }
             case _ =>
-              createFileUploadUrl(None)
-              Logger.error("[FileUploadController][get] failed to obtain an envelope")
-              Future.successful(Redirect(routes.GlobalErrorController.get))
+              createFileUploadUrl(None)(hc).flatMap {
+                case Some(url) =>
+                  Future.successful(Ok(views.html.file_upload(url,extractErrorReason(None))))
+                case _ =>
+                  Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                  Future.successful(Redirect(routes.GlobalErrorController.get()))
+              }.recover {
+                case e: Throwable =>
+                  Logger.error("[FileUploadController][get] failed to obtain an envelope")
+                  Redirect(routes.GlobalErrorController.get)
+              }
           }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user not authorised")

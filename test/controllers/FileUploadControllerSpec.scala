@@ -256,6 +256,7 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
 
     "not contain any errors if no session cache is available" in {
       when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(None))
+      when(mockFileUploadConnector.createEnvelope()(any())).thenReturn(Future.successful(connectorResponse))
       val result = await(TestFileUploadController.get().apply(fakeRequest))
       doc(result).getElementById("upload-error").text shouldBe ""
     }
