@@ -19,13 +19,8 @@ package models
 import play.api.libs.json.Json
 
 
-case class RasSession(name:MemberName,
-                      nino:MemberNino,
-                      dateOfBirth:MemberDateOfBirth,
-                      residencyStatusResult: ResidencyStatusResult,
-                      uploadResponse: Option[UploadResponse] = None,
-                      envelope: Option[Envelope] = None)
+case class Envelope(id:String)
 
-object RasSession{
-  implicit val format = Json.format[RasSession]
+object Envelope {
+  implicit val formats = Json.format[Envelope]
 }
