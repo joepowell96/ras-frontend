@@ -55,7 +55,14 @@ trait FileUploadController extends RasController with PageFlowController {
             case _ =>
               createFileUploadUrl(None)(hc).flatMap {
                 case Some(url) =>
-                  Future.successful(Ok(views.html.file_upload(url,extractErrorReason(None))))
+                  sessionService.cacheEnvelope(Envelope(url)).flatMap{
+                    case Some(session) =>
+                      Logger.debug("[FileUploadController][get] stored new envelope id successfully")
+                      Future.successful(Ok(views.html.file_upload(url,extractErrorReason(None))))
+                    case _ =>
+                      Logger.debug("[FileUploadController][get] failed to retrieve cache after storing the envelope")
+                      Future.successful(Redirect(routes.GlobalErrorController.get))
+                  }
                 case _ =>
                   Logger.debug("[FileUploadController][get] failed to obtain a form url")
                   Future.successful(Redirect(routes.GlobalErrorController.get()))
