@@ -43,13 +43,14 @@ trait FileUploadController extends RasController with PageFlowController {
             case Some(session) =>
               createFileUploadUrl(session.envelope)(hc).flatMap {
                 case Some(url) =>
+                  Logger.debug("[FileUploadController][get] form url created successfully")
                   Future.successful(Ok(views.html.file_upload(url,extractErrorReason(session.uploadResponse))))
                 case _ =>
-                  Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                  Logger.debug("[FileUploadController][get] failed to obtain a form url using existing envelope")
                   Future.successful(Redirect(routes.GlobalErrorController.get()))
               }.recover {
                 case e: Throwable =>
-                  Logger.error("[FileUploadController][get] failed to obtain an envelope")
+                  Logger.error("[FileUploadController][get] failed to create an upload url using existing envelope")
                   Redirect(routes.GlobalErrorController.get)
               }
             case _ =>
@@ -62,15 +63,23 @@ trait FileUploadController extends RasController with PageFlowController {
                     case _ =>
                       Logger.debug("[FileUploadController][get] failed to retrieve cache after storing the envelope")
                       Future.successful(Redirect(routes.GlobalErrorController.get))
+                  }.recover {
+                    case e: Throwable =>
+                      Logger.error("[FileUploadController][get] failed to cache envelope")
+                      Redirect(routes.GlobalErrorController.get)
                   }
                 case _ =>
-                  Logger.debug("[FileUploadController][get] failed to obtain a form url")
+                  Logger.debug("[FileUploadController][get] failed to obtain a form url using new envelope")
                   Future.successful(Redirect(routes.GlobalErrorController.get()))
               }.recover {
                 case e: Throwable =>
-                  Logger.error("[FileUploadController][get] failed to obtain an envelope")
+                  Logger.error("[FileUploadController][get] failed to create an upload url using new envelope")
                   Redirect(routes.GlobalErrorController.get)
               }
+          }.recover {
+            case e: Throwable =>
+              Logger.error("[FileUploadController][get] failed to fetch ras session")
+              Redirect(routes.GlobalErrorController.get)
           }
         case Left(resp) =>
           Logger.debug("[FileUploadController][get] user not authorised")
@@ -184,9 +193,11 @@ trait FileUploadController extends RasController with PageFlowController {
 }
 
 object FileUploadController extends FileUploadController {
+  // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
   val authConnector: AuthConnector = FrontendAuthConnector
   override val userDetailsConnector: UserDetailsConnector = UserDetailsConnector
   override val fileUploadConnector = FileUploadConnector
   val config: Configuration = Play.current.configuration
   val env: Environment = Environment(Play.current.path, Play.current.classloader, Play.current.mode)
+  // $COVERAGE-ON$
 }
