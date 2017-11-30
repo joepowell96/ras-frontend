@@ -145,6 +145,8 @@ file.upload.page.header = Upload your file
 file.upload.page.sub-header = The file must contain mandatory information and in a specific format. You can {0} on how to create your file first.
 templates.link = <a href="">download a template and instructions (2 files)</a>
 
+upload.success.header = Upload success
+upload.success.sub-header = Your file will now be processed. This may take up to 24 hours.
 upload = Upload
 
 file.upload.empty.file.reason=Envelope does not allow zero length files, and submitted file has length 0
