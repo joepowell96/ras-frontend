@@ -44,42 +44,18 @@ class GlobalErrorControllerSpec extends UnitSpec with WithFakeApplication with I
     }
 
     "return 200" in {
-      val result = TestGlobalErrorController.getGlobalError(fakeRequest)
+      val result = TestGlobalErrorController.get(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
     "return HTML" in {
-      val result = TestGlobalErrorController.getGlobalError(fakeRequest)
-      contentType(result) shouldBe Some("text/html")
-      charset(result) shouldBe Some("utf-8")
-    }
-
-    "contain correct title and header" in {
-      val result = TestGlobalErrorController.getGlobalError(fakeRequest)
-      val doc = Jsoup.parse(contentAsString(result))
-      doc.title shouldBe Messages("global.error.page.title")
-      doc.getElementById("header").text shouldBe Messages("service.unavailable")
-      doc.getElementById("description").text shouldBe Messages("technical.difficulty")
-    }
-
-    "respond to GET /relief-at-source/global-upload-error" in {
-      val result = await(route(fakeApplication, FakeRequest(GET, "/relief-at-source/global-upload-error")))
-      status(result.get) should not equal (NOT_FOUND)
-    }
-
-    "return 200 when upload error" in {
-      val result = TestGlobalErrorController.getUploadError(fakeRequest)
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
-
-    "return HTML when upload error" in {
-      val result = TestGlobalErrorController.getUploadError(fakeRequest)
+      val result = TestGlobalErrorController.get(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "contain correct title and header when upload error" in {
-      val result = TestGlobalErrorController.getUploadError(fakeRequest)
+      val result = TestGlobalErrorController.get(fakeRequest)
       val doc = Jsoup.parse(contentAsString(result))
       doc.title shouldBe Messages("global.upload.error.page.title")
       doc.getElementById("header").text shouldBe Messages("global.upload.error.header")

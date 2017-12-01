@@ -28,8 +28,7 @@ GET         /match-found/back             controllers.ResultsController.back
 GET         /match-not-found              controllers.ResultsController.noMatchFound
 GET         /match-not-found/back         controllers.ResultsController.back
 
-GET         /global-error                 controllers.GlobalErrorController.getGlobalError
-GET         /global-upload-error          controllers.GlobalErrorController.getUploadError
+GET         /global-error                 controllers.GlobalErrorController.get
 
 GET         /notauthorised                controllers.GlobalErrorController.notAuthorised
 

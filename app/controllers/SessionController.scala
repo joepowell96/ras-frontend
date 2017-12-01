@@ -54,11 +54,11 @@ trait SessionController extends RasController {
               case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
               case _ =>
                 Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
-                Redirect(routes.GlobalErrorController.getGlobalError)
+                Redirect(routes.GlobalErrorController.get)
             }
           case _ =>
             Logger.error("[SessionController][cleanAndRedirect] No session found")
-            Redirect(routes.GlobalErrorController.getGlobalError)
+            Redirect(routes.GlobalErrorController.get)
         }
       } else {
         target match {
@@ -68,7 +68,7 @@ trait SessionController extends RasController {
           case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
           case _ =>
             Logger.error(s"[SessionController][cleanAndRedirect] Invalid redirect target ${target}")
-            Future.successful(Redirect(routes.GlobalErrorController.getGlobalError))
+            Future.successful(Redirect(routes.GlobalErrorController.get))
         }
       }
 
