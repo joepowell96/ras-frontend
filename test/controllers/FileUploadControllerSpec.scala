@@ -155,13 +155,14 @@ class FileUploadControllerSpec extends UnitSpec with WithFakeApplication with I1
       }
     }
 
-    "succesful upload page" should {
-      "contain the correct page header" in {
+    "successful upload page" should {
+      "contain the correct content" in {
         val rasSession = RasSession(memberName, memberNino, memberDob, ResidencyStatusResult("", "", "", "", "", "", ""), None, Some(Envelope("existingEnvelopeId123")))
         when(mockSessionService.fetchRasSession()(Matchers.any(), Matchers.any())).thenReturn(Future.successful(Some(rasSession)))
         val result = await(TestFileUploadController.uploadSuccess().apply(fakeRequest))
         doc(result).getElementById("page-header").text shouldBe Messages("upload.success.header")
         doc(result).getElementById("page-sub-header").text shouldBe Messages("upload.success.sub-header")
+        doc(result).getElementById("continue").text shouldBe Messages("continue")
       }
     }
 

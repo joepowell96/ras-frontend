@@ -37,7 +37,7 @@ trait SessionController extends RasController {
 
   implicit val context: RasContext = RasContextImpl
 
-  val START = "start"
+  val DASHBOARD = "dashboard"
   val MEMBER_NAME = "member-name"
   val MEMBER_NINO = "member-nino"
   val MEMBER_DOB = "member-dob"
@@ -48,7 +48,7 @@ trait SessionController extends RasController {
         sessionService.resetRasSession() map {
           case Some(session) =>
             target match {
-              case START => Redirect(routes.StartPageController.get())
+              case DASHBOARD => Redirect(routes.DashboardController.get())
               case MEMBER_NAME => Redirect(routes.MemberNameController.get())
               case MEMBER_NINO => Redirect(routes.MemberNinoController.get())
               case MEMBER_DOB => Redirect(routes.MemberDOBController.get())
@@ -62,7 +62,7 @@ trait SessionController extends RasController {
         }
       } else {
         target match {
-          case START => Future.successful(Redirect(routes.StartPageController.get()))
+          case DASHBOARD => Future.successful(Redirect(routes.DashboardController.get()))
           case MEMBER_NAME => Future.successful(Redirect(routes.MemberNameController.get()))
           case MEMBER_NINO => Future.successful(Redirect(routes.MemberNinoController.get()))
           case MEMBER_DOB => Future.successful(Redirect(routes.MemberDOBController.get()))
