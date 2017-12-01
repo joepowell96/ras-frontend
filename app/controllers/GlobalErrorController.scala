@@ -29,9 +29,14 @@ trait GlobalErrorController extends FrontendController with I18nHelper {
 
   implicit val context: config.RasContext = RasContextImpl
 
-  def get = Action.async {
+  def getGlobalError = Action.async {
     implicit request =>
         Future.successful(InternalServerError(views.html.global_error()))
+  }
+
+  def getUploadError = Action.async {
+    implicit request =>
+      Future.successful(InternalServerError(views.html.global_upload_error()))
   }
 
   def notAuthorised = Action.async {

@@ -60,6 +60,13 @@ match.found.page.title = Match found - GOV.UK
 match.not.found.page.title = Match not found - GOV.UK
 global.error.page.title = Technical error - GOV.UK
 
+global.upload.error.page.title = Upload error - GOV.UK
+global.upload.error.header = There has been a problem
+global.upload.error.sub-header = This could be caused by:
+a.system.timeout = A system timeout
+a.technical.error = A technical error
+try.uploading.again = Try again and upload your file
+
 first.name = first name
 last.name = last name
 nino = National Insurance number

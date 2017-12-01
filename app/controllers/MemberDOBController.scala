@@ -90,7 +90,7 @@ trait MemberDOBController extends RasController with PageFlowController {
 
                 if (!uuid.isDefined) {
                   Logger.info("[DobController][post] UUID not contained in the Location header")
-                  Future.successful(Redirect(routes.GlobalErrorController.get))
+                  Future.successful(Redirect(routes.GlobalErrorController.getGlobalError))
                 }
 
                 residencyStatusAPIConnector.getResidencyStatus(uuid.get).map { rasResponse =>
@@ -102,7 +102,7 @@ trait MemberDOBController extends RasController with PageFlowController {
 
                   if (cyResidencyStatus.isEmpty) {
                     Logger.info("[DobController][post] An unknown residency status was returned")
-                    Redirect(routes.GlobalErrorController.get)
+                    Redirect(routes.GlobalErrorController.getGlobalError)
                   }
                   else {
                     Logger.info("[DobController][post] Match found")
@@ -122,7 +122,7 @@ trait MemberDOBController extends RasController with PageFlowController {
                 }.recover {
                   case e: Throwable =>
                     Logger.error("[DobController][getResult] Residency status failed")
-                    Redirect(routes.GlobalErrorController.get)
+                    Redirect(routes.GlobalErrorController.getGlobalError)
                 }
               }.recover {
                 case e: Upstream4xxResponse if (e.upstreamResponseCode == FORBIDDEN) =>
@@ -131,10 +131,10 @@ trait MemberDOBController extends RasController with PageFlowController {
                   Redirect(routes.ResultsController.noMatchFound())
                 case e: Throwable =>
                   Logger.error(s"[DobController][getResult] Customer Matching failed: ${e.getMessage}")
-                  Redirect(routes.GlobalErrorController.get)
+                  Redirect(routes.GlobalErrorController.getGlobalError)
               }
             }
-            case _ => Future.successful(Redirect(routes.GlobalErrorController.get()))
+            case _ => Future.successful(Redirect(routes.GlobalErrorController.getGlobalError()))
           }
         }
       )
@@ -148,7 +148,7 @@ trait MemberDOBController extends RasController with PageFlowController {
         case Right(userInfo) =>
           sessionService.fetchRasSession() map {
             case Some(session) => previousPage("MemberDOBController")
-            case _ => Redirect(routes.GlobalErrorController.get())
+            case _ => Redirect(routes.GlobalErrorController.getGlobalError())
           }
         case Left(res) => res
       }
