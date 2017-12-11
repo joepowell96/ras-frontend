@@ -14,15 +14,16 @@
  * limitations under the License.
  *@
 
-@(memberForm:Form[MemberDetails])(implicit request: Request[_])
+@(memberForm:Form[MemberDetails])(implicit request: Request[_], context: config.RasContext, messages: Messages)
 
 @import uk.gov.hmrc.play.views.html._
 @import uk.gov.hmrc.play.views.html.helpers._
 @import views.html.helpers._
+@import helper._
 
 @ras_main(title = "Member Details") {
 
-    @helper.form(action = routes.Application.memberDetailsSubmit){
+    @helper.form(action = routes.StartPageController.submit){
         @inputText(memberForm("firstName"))
         @inputText(memberForm("lastName"))
         @inputText(memberForm("nino"))

@@ -4,3 +4,6 @@ GET         /assets/*file                 @controllers.AssetsController.at(path=
 
 GET         /                             controllers.StartPageController.get
 GET         /start                        controllers.StartPageController.get
+
+GET         /member-details               controllers.StartPageController.present
+POST        /member-details               controllers.StartPageController.submit

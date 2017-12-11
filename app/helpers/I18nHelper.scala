@@ -16,8 +16,6 @@
 
 package helpers
 
-package helpers
-
 import play.api.Play.current
 
 trait I18nHelper {

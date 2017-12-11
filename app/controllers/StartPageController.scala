@@ -16,13 +16,13 @@
 
 package controllers
 
-import config.RasContextImpl
-import helpers.helpers.I18nHelper
+import config.{ApplicationConfig, RasContextImpl}
 import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 import forms.Forms.memberForm
+import helpers.I18nHelper
 import play.api.Logger
 
 object StartPageController extends StartPageController
@@ -36,7 +36,7 @@ trait StartPageController extends FrontendController with I18nHelper {
   }
 
   def present = Action.async { implicit request =>
-    Future.successful(Ok(views.html.Member_details_page))
+    Future.successful(Ok(views.html.Member_details_page(memberForm)))
   }
 
   def submit = Action.async { implicit request =>
@@ -46,6 +46,8 @@ trait StartPageController extends FrontendController with I18nHelper {
      },
       memberDetails => {
         Logger.debug(memberDetails.firstName)
+        println(Console.YELLOW, memberDetails.firstName)
+        println(Console.WHITE)
         Future.successful(Redirect(routes.StartPageController.get()))
       }
     )
